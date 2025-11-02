@@ -18,17 +18,17 @@ export default function Home() {
             </div>
             <EventCard 
                 name="Halloween Night" 
-                badges={["11/27", "8:00PM", "Hardy Hall", "All W&M Students"]} 
+                badges={["October 30, 2025", "8:00PM", "Hardy Hall", "All W&M Students"]} 
                 description={description}
-                titleColor="#b45309"
+                titleColor="orange"
                 backgroundImage={Halloween}
 
             />
             <EventCard 
                 name="Christmas Night" 
-                badges={["12/27", "9:00PM", "Hardy Hall", "All W&M Students"]} 
+                badges={["December 10, 2025", "9:00PM", "Hardy Hall", "All W&M Students"]} 
                 description={description}
-                titleColor="#16a34a"
+                titleColor="white"
                 backgroundImage={Christmas}
             />
         </div>
