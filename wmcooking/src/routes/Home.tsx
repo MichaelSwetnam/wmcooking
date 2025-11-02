@@ -1,3 +1,6 @@
+import Christmas from "../assets/christmas.jpg";
+import Halloween from "../assets/halloween.jpeg";
+
 import { InstagramEmbed } from "react-social-media-embed";
 import EventCard from "../components/EventCard";
 
@@ -18,18 +21,15 @@ export default function Home() {
                 badges={["11/27", "8:00PM", "Hardy Hall", "All W&M Students"]} 
                 description={description}
                 titleColor="#b45309"
-                gradientFrom="#fed7aa"
-                gradientVia="#ffedd5"
-                gradientTo="#fef9c3"
+                backgroundImage={Halloween}
+
             />
             <EventCard 
                 name="Christmas Night" 
                 badges={["12/27", "9:00PM", "Hardy Hall", "All W&M Students"]} 
                 description={description}
                 titleColor="#16a34a"
-                gradientFrom="#f87171"
-                gradientVia="#fee2e2"
-                gradientTo="#f87171"
+                backgroundImage={Christmas}
             />
         </div>
 
