@@ -13,7 +13,7 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <div className='flex flex-col min-h-screen'>
         <Header />
-        <main className='flex-1 flex'>
+        <main className='flex-1 flex p-5'>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="*" element={<NotFound />} />
