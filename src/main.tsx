@@ -9,6 +9,7 @@ import NotFound from './routes/NotFound.tsx';
 import Footer from './components/Footer.tsx';
 import WIP from './routes/WIP.tsx';
 import Events from './routes/Events.tsx';
+import EventPage from './routes/EventPage.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -21,6 +22,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/" element={<Home />} />
               <Route path="/wip" element={<WIP />} />
               <Route path="/events" element={<Events />} />
+              <Route path="/events/:id" element={<EventPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
