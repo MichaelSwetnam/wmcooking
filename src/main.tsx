@@ -7,6 +7,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from './routes/Home.tsx'
 import NotFound from './routes/NotFound.tsx';
 import Footer from './components/Footer.tsx';
+import WIP from './routes/WIP.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -16,6 +17,7 @@ createRoot(document.getElementById('root')!).render(
         <main className='flex-1 flex p-5'>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/wip" element={<WIP />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
