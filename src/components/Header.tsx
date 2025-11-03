@@ -29,8 +29,9 @@ export default function Header() {
             <nav className="flex gap-6 text-blue-800 font-medium">
                 <SectionLink to="/about">About</SectionLink>
                 <SectionLink to="/events">Events</SectionLink>
-                <SectionLink to="/contact">Contact</SectionLink>
-            </nav>
+                <SectionLink to="/recipes">Recipes</SectionLink>
+                <SectionLink to="/health">Health & Safety</SectionLink>
+           </nav>
         </div>
     </header>
   );

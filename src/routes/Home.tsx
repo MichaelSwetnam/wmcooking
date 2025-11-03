@@ -4,7 +4,7 @@ import { InstagramEmbed } from "react-social-media-embed";
 import EventCard from "../components/EventCard";
 
 export default function Home() {
-    return <div className="flex-1 flex flex-col md:flex-row justify-center items-center md:items-start bg-linear-to-b from-orange-50 via-white to-orange-100 p-5 gap-8 rounded-3xl">
+    return <div className="flex-1 flex flex-col md:flex-row justify-center items-center md:items-start p-5 gap-8">
         { /* Main Content */ }
         <div className="flex-2 flex flex-col items-center gap-5">
             <div className="flex flex-col items-center">
