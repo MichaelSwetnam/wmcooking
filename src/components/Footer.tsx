@@ -4,9 +4,9 @@ export default function Footer() {
     const currentYear = new Date().getFullYear();
 
     return (
-        <header className="bg-blue-200 py-3 shadow-md">
-            <div className="flex justify-between mx-auto px-6">
-                <div className="flex-1 flex flex-col items-center">
+        <footer className="bg-blue-200 py-3 shadow-md w-full">
+            <div className="flex flex-col md:flex-row justify-between mx-auto px-6 text-center md:text-left">
+                <div className="flex-1 flex flex-col items-center md:items-start mb-4 md:mb-0">
                     <span className="font-semibold">Contact Us!</span>
                     <span>
                         Send us an email at <a href="mailto:cooking@wm.edu" className="underline hover:text-blue-600 transition">cooking@wm.edu</a>
@@ -17,14 +17,14 @@ export default function Footer() {
                 </div>
 
                 { /* Could be filled with other information in these two columns */ }
-                <div className="flex-1 flex flex-col items-center">
+                <div className="flex-1 flex flex-col items-center md:items-start mb-4 md:mb-0">
                      <span className="font-semibold">Admin Login:</span>
                     <ResponsiveLink className="underline" to="/admin">Click here</ResponsiveLink>
                 </div>
-                <div className="flex-1 flex flex-col items-center">
+                <div className="flex-1 flex flex-col items-center md:items-start">
                     Copyright © {currentYear} Club Cooking
                 </div>
             </div>
-        </header>
+        </footer>
     );
 }

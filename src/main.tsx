@@ -15,11 +15,13 @@ createRoot(document.getElementById('root')!).render(
       <div className='flex flex-col min-h-screen'>
         <Header />
         <main className='flex-1 flex p-5'>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/wip" element={<WIP />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <div className='w-full'>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/wip" element={<WIP />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
         </main>
         <Footer />
       </div>
