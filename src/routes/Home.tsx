@@ -1,12 +1,9 @@
-import Christmas from "../assets/christmas.jpg";
-import Halloween from "../assets/halloween.jpeg";
+import November from "../assets/november.jpg"
 
 import { InstagramEmbed } from "react-social-media-embed";
 import EventCard from "../components/EventCard";
 
 export default function Home() {
-    const description = `Come on down to yee old Hardy Hall for Spooky Halloween Night. We will be serving spooky Halloween foods that will knock your pants off. AHHHHHHH. Lorem Ipsum dolor sit amet consectetur adipiscing lit. Quisque faucibus ex sapien vitae pellentesque sem placerat.  id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.`;
-
     return <div className="flex-1 flex flex-col md:flex-row justify-center items-center md:items-start bg-linear-to-b from-orange-50 via-white to-orange-100 p-5 gap-8 rounded-3xl">
         { /* Main Content */ }
         <div className="flex-2 flex flex-col items-center gap-5">
@@ -17,20 +14,22 @@ export default function Home() {
                 </p>
             </div>
             <EventCard 
-                name="Halloween Night" 
-                badges={["October 30, 2025", "8:00PM", "Hardy Hall", "All W&M Students"]} 
-                description={description}
-                titleColor="orange"
-                backgroundImage={Halloween}
-
+                name="Mac & Cheese Night" 
+                badges={["November 6, 2025", "8:00PM", "Hardy Hall", "Club Cooking Members"]} 
+                titleColor="#C76E00"
+                backgroundImage={November}
+                description={"We will be serving classic thanksgiving side dishes for all of november! Our first meeting will be the american classic, mac and cheese! As long as you've paid Club Cooking dues, you are welcome to come down and have a bite."}
             />
             <EventCard 
-                name="Christmas Night" 
-                badges={["December 10, 2025", "9:00PM", "Hardy Hall", "All W&M Students"]} 
-                description={description}
-                titleColor="white"
-                backgroundImage={Christmas}
+                name="Mashed Potatoes & Gravy" 
+                badges={["November 11, 2025", "8:00PM", "Hardy Hall", "Club Cooking Members"]} 
+                titleColor="#C76E00"
+                backgroundImage={November}
+                description={"Our second meeting of November and a thanksgiving classic is mashed potatoes and gravy. As long as you've paid Club Cooking dues, you are welcome to come down and have a bite."}
             />
+            <div className="p-2 text-xl font-semibold bg-white rounded-xl shadow-md">
+                Stay tuned for more events coming soon.
+            </div>
         </div>
 
         { /* Social Media Sidebar */}
