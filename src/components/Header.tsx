@@ -1,4 +1,4 @@
-import logo from "../assets/cooking-logo.jpg";
+import logo from "../assets/cooking-logo.png";
 import ResponsiveLink from "./ResponsiveLink";
 
 interface SectionLinkProps {
