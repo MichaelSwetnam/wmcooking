@@ -29,7 +29,7 @@ class Database {
     }
 
     async getNextEvents(limit: number): Promise<DatabaseReturn<EventRecord[]>> {
-        limit = Math.min(5, limit);
+        limit = Math.min(10, limit);
         
         return this.client
             .from("Events")

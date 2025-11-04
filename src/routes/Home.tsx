@@ -8,7 +8,7 @@ import { PostgrestError } from "@supabase/supabase-js";
 import ErrorComponent from "../components/ErrorComponent";
 import LoadingComponent from "../components/LoadingComponent";
 
-export default function Home() {
+function EventsSubpage() {
     const [events, setEvents] = useState<EventRecord[] | null>(null);
     const [error, setError] = useState<PostgrestError | null>(null);
 
@@ -29,7 +29,13 @@ export default function Home() {
     if (events === null) {
         return <LoadingComponent />
     }
-    
+
+    return <div className="flex flex-col gap-5">
+        { events.map((e, i) => <EventCard event={e} key={i} />) }
+    </div> 
+}
+
+export default function Home() {
     return <div className="flex-1 flex flex-col md:flex-row justify-center items-center md:items-start gap-8">
         { /* Main Content */ }
         <div className="flex-2 flex flex-col items-center gap-5">
@@ -39,7 +45,7 @@ export default function Home() {
                     Here's our next few events:
                 </p>
             </div>
-            { events.map((e, i) => <EventCard event={e} key={i} />) }
+            <EventsSubpage />
             <div className="p-2 text-xl font-semibold bg-white rounded-xl shadow-md">
                 Stay tuned for more events coming soon.
             </div>
