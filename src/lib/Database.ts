@@ -1,6 +1,6 @@
 import { createClient, PostgrestError } from "@supabase/supabase-js";
 
-interface EventRecord {
+export interface EventRecord {
     accessability: "AllStudents" | "ClubMembers";
     description: string;
     end: string;
@@ -22,7 +22,21 @@ class Database {
     client = createClient(this.PROJECT_URL, this.PUBLIC_API_KEY);
 
     async getEvent(id: number): Promise<DatabaseReturn<EventRecord>> {
-        return this.client.from("Events").select("*").eq('id', id).single();
+        return this.client
+            .from("Events")
+            .select("*")
+            .eq('id', id).single();
+    }
+
+    async getNextEvents(limit: number): Promise<DatabaseReturn<EventRecord[]>> {
+        limit = Math.min(5, limit);
+        
+        return this.client
+            .from("Events")
+            .select("*")
+            .gte("start", new Date().toISOString())
+            .order("start", { ascending: true })
+            .limit(limit);
     }
 }
 

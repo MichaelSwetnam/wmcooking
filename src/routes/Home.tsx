@@ -1,9 +1,35 @@
-import November from "../assets/november.jpg"
+import type { EventRecord } from "../lib/Database";
 
 import { InstagramEmbed } from "react-social-media-embed";
 import EventCard from "../components/EventCard";
+import { useEffect, useState } from "react";
+import Database from "../lib/Database";
+import { PostgrestError } from "@supabase/supabase-js";
+import ErrorComponent from "../components/ErrorComponent";
+import LoadingComponent from "../components/LoadingComponent";
 
 export default function Home() {
+    const [events, setEvents] = useState<EventRecord[] | null>(null);
+    const [error, setError] = useState<PostgrestError | null>(null);
+
+    useEffect(() => {
+        const load = async () => {
+            const { data, error } = await Database.getNextEvents(3);
+            setEvents(data);
+            setError(error);
+        }
+
+        load();
+    }, []);
+
+    if (error) {
+        return <ErrorComponent message="Could not find any events." technical={`Database: ${error.message}`}/>
+    }
+
+    if (events === null) {
+        return <LoadingComponent />
+    }
+    
     return <div className="flex-1 flex flex-col md:flex-row justify-center items-center md:items-start gap-8">
         { /* Main Content */ }
         <div className="flex-2 flex flex-col items-center gap-5">
@@ -13,20 +39,7 @@ export default function Home() {
                     Here's our next few events:
                 </p>
             </div>
-            <EventCard 
-                name="Mac & Cheese Night" 
-                badges={["November 6, 2025", "8:00PM", "Hardy Hall", "Club Cooking Members"]} 
-                titleColor="#C76E00"
-                backgroundImage={November}
-                description={"We will be serving classic thanksgiving side dishes for all of november! Our first meeting will be the american classic, mac and cheese! As long as you've paid Club Cooking dues, you are welcome to come down and have a bite."}
-            />
-            <EventCard 
-                name="Mashed Potatoes & Gravy" 
-                badges={["November 11, 2025", "8:00PM", "Hardy Hall", "Club Cooking Members"]} 
-                titleColor="#C76E00"
-                backgroundImage={November}
-                description={"Our second meeting of November and a thanksgiving classic is mashed potatoes and gravy. As long as you've paid Club Cooking dues, you are welcome to come down and have a bite."}
-            />
+            { events.map((e, i) => <EventCard event={e} key={i} />) }
             <div className="p-2 text-xl font-semibold bg-white rounded-xl shadow-md">
                 Stay tuned for more events coming soon.
             </div>

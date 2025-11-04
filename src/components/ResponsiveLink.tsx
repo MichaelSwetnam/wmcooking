@@ -10,8 +10,9 @@ export default function ResponsiveLink({ to, children, className }: Props) {
     // Evil switch to ensure that valid links don't take you to 404 page and instead the WIP page
     switch (to) {
         case "/about":
-        case "/contact":
+        case "/recipes":
         case "/admin":
+        case "/health":
             to = "/wip";
             break;
         

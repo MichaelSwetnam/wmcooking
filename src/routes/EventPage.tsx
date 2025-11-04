@@ -1,23 +1,15 @@
 import { useParams } from "react-router-dom";
-import ErrorComponent from "../components/ErrorCompnent";
+import ErrorComponent from "../components/ErrorComponent";
 import Cookies from "../assets/cookies.jpeg";
 import EventBadge from "../components/EventBadge";
 
 import { PostgrestError } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
-import Database from "../lib/Database";
+import Database, { type EventRecord } from "../lib/Database";
 import LoadingComponent from "../components/LoadingComponent";
 
 function Success({ id }: { id: number }) {
-    const [event, setEvent] = useState<{
-        accessability: "AllStudents" | "ClubMembers";
-        description: string;
-        end: string;
-        id: number;
-        location: string;
-        name: string;
-        start: string;
-    } | null>(null);
+    const [event, setEvent] = useState<EventRecord | null>(null);
     const [error, setError] = useState<PostgrestError | null>(null);
 
     useEffect(() => {
@@ -74,7 +66,7 @@ function Success({ id }: { id: number }) {
                 backgroundSize: "cover"
             }}>
                 <div className="mb-60 p-2 rounded-xl bg-white shadow-sm">
-                    <span className={"font-bold text-2xl"} style={{ color: "black" }}>{event.name}</span>
+                    <span className={"font-bold text-2xl text-black"}>{event.name}</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                     { badges.map((t, i) => <EventBadge key={i} text={t} />) }
