@@ -42,17 +42,34 @@ function Success({ id }: { id: number }) {
     }
 
     const badges: string[] = [];
-    badges.push(event.start);
+    const startDate = new Date(event.start);
+    const endDate = new Date(event.end);
+
+    badges.push(startDate.toLocaleDateString('en-us', {
+        weekday: "short",
+        day: 'numeric',
+        month: 'long'
+    }));
+    badges.push(startDate.toLocaleTimeString('en-us', {
+        hour: "numeric"
+    }) + " - " + endDate.toLocaleTimeString('en-us', {
+        hour: "numeric"
+    }));
+    
     badges.push(event.location);
-    badges.push(event.accessability);
 
-    return <div className="flex-1 flex flex-col justify-start items-center gap-2">
-        <h2 className="font-bold text-3xl p-2 text-orange-700">This page is in construction</h2> 
-        <p className="text-xl text-center md:text-left">
-            It will look something like this:
-        </p>
+    switch (event.accessability) {
+        case "AllStudents":
+            badges.push("All Students");
+            break;
+        case "ClubMembers":
+            badges.push("Club Members");
+            break;
+    }
 
-        <div className="flex flex-col bg-white rounded-3xl overflow-hidden w-full">
+    return <div className="flex-1 flex flex-col justify-start items-center gap-2 h-full">
+        <h2 className="pt-5 text-3xl md:text-4xl font-extrabold text-orange-700 text-center">Event Details:</h2>
+        <div className="flex-1 flex flex-col bg-white rounded-3xl overflow-hidden w-full">
             <div className={"flex flex-col items-center p-5 gap-1"} style={{
                 backgroundImage: `url(${Cookies})`,
                 backgroundPosition: "center",
@@ -65,14 +82,7 @@ function Success({ id }: { id: number }) {
                     { badges.map((t, i) => <EventBadge key={i} text={t} />) }
                 </div>
             </div>
-            <div className="p-6 text-gray-800 leading-relaxed text-sm md:text-base">
-                {event.description}
-            </div>
-            { /* DO NOT USE THIS SHIT EVERYTHING IS BAD AND UGLY */}
-            <div className="pl-6 text-gray-800 leading-relatex text-sm md:text-base">Probably some more information down here</div>
-            <div className="pl-6 text-gray-800 leading-relatex text-sm md:text-base">Maybe a link to TribeLink</div>
-            <div className="pl-6 text-gray-800 leading-relatex text-sm md:text-base">Maybe a link to the recipe</div>
-            <div className="pl-6 pb-6 text-gray-800 leading-relatex text-sm md:text-base">¯\_(ツ)_/¯</div>
+            <p className="p-6 text-gray-800 leading-relaxed text-sm md:text-base">{event.description}</p>
         </div>
     </div>;
 }
