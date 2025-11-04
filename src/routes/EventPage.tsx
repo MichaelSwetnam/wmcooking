@@ -3,11 +3,10 @@ import ErrorComponent from "../components/ErrorCompnent";
 import Cookies from "../assets/cookies.jpeg";
 import EventBadge from "../components/EventBadge";
 
-import { createClient, PostgrestError } from "@supabase/supabase-js";
+import { PostgrestError } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
-
-const PROJECT_URL = "https://okoywtixurlcfnkraeob.supabase.co";
-const PUBLIC_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9rb3l3dGl4dXJsY2Zua3JhZW9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyMDExNjcsImV4cCI6MjA3Nzc3NzE2N30.Vtyh85w1_WYOjLeGbXNo35JwEMOG7E0Bo1tdFFr4vYw";
+import Database from "../lib/Database";
+import LoadingComponent from "../components/LoadingComponent";
 
 function Success({ id }: { id: number }) {
     const [event, setEvent] = useState<{
@@ -23,9 +22,8 @@ function Success({ id }: { id: number }) {
 
     useEffect(() => {
         const getData = async () => {
-            const client = createClient(PROJECT_URL, PUBLIC_API_KEY);
+            const { data, error } = await Database.getEvent(id);
 
-            const { data, error } = await client.from("Events").select("*").eq('id', id).single();
             setError(error);
             setEvent(data);
         }
@@ -38,7 +36,7 @@ function Success({ id }: { id: number }) {
     }
 
     if (event === null) {
-        return <div>Loading...</div>
+        return <LoadingComponent />
     }
 
     const badges: string[] = [];
