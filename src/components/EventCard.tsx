@@ -1,10 +1,12 @@
+import { useNavigate } from "react-router-dom";
 import November from "../assets/november.jpg"
 
 import type { EventRecord } from "../lib/Database";
 import EventBadge from "./EventBadge";
 
 export default function EventCard({ event }: { event: EventRecord }) {
-const badges: string[] = [];
+    const nav = useNavigate();
+    const badges: string[] = [];
     const startDate = new Date(event.start);
     const endDate = new Date(event.end);
 
@@ -30,7 +32,7 @@ const badges: string[] = [];
             break;
     }
 
-    return <div className="flex flex-col bg-white shadow-xl rounded-3xl overflow-hidden hover:shadow-2xl transition-shadow duration-300 w-full max-w-3xl">
+    return <div className="flex flex-col bg-white shadow-xl rounded-3xl overflow-hidden hover:shadow-2xl transition-shadow duration-300 w-full max-w-3xl cursor-pointer" onClick={() => {nav(`/events/${event.id}`)}}>
         <div className={"flex flex-col items-center p-5 gap-1"} style={{
             backgroundImage: `url(${November})`,
             backgroundPosition: "center",

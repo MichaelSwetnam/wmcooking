@@ -1,6 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import type { EventRecord } from "../../lib/Database";
 
 function Day({ events }: { events: EventRecord[] }) {
+    const nav = useNavigate();
     const date = new Date(events[0].start);
 
     return <div className=" 
@@ -10,7 +12,7 @@ function Day({ events }: { events: EventRecord[] }) {
     ">
         <p className="font-semibold">{date.toLocaleDateString('en-us', { weekday: "short", day: "numeric", month: "short" })}</p>
         { events.map((e, i) => 
-        <div key={i} className="flex flex-row gap-2">
+        <div key={i} className="flex flex-row gap-2 cursor-pointer" onClick={() => nav(`/events/${e.id}`)}>
             <p className="font-semibold">
                 {new Date(e.start).toLocaleTimeString('en-us', {hour: "numeric"})}
             </p> 
