@@ -13,7 +13,7 @@ import EventPage from './routes/EventPage.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter basename='/wmcooking'> 
+    <BrowserRouter> 
       <div className='flex flex-col min-h-screen'>
         <Header />
         <main className='flex-1 flex p-5'>
