@@ -20,10 +20,11 @@ class Database {
     private readonly PROJECT_URL = "https://okoywtixurlcfnkraeob.supabase.co";
     private readonly PUBLIC_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9rb3l3dGl4dXJsY2Zua3JhZW9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyMDExNjcsImV4cCI6MjA3Nzc3NzE2N30.Vtyh85w1_WYOjLeGbXNo35JwEMOG7E0Bo1tdFFr4vYw";
 
-    client = createClient(this.PROJECT_URL, this.PUBLIC_API_KEY);
-    events = new Map<number, EventRecord>();
-    nextEvents: EventRecord[] | undefined = undefined;
-    eventsInMonth: EventRecord[] | undefined = undefined;
+    private client = createClient(this.PROJECT_URL, this.PUBLIC_API_KEY);
+    
+    private events = new Map<number, EventRecord>();
+    private nextEvents: EventRecord[] | undefined = undefined;
+    private eventsInMonth: EventRecord[] | undefined = undefined;
 
     async getEvent(id: number): Promise<DatabaseReturn<EventRecord>> {
         const cache = this.events.get(id);
@@ -58,9 +59,16 @@ class Database {
         
         if (result.data && !result.error) {
             this.nextEvents = result.data;
+
+            for (const event of result.data as EventRecord[]) {
+                this.events.set(event.id, event);
+            }
         }
 
-        return { data: result.data!.slice(0, limit), error: result.error };
+        return { 
+            data: result.data ? result.data.slice(0, limit) : null,
+            error: result.error
+        };
     }
 
     async getEventsInCurrentMonth(): Promise<DatabaseReturn<EventRecord[]>> {
@@ -80,6 +88,10 @@ class Database {
 
         if (result.data && !result.error) {
             this.eventsInMonth = result.data;
+
+            for (const event of result.data as EventRecord[]) {
+                this.events.set(event.id, event);
+            }
         }
 
         return result;
