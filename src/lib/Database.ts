@@ -60,7 +60,7 @@ class Database {
             this.nextEvents = result.data;
         }
 
-        return result;
+        return { data: result.data!.slice(0, limit), error: result.error };
     }
 
     async getEventsInCurrentMonth(): Promise<DatabaseReturn<EventRecord[]>> {
