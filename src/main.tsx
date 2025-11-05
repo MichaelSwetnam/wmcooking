@@ -8,7 +8,7 @@ import Home from './routes/Home.tsx'
 import NotFound from './routes/NotFound.tsx';
 import Footer from './components/Footer.tsx';
 import WIP from './routes/WIP.tsx';
-import Events from './routes/Events.tsx';
+import Events from './routes/Events/Events.tsx';
 import EventPage from './routes/EventPage.tsx';
 
 createRoot(document.getElementById('root')!).render(
