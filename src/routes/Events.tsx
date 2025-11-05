@@ -54,7 +54,7 @@ function DateBuilder({ day, info }: { day: Date, info: EventRecord[] }) {
     const currentDate = new Date();
     currentDate.setHours(-1);
 
-    if (day.getMonth() !== currentDate.getMonth() || day < currentDate) {
+    if (day < currentDate) {
         return <DateBase day={day} info={info} active={false} />;
     }
 
@@ -65,7 +65,8 @@ export default function Events() {
     const nav = useNavigate();
     const [data, setData] = useState<EventRecord[] | null>(null);
     const [error, setError] = useState<PostgrestError | null>(null);
-
+    const [[ month, year ], setMonthYear ] = useState([new Date().getMonth(), new Date().getFullYear()]);
+   
     useEffect(() => {
         if (window.innerWidth < 768) {
             // Will start an infinite load. This is because I don't want to query DB when this page won't even render on mobile no matter what.
@@ -74,12 +75,12 @@ export default function Events() {
         }
 
         const fx = async () => {
-            const { data, error } = await Database.getEventsInCurrentMonth();
+            const { data, error } = await Database.getEventsInMonth(month, year);
             setData(data);
             setError(error);
         };
         fx();
-    }, []);
+    }, [month, year]);
 
     if (window.innerWidth < 768) {
         return <div className="flex-1 flex flex-col justify-center items-center gap-3">
@@ -114,35 +115,64 @@ export default function Events() {
         }
     }
 
-    const date = new Date();
-    const fullYear = date.getFullYear();
-    const month = date.getMonth();
+    const prevMonthLength = new Date(year, month, 0).getDate();
+    const monthLength = new Date(year, month + 1, 0).getDate();
 
-    const prevMonthLength = new Date(fullYear, month, 0).getDate();
-    const monthLength = new Date(fullYear, month + 1, 0).getDate();
-
-    const firstDay = new Date(fullYear, month, 1).getDay();
-    const lastDay = new Date(fullYear, month, monthLength).getDay();
+    const firstDay = new Date(year, month, 1).getDay();
+    const lastDay = new Date(year, month, monthLength).getDay();
 
     const days = [];
     for (let i = firstDay - 1; i >= 0; i--) {
-        days.push(new Date(fullYear, month - 1, prevMonthLength - i));
+        days.push(new Date(year, month - 1, prevMonthLength - i));
     }
     for (let i = 0; i < monthLength; i++) {
-        days.push(new Date(fullYear, month, i + 1));
+        days.push(new Date(year, month, i + 1));
     }
-    for (let i = lastDay + 1; i < 7; i++) {
-        days.push(new Date(fullYear, month + 1, i));
+    for (let i = 1; i < 7 - lastDay; i++) {
+        days.push(new Date(year, month + 1, i));
+    }
+
+    function incrementMonth() {
+        let newMonth = month + 1;
+        let newYear = year;
+        if (newMonth >= 12) {
+            newMonth = 0;
+            newYear++;
+        }
+
+        setMonthYear([ newMonth, newYear ]);
+    }
+
+    function decrementMonth() {
+        let newMonth = month - 1;
+        let newYear = year;
+        if (newMonth < 0) {
+            newMonth = 11;
+            newYear--;
+        }
+
+        setMonthYear([ newMonth, newYear ]);
     }
 
     return (
         <div className="flex-1 flex flex-col justify-start items-center gap-2">
-            <h2 className="font-bold text-3xl p-2 text-orange-700">Events this month:</h2>
-            <div className="grid grid-cols-7 gap-2 rounded-lg p-3 bg-white shadow-xl hover:shadow-2xl transition-shadow w-full">
-                {days.map((x, i) => (
-                    <DateBuilder day={x} info={info.get(`${x.getMonth()}/${x.getDate()}`) ?? []} key={i} />
-                ))}
+            <h2 className="font-bold text-3xl p-2 text-orange-700">Event Calendar:</h2>
+            <div className="flex flex-col p-3 bg-white shadow-xl w-full gap-1">
+                <div className="w-full bg-blue-200 rounded-md p-3 text-center text-xl font-semibold">
+                    <div className="flex flex-row justify-center items-center gap-3">
+                        <button className="aspect-video bg-blue-300 py-1 px-3 rounded-md shadow-sm cursor-pointer" onClick={decrementMonth}>{"<"}</button>
+                        <p>{new Date(year, month).toLocaleDateString('en-us', { month: "long", year: "numeric" })}</p>
+                        <button className="aspect-video bg-blue-300 py-1 px-3 rounded-md shadow-sm cursor-pointer" onClick={incrementMonth}>{">"}</button>
+                    </div>
+                    
+                </div>
+                <div className="grid grid-cols-7 gap-2 rounded-lg">
+                    {days.map((x, i) => (
+                        <DateBuilder day={x} info={info.get(`${x.getMonth()}/${x.getDate()}`) ?? []} key={i} />
+                    ))}
+                </div>
             </div>
+            
         </div>
     );
 }

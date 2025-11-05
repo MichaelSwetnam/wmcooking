@@ -24,7 +24,7 @@ class Database {
     
     private events = new Map<number, EventRecord>();
     private nextEvents: EventRecord[] | undefined = undefined;
-    private eventsInMonth: EventRecord[] | undefined = undefined;
+    private monthLoaded = new Map<string, number[]>(); // Year-Month -> id[]
 
     async getEvent(id: number): Promise<DatabaseReturn<EventRecord>> {
         const cache = this.events.get(id);
@@ -71,14 +71,17 @@ class Database {
         };
     }
 
-    async getEventsInCurrentMonth(): Promise<DatabaseReturn<EventRecord[]>> {
-        if (this.eventsInMonth)
-            return { data: this.eventsInMonth, error: null, cached: true }
+    async getEventsInMonth(month: number, year: number): Promise<DatabaseReturn<EventRecord[]>> {
+        const mapString = `${year}-${month}`;
+        if (this.monthLoaded.has(mapString)) {
+            const ids = this.monthLoaded.get(mapString)!;            
+            const eventData = await Promise.all(ids.map(id => this.getEvent(id)));
+            return { data: eventData.map(r => r.data!), error: null, cached: true };
+        }
 
-        // Get the current date
-        const now = new Date();
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
+        // Get the dates (start and end of month)
+        const startOfMonth = new Date(year, month, 1).toISOString();
+        const endOfMonth = new Date(year, month + 1, 1).toISOString();
         
         const result = await this.client
             .from("Events")
@@ -87,7 +90,7 @@ class Database {
             .lt("start", endOfMonth)
 
         if (result.data && !result.error) {
-            this.eventsInMonth = result.data;
+            this.monthLoaded.set(mapString, result.data.map(event => event.id));
 
             for (const event of result.data as EventRecord[]) {
                 this.events.set(event.id, event);
