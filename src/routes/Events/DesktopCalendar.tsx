@@ -1,7 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import type { EventRecord } from "../../lib/Database"
-import type { CalendarProps } from "./CalendarProps";
-
 
 function DateBase({ day, info, active }: { day: Date, info: EventRecord[], active: boolean }) {
     const nav = useNavigate();
@@ -46,18 +44,18 @@ function DateBase({ day, info, active }: { day: Date, info: EventRecord[], activ
     );
 }
 
-function DateBuilder({ day, info }: { day: Date, info: EventRecord[] }) {
+function DateBuilder({ month, day, info }: { month: number, day: Date, info: EventRecord[] }) {
     const currentDate = new Date();
     currentDate.setHours(-1);
 
-    if (day < currentDate) {
+    if (day.getMonth() != month) {
         return <DateBase day={day} info={info} active={false} />;
     }
 
     return <DateBase day={day} info={info} active={true} />;
 }
 
-export default function DesktopCalendar({ year, month, increment, decrement, info }: CalendarProps) {
+export default function DesktopCalendar({ year, month, info }: { year: number, month: number, info: Map<string, EventRecord[]>}) {
     // Create the calendar layout
     const prevMonthLength = new Date(year, month, 0).getDate();
     const monthLength = new Date(year, month + 1, 0).getDate();
@@ -76,18 +74,10 @@ export default function DesktopCalendar({ year, month, increment, decrement, inf
         days.push(new Date(year, month + 1, i));
     }
 
-    return <div className="flex flex-col p-3 bg-white shadow-xl w-full gap-1">
-        <div className="w-full bg-blue-200 rounded-md p-3 text-center text-xl font-semibold">
-            <div className="flex flex-row justify-center items-center gap-3">
-                <button className="aspect-video bg-blue-300 py-1 px-3 rounded-md shadow-sm cursor-pointer" onClick={decrement}>{"<"}</button>
-                <p>{new Date(year, month).toLocaleDateString('en-us', { month: "long", year: "numeric" })}</p>
-                <button className="aspect-video bg-blue-300 py-1 px-3 rounded-md shadow-sm cursor-pointer" onClick={increment}>{">"}</button>
-            </div>
-            
-        </div>
+    return <div className="flex flex-col w-full gap-1">
         <div className="grid grid-cols-7 gap-2 rounded-lg">
             {days.map((x, i) => (
-                <DateBuilder day={x} info={info.get(`${x.getMonth()}/${x.getDate()}`) ?? []} key={i} />
+                <DateBuilder month={month} day={x} info={info.get(`${x.getMonth()}/${x.getDate()}`) ?? []} key={i} />
             ))}
         </div>
     </div>

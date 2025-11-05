@@ -4,7 +4,6 @@ import Database from "../../lib/Database";
 import { PostgrestError } from "@supabase/supabase-js";
 import ErrorComponent from "../../components/ErrorComponent";
 import LoadingComponent from "../../components/LoadingComponent";
-import { useNavigate } from "react-router-dom";
 import DesktopCalendar from "./DesktopCalendar";
 import MobileCalendar from "./MobileCalendar";
 
@@ -24,6 +23,8 @@ export default function Events() {
 
     // Get events from database 
     useEffect(() => {
+        setData(null);
+        setError(null);
         const fx = async () => {
             const { data, error } = await Database.getEventsInMonth(month, year);
             setData(data);
@@ -37,7 +38,18 @@ export default function Events() {
     }
 
     if (data === null) {
-        return <LoadingComponent />;
+        return (
+            <div className="flex flex-col p-3 bg-white shadow-xl w-full gap-1">
+                <div className="w-full bg-blue-200 rounded-md p-3 text-center text-xl font-semibold">
+                    <div className="flex flex-row justify-center items-center gap-3">
+                        <button className="aspect-video bg-blue-300 py-1 px-3 rounded-md shadow-sm cursor-pointer" onClick={incrementMonth}>{"<"}</button>
+                        <p>{new Date(year, month).toLocaleDateString('en-us', { month: "long", year: "numeric" })}</p>
+                        <button className="aspect-video bg-blue-300 py-1 px-3 rounded-md shadow-sm cursor-pointer" onClick={decrementMonth}>{">"}</button>
+                    </div>
+                </div>
+                <LoadingComponent />
+            </div>
+        );
     }
 
     // Format data base information into a Map of day -> event[]
@@ -77,29 +89,25 @@ export default function Events() {
     }
 
     
-    return (
-        <div className="flex-1 flex flex-col justify-start items-center gap-2">
-            <h2 className="font-bold text-3xl p-2 text-orange-700">Event Calendar:</h2>
-            <div className="flex flex-col p-3 bg-white shadow-xl w-full gap-1">
-                { /* Tailwind CSS uses 48rem for md screens = 768 px https://tailwindcss.com/docs/responsive-design */ }
-                {
-                    width < 768
-                    ? <MobileCalendar
-                        year={year} 
-                        month={month} 
-                        increment={incrementMonth} 
-                        decrement={decrementMonth}
-                        info={info}
-                    />
-                    : <DesktopCalendar 
-                        year={year} 
-                        month={month} 
-                        increment={incrementMonth} 
-                        decrement={decrementMonth}
-                        info={info}
-                    />
-                } 
+    return <div className="flex flex-col p-3 bg-white shadow-xl w-full gap-1">
+        <div className="w-full bg-blue-200 rounded-md p-3 text-center text-xl font-semibold">
+            <div className="flex flex-row justify-center items-center gap-3">
+                <button className="aspect-video bg-blue-300 py-1 px-3 rounded-md shadow-sm cursor-pointer" onClick={incrementMonth}>{"<"}</button>
+                <p>{new Date(year, month).toLocaleDateString('en-us', { month: "long", year: "numeric" })}</p>
+                <button className="aspect-video bg-blue-300 py-1 px-3 rounded-md shadow-sm cursor-pointer" onClick={decrementMonth}>{">"}</button>
             </div>
         </div>
-    );
+        { /* Tailwind CSS uses 48rem for md screens = 768 px https://tailwindcss.com/docs/responsive-design */ }
+        {
+            width < 768
+            ? <MobileCalendar
+                info={info}
+            />
+            : <DesktopCalendar 
+                year={year} 
+                month={month} 
+                info={info}
+            />
+        } 
+    </div>
 }

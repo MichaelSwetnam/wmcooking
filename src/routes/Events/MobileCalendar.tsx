@@ -1,5 +1,4 @@
 import type { EventRecord } from "../../lib/Database";
-import type { CalendarProps } from "./CalendarProps";
 
 function Day({ events }: { events: EventRecord[] }) {
     const date = new Date(events[0].start);
@@ -22,18 +21,13 @@ function Day({ events }: { events: EventRecord[] }) {
     </div>;
 }
 
-export default function MobileCalendar({ year, month, increment, decrement, info }: CalendarProps) {
+export default function MobileCalendar({ info }: { info: Map<string, EventRecord[]> }) {
     const keys = [];
     for (const key of info.keys()) {
         keys.push(key);
     }
     
     return <div className="flex flex-col">
-        <div className="flex items-center justify-center bg-blue-200 font-semibold text-xl pd-2 rounded-md gap-2 p-1">
-            <button className="aspect-video bg-blue-300 py-1 px-3 rounded-md shadow-sm cursor-pointer" onClick={decrement}>{"<"}</button>
-            <p>{new Date(year, month).toLocaleDateString('en-us', { month: "long", year: "numeric" })}</p>
-            <button className="aspect-video bg-blue-300 py-1 px-3 rounded-md shadow-sm cursor-pointer" onClick={increment}>{">"}</button>
-        </div>
         <div className="flex flex-col gap-2 p-1">
         { keys.map((k, i) => <Day key={i} events={info.get(k)!} />) }
         </div>
