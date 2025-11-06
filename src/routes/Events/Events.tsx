@@ -39,7 +39,7 @@ export default function Events() {
 
     if (data === null) {
         return (
-            <div className="flex flex-col p-3 bg-white shadow-xl w-full gap-1">
+            <div className="flex flex-col p-3 bg-white shadow-xl w-full gap-1 rounded-md">
                 <div className="w-full bg-blue-200 rounded-md p-3 text-center text-xl font-semibold">
                     <div className="flex flex-row justify-center items-center gap-3">
                         <button className="aspect-video bg-blue-300 py-1 px-3 rounded-md shadow-sm cursor-pointer" onClick={incrementMonth}>{"<"}</button>
@@ -89,7 +89,7 @@ export default function Events() {
     }
 
     
-    return <div className="flex flex-col p-3 bg-white shadow-xl w-full gap-1">
+    return <div className="flex flex-col p-3 bg-white shadow-xl w-full gap-1 rounded-md">
         <div className="w-full bg-blue-200 rounded-md p-3 text-center text-xl font-semibold">
             <div className="flex flex-row justify-center items-center gap-3">
                 <button className="aspect-video bg-blue-300 py-1 px-3 rounded-md shadow-sm cursor-pointer" onClick={decrementMonth}>{"<"}</button>

@@ -1,6 +1,5 @@
 import { useParams } from "react-router-dom";
 import ErrorComponent from "../components/ErrorComponent";
-import Cookies from "../assets/cookies.jpeg";
 import EventBadge from "../components/EventBadge";
 
 import { PostgrestError } from "@supabase/supabase-js";
@@ -61,7 +60,7 @@ function Success({ id }: { id: number }) {
         <h2 className="pt-5 text-3xl md:text-4xl font-extrabold text-orange-700 text-center">Event Details:</h2>
         <div className="flex-1 flex flex-col bg-white rounded-3xl overflow-hidden w-full">
             <div className={"flex flex-col items-center p-5 gap-1"} style={{
-                backgroundImage: `url(${Cookies})`,
+                backgroundImage: `url(${event.background_image})`,
                 backgroundPosition: "center",
                 backgroundSize: "cover"
             }}>

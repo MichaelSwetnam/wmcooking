@@ -49,6 +49,16 @@ export default function MobileCalendar({ info }: { info: Map<string, EventRecord
     for (const key of info.keys()) {
         keys.push(key);
     }
+
+    if (keys.length <= 0) {
+        return <div className="flex flex-col">
+            <div className="flex flex-col gap-2 p-1">
+                <div className="flex flex-row gap-2 justify-center bg-gray-200 p-2 rounded-md [background:repeating-linear-gradient(45deg,#f3f4f6_0px,#f3f4f6_20px,#e5e7eb_20px,#e5e7eb_40px)]">
+                    <p>We don't have any events planned this month.</p>    
+                </div>
+            </div>
+        </div>;
+    }
     
     return <div className="flex flex-col">
         <div className="flex flex-col gap-2 p-1">
