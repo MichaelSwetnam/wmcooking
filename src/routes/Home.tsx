@@ -59,11 +59,6 @@ export default function Home() {
             </div>
             <div className="flex-1 h-full max-w-md">
                 <a href="https://flathatnews.com/2025/09/09/serving-up-community-club-cooking-aims-to-create-inclusive-space-for-sharing-food/" target="_blank" className="font-semibold text-xl text-blue-600 hover:text-blue-800 transition underline">or check out on this article on us by the Flat Hat.</a>
-                <iframe className="w-full aspect-square mt-2 rounded-lg shadow-md"
-                    src="https://flathatnews.com/2025/09/09/serving-up-community-club-cooking-aims-to-create-inclusive-space-for-sharing-food/" 
-                    title="Flat Hat Article - Serving up community: Club Cooking aims to create inclusive space for sharing food"
-                    loading="lazy"
-                />
             </div>
         </div>
     </div>
