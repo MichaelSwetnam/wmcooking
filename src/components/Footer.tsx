@@ -18,8 +18,7 @@ export default function Footer() {
 
                 { /* Could be filled with other information in these two columns */ }
                 <div className="flex-1 flex flex-col items-center md:items-start mb-4 md:mb-0">
-                     <span className="font-semibold">Admin Login:</span>
-                    <ResponsiveLink className="underline" to="/admin">Click here</ResponsiveLink>
+                    <ResponsiveLink className="underline" to="/admin">Admin Login</ResponsiveLink>
                 </div>
                 <div className="flex-1 flex flex-col items-center md:items-start">
                     Copyright © {currentYear} Club Cooking
