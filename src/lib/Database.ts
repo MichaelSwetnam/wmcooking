@@ -1,4 +1,5 @@
-import { createClient, PostgrestError } from "@supabase/supabase-js";
+import { PostgrestError } from "@supabase/supabase-js";
+import { Supabase } from "./Supabase";
 
 export interface EventRecord {
     accessability: "AllStudents" | "ClubMembers";
@@ -8,6 +9,7 @@ export interface EventRecord {
     location: string;
     name: string;
     start: string;
+    background_image: string;
 }
 
 interface DatabaseReturn<T> {
@@ -16,12 +18,7 @@ interface DatabaseReturn<T> {
     cached?: true
 }
 
-class Database {
-    private readonly PROJECT_URL = "https://okoywtixurlcfnkraeob.supabase.co";
-    private readonly PUBLIC_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9rb3l3dGl4dXJsY2Zua3JhZW9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyMDExNjcsImV4cCI6MjA3Nzc3NzE2N30.Vtyh85w1_WYOjLeGbXNo35JwEMOG7E0Bo1tdFFr4vYw";
-
-    private client = createClient(this.PROJECT_URL, this.PUBLIC_API_KEY);
-    
+class Database {    
     private events = new Map<number, EventRecord>();
     private nextEvents: EventRecord[] | undefined = undefined;
     private monthLoaded = new Map<string, number[]>(); // Year-Month -> id[]
@@ -31,7 +28,7 @@ class Database {
         if (cache !== undefined)
             return { data: cache, error: null, cached: true };
 
-        const result = await this.client
+        const result = await Supabase
             .from("Events")
             .select("*")
             .eq('id', id)
@@ -50,7 +47,7 @@ class Database {
             return { data: this.nextEvents.slice(0, limit), error: null, cached: true };
         }
 
-        const result = await this.client
+        const result = await Supabase
             .from("Events")
             .select("*")
             .gte("start", new Date().toISOString())
@@ -83,7 +80,7 @@ class Database {
         const startOfMonth = new Date(year, month, 1).toISOString();
         const endOfMonth = new Date(year, month + 1, 1).toISOString();
         
-        const result = await this.client
+        const result = await Supabase
             .from("Events")
             .select("*")
             .gte("start", startOfMonth)
