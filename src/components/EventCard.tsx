@@ -2,34 +2,10 @@ import { useNavigate } from "react-router-dom";
 
 import type { EventRecord } from "../lib/Database";
 import EventBadge from "./EventBadge";
+import getBadges from "../lib/getBadges";
 
 export default function EventCard({ event }: { event: EventRecord }) {
     const nav = useNavigate();
-    const badges: string[] = [];
-    const startDate = new Date(event.start);
-    const endDate = new Date(event.end);
-
-    badges.push(startDate.toLocaleDateString('en-us', {
-        weekday: "short",
-        day: 'numeric',
-        month: 'long'
-    }));
-    badges.push(startDate.toLocaleTimeString('en-us', {
-        hour: "numeric"
-    }) + " - " + endDate.toLocaleTimeString('en-us', {
-        hour: "numeric"
-    }));
-    
-    badges.push(event.location);
-
-    switch (event.accessability) {
-        case "AllStudents":
-            badges.push("All Students");
-            break;
-        case "ClubMembers":
-            badges.push("Club Members");
-            break;
-    }
 
     return <div className="flex flex-col bg-white shadow-xl rounded-3xl overflow-hidden hover:shadow-2xl transition-shadow duration-300 w-full max-w-3xl cursor-pointer" onClick={() => {nav(`/events/${event.id}`)}}>
         <div className={"flex flex-col items-center p-5 gap-1"} style={{
@@ -41,17 +17,20 @@ export default function EventCard({ event }: { event: EventRecord }) {
                 <span className={"font-bold text-2xl text-black"}>{ event.name }</span>
             </div>
             <div className="flex flex-wrap gap-2">
-                { badges.map(t => <EventBadge text={t} />) }
+                { getBadges(event).map(t => <EventBadge text={t} />) }
             </div>
         </div>
         <div className="p-6 text-gray-800 leading-relaxed text-sm md:text-base">
             { event.description }
         </div>
         {
-            event.signup_link && <p className="pb-4 text-center text-gray-800 font-semibold">Click here to sign up!</p>
+            (event.requires_signup && event.signup_link) && <p className="pb-4 text-center text-gray-800 font-semibold">Click here to sign up!</p>
         }
         {
-            !event.signup_link && <p className="pb-4 text-center text-gray-800 font-semibold">Signup not currently available.</p>
+            (event.requires_signup && !event.signup_link) && <p className="pb-4 text-center text-gray-800 font-semibold">Signup not currently available.</p>
+        }
+        {
+            !event.requires_signup && <p className="pb-4 text-center text-gray-800 font-semibold">No signup required.</p>
         }
     </div>
 }

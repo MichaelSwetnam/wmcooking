@@ -11,6 +11,7 @@ export interface EventRecord {
     start: string;
     background_image: string;
     signup_link: string | null;
+    requires_signup: boolean;
 }
 
 interface DatabaseReturn<T> {

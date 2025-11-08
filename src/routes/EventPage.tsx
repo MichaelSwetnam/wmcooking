@@ -6,6 +6,7 @@ import { PostgrestError } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import Database, { type EventRecord } from "../lib/Database";
 import LoadingComponent from "../components/LoadingComponent";
+import getBadges from "../lib/getBadges";
 
 function Success({ id }: { id: number }) {
     const [event, setEvent] = useState<EventRecord | null>(null);
@@ -30,32 +31,6 @@ function Success({ id }: { id: number }) {
         return <LoadingComponent />
     }
 
-    const badges: string[] = [];
-    const startDate = new Date(event.start);
-    const endDate = new Date(event.end);
-
-    badges.push(startDate.toLocaleDateString('en-us', {
-        weekday: "short",
-        day: 'numeric',
-        month: 'long'
-    }));
-    badges.push(startDate.toLocaleTimeString('en-us', {
-        hour: "numeric"
-    }) + " - " + endDate.toLocaleTimeString('en-us', {
-        hour: "numeric"
-    }));
-    
-    badges.push(event.location);
-
-    switch (event.accessability) {
-        case "AllStudents":
-            badges.push("All Students");
-            break;
-        case "ClubMembers":
-            badges.push("Club Members");
-            break;
-    }
-
     return <div className="flex-1 flex flex-col justify-start items-center gap-2 h-full">
         <h2 className="pt-5 text-3xl md:text-4xl font-extrabold text-orange-700 text-center">Event Details:</h2>
         <div className="flex-1 flex flex-col bg-white rounded-3xl overflow-hidden w-full">
@@ -68,7 +43,7 @@ function Success({ id }: { id: number }) {
                     <span className={"font-bold text-2xl text-black"}>{event.name}</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                    { badges.map((t, i) => <EventBadge key={i} text={t} />) }
+                    { getBadges(event).map((t, i) => <EventBadge key={i} text={t} />) }
                 </div>
             </div>
             <div className="flex flex-col gap-3 px-6 p-3">
@@ -81,6 +56,9 @@ function Success({ id }: { id: number }) {
                         <p className="text-gray-800 font-semibold">Signup Link:</p>
                         <a href={event.signup_link} target="_blank" className="text-blue-800 underline hover:text-blue-600 transition duration-200 cursor-pointer">{event.signup_link}</a>
                     </div>
+                }
+                { 
+                    !event.signup_link && event.requires_signup && <p className="text-gray-800 font-semibold">Signup link is not currently available.</p>
                 }
             </div>
         </div>
