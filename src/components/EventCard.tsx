@@ -47,5 +47,11 @@ export default function EventCard({ event }: { event: EventRecord }) {
         <div className="p-6 text-gray-800 leading-relaxed text-sm md:text-base">
             { event.description }
         </div>
+        {
+            event.signup_link && <p className="pb-4 text-center text-gray-800 font-semibold">Click here to sign up!</p>
+        }
+        {
+            !event.signup_link && <p className="pb-4 text-center text-gray-800 font-semibold">Signup not currently available.</p>
+        }
     </div>
 }

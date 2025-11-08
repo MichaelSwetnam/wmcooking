@@ -71,7 +71,18 @@ function Success({ id }: { id: number }) {
                     { badges.map((t, i) => <EventBadge key={i} text={t} />) }
                 </div>
             </div>
-            <p className="p-6 text-gray-800 leading-relaxed text-sm md:text-base">{event.description}</p>
+            <div className="flex flex-col gap-3 px-6 p-3">
+                <div>
+                    <p className="text-gray-800 font-semibold">Description:</p>
+                    <p className="text-gray-800 leading-relaxed text-sm md:text-base">{event.description}</p>
+                </div>
+                { event.signup_link && 
+                    <div>
+                        <p className="text-gray-800 font-semibold">Signup Link:</p>
+                        <a href={event.signup_link} target="_blank" className="text-blue-800 underline hover:text-blue-600 transition duration-200 cursor-pointer">{event.signup_link}</a>
+                    </div>
+                }
+            </div>
         </div>
     </div>;
 }

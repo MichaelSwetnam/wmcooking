@@ -10,6 +10,7 @@ export interface EventRecord {
     name: string;
     start: string;
     background_image: string;
+    signup_link: string | null;
 }
 
 interface DatabaseReturn<T> {
