@@ -49,10 +49,13 @@ class Database {
             return { data: this.nextEvents.slice(0, limit), error: null, cached: true };
         }
 
+        const rightNow = new Date();
+        const today = new Date(rightNow.getFullYear(), rightNow.getMonth(), rightNow.getDay());
+
         const result = await Supabase
             .from("Events")
             .select("*")
-            .gte("start", new Date().toISOString())
+            .gte("start", today.toISOString())
             .order("start", { ascending: true })
             .limit(10);
         

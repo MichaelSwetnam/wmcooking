@@ -72,7 +72,7 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
                         </span>
                     )}
                     <span>{user.email}</span>
-                    <span>{ priveleged ? "✅" : ""}</span>
+                    <span className="transform rotate-3">{ priveleged ? "✅" : ""}</span>
                 </div>
             </button>
 
