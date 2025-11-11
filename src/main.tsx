@@ -10,7 +10,6 @@ import Footer from './components/Footer.tsx';
 import WIP from './routes/WIP.tsx';
 import Events from './routes/Events/Events.tsx';
 import EventPage from './routes/EventPage.tsx';
-import SignIn from './routes/SignIn.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -24,7 +23,6 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/wip" element={<WIP />} />
               <Route path="/events" element={<Events />} />
               <Route path="/events/:id" element={<EventPage />} />
-              <Route path="/signin" element={<SignIn />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>

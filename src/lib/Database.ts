@@ -14,7 +14,7 @@ export interface EventRecord {
     requires_signup: boolean;
 }
 
-interface DatabaseReturn<T> {
+export interface DatabaseReturn<T> {
     data: T | null,
     error: PostgrestError | null,
     cached?: true
