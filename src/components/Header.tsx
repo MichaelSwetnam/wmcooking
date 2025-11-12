@@ -35,7 +35,7 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
 
             setPriveleged(data);
         });
-    }, [user.id])
+    }, [user.id]);
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -94,12 +94,17 @@ export default function Header() {
     const [user, setUser] = useState<User | null>(null);
     const [error, setError] = useState<AuthError | null>(null);
 
-    useEffect(() => {
-        Supabase.auth.getUser().then(({ data, error }) => {
-            setUser(data.user);
-            setError(error);
-        });
-    }, []);
+     useEffect(() => {
+        (async () => {
+            const { data, error } = await OAuth.getUser();
+            console.log("Data, error: ");
+            console.log(data);
+            console.log(error);
+
+            setUser(null);
+            setError(null);
+        })();
+    }, [])
 
     let profileComponent = <LoadingComponent />;
     if (user) {
