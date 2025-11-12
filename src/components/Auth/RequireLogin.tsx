@@ -21,7 +21,7 @@ export default function Component({ children }: { children: React.ReactNode }) {
         return <LoadingComponent />;
 
     case "LOGGED_OUT":
-        return <ErrorComponent message="You are not logged in" />;
+        return <ErrorComponent message="You need to be logged in to access this content." />;
 
     case "LOGGED_IN":
         return <>{children}</>;
