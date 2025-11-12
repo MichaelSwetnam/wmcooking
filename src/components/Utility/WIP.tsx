@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import Button from "../components/Utility/Button";
+import Button from "./Button";
 
-export default function Home() {
+export default function Page() {
     const nav = useNavigate();
 
     return <div className="flex-1 flex flex-col justify-center items-center gap-3">
