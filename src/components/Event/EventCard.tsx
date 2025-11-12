@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 
-import type { EventRecord } from "../lib/Database";
+import type { EventRecord } from "../../lib/Database";
 import EventBadge from "./EventBadge";
-import getBadges from "../lib/getBadges";
+import getBadges from "../../lib/getBadges";
 
 export default function EventCard({ event }: { event: EventRecord }) {
     const nav = useNavigate();

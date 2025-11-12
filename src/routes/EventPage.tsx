@@ -1,11 +1,11 @@
 import { useParams } from "react-router-dom";
-import ErrorComponent from "../components/ErrorComponent";
-import EventBadge from "../components/EventBadge";
+import ErrorComponent from "../components/Event/ErrorComponent";
+import EventBadge from "../components/Event/EventBadge";
 
 import { PostgrestError } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import Database, { type EventRecord } from "../lib/Database";
-import LoadingComponent from "../components/LoadingComponent";
+import LoadingComponent from "../components/Utility/LoadingComponent";
 import getBadges from "../lib/getBadges";
 
 function Success({ id }: { id: number }) {

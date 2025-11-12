@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import logo from "../assets/cooking-logo.png";
-import ResponsiveLink from "./ResponsiveLink";
-import LoadingComponent from "./LoadingComponent";
+import ResponsiveLink from "./Utility/ResponsiveLink";
+import LoadingComponent from "./Utility/LoadingComponent";
 import OAuth, { type UserRecord } from "../lib/OAuth";
+import SignInButton from "./Auth/SignInButton";
 
 interface SectionLinkProps {
     to: string;
@@ -93,35 +94,15 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
 
 export default function Header() {
     const [user, setUser] = useState<UserRecord | null>(null);
+    const [authLoaded, setAuthLoaded] = useState(false);
 
      useEffect(() => {
         (async () => {
             const user = await OAuth.getUser();
             setUser(user);
+            setAuthLoaded(true);
         })();
-    }, [])
-
-    let profileComponent = <LoadingComponent />;
-    if (user) {
-        profileComponent = <UserDropdown user={user} onLogout={() => setUser(null)} />;
-    } else {
-        const signIn = () => {
-            OAuth.logIn(window.location.href);
-        };
-
-        profileComponent = (
-            <button
-                onClick={signIn}
-                className="cursor-pointer flex gap-2 items-center justify-center bg-blue-100 text-blue-900 font-medium px-3 py-1 rounded-full hover:shadow-md transition-shadow"
-            >
-                <img
-                    className="w-8 h-8 rounded-full object-cover"
-                    src="https://www.gstatic.com/marketing-cms/assets/images/d5/dc/cfe9ce8b4425b410b49b7f2dd3f3/g.webp=s48-fcrop64=1,00000000ffffffff-rw"
-                ></img>
-                <span>Sign in</span>
-            </button>
-        );
-    }
+    }, []);
 
     return (
         <header className="bg-linear-to-r from-blue-300 to-blue-200 py-3 shadow-md w-full">
@@ -143,7 +124,14 @@ export default function Header() {
                     <nav>
                         <SectionLink to="/events">Events</SectionLink>
                     </nav>
-                    {profileComponent}
+                    {
+                        !authLoaded && <LoadingComponent />
+                    }
+                    {
+                        user
+                        ? <UserDropdown user={user} onLogout={() => setUser(null)} />
+                        : <SignInButton />
+                    }
                 </div>
             </div>
         </header>

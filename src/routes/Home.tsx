@@ -1,12 +1,12 @@
 import type { EventRecord } from "../lib/Database";
 
 import { InstagramEmbed } from "react-social-media-embed";
-import EventCard from "../components/EventCard";
+import EventCard from "../components/Event/EventCard";
 import { useEffect, useState } from "react";
 import Database from "../lib/Database";
 import { PostgrestError } from "@supabase/supabase-js";
-import ErrorComponent from "../components/ErrorComponent";
-import LoadingComponent from "../components/LoadingComponent";
+import ErrorComponent from "../components/Event/ErrorComponent";
+import LoadingComponent from "../components/Utility/LoadingComponent";
 
 function EventsSubpage() {
     const [events, setEvents] = useState<EventRecord[] | null>(null);

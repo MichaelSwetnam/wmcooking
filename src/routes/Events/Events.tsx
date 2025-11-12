@@ -2,8 +2,8 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import type { EventRecord } from "../../lib/Database";
 import Database from "../../lib/Database";
 import { PostgrestError } from "@supabase/supabase-js";
-import ErrorComponent from "../../components/ErrorComponent";
-import LoadingComponent from "../../components/LoadingComponent";
+import ErrorComponent from "../../components/Event/ErrorComponent";
+import LoadingComponent from "../../components/Utility/LoadingComponent";
 import DesktopCalendar from "./DesktopCalendar";
 import MobileCalendar from "./MobileCalendar";
 

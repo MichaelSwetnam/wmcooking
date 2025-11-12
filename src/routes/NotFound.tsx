@@ -1,4 +1,4 @@
-import ResponsiveLink from "../components/ResponsiveLink";
+import ResponsiveLink from "../components/Utility/ResponsiveLink";
 
 export default function NotFound() {
     return <div className="flex-1 flex flex-col justify-center items-center space-y-4">
