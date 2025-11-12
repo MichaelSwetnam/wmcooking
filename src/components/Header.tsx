@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import logo from "../assets/cooking-logo.png";
 import ResponsiveLink from "./ResponsiveLink";
-import { Supabase } from "../lib/Supabase";
 import LoadingComponent from "./LoadingComponent";
 import OAuth, { type UserRecord } from "../lib/OAuth";
 
@@ -42,7 +41,7 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
     }, []);
 
     const handleLogout = async () => {
-        await Supabase.auth.signOut();
+        OAuth.logOut();
         setOpen(false);
         if (onLogout) onLogout();
     };
@@ -107,7 +106,7 @@ export default function Header() {
         profileComponent = <UserDropdown user={user} onLogout={() => setUser(null)} />;
     } else {
         const signIn = () => {
-            Supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.href }});
+            OAuth.logIn(window.location.href);
         };
 
         profileComponent = (
