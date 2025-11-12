@@ -2,10 +2,11 @@ import type { AuthError, PostgrestError } from "@supabase/supabase-js";
 import { Supabase } from "./Supabase";
 import type { DatabaseReturn } from "./Database";
 
-interface UserRecord {
+export interface UserRecord {
     id: string;
     email: string;
     is_admin: boolean;
+    picture: string;
 }
 
 export interface OAuthReturn<T> {
@@ -15,41 +16,42 @@ export interface OAuthReturn<T> {
 }
 
 class OAuth {
-    private signedInUser: UserRecord | null
+    private signedInUser: UserRecord | null = null; 
+    private isSignedIn: boolean | null = null;
 
-    constructor() {
-        this.signedInUser = null;
-    }
+    async getUser(): Promise<UserRecord | null> {
+        if (this.isSignedIn === false)
+            return null;
 
-    async getUser(): Promise<OAuthReturn<UserRecord>> {
         if (this.signedInUser) {
-            return {
-                data: this.signedInUser,
-                error: null,
-                cached: true
+            return this.signedInUser;
+        }
+
+        const { data: { user }, error } = await Supabase.auth.getUser();
+        if (error || !user) {
+            this.isSignedIn = false;
+            return null;
+        }
+
+        const userResult = await this.getAssociatedData(user.id);
+        if (userResult.data && !userResult.error) {
+            const picture = user.user_metadata?.picture;
+            if (!picture)
+                throw new Error("User did not have a picture / ie did not go through google as a provider.");
+
+            this.isSignedIn = true;
+            const completeUser: UserRecord = {
+                id: user.id,
+                email: user.email!,
+                is_admin: userResult.data.is_admin,
+                picture
             };
+
+            this.signedInUser = completeUser;
+            return completeUser;
         }
 
-        const result = await Supabase.auth.getUser();
-        const { data, error } = result as unknown as { data: { id: string, email: string }, error: AuthError };
-        if (result.error)
-            return { error, data: null, cached: undefined };
-
-        const userResult = await this.getAssociatedData(data.id);
-        if (result.data && !userResult.error) {
-            console.log(result.data);
-            throw new Error("RAAAH");
-            // this.signedInUser = result.data;
-            // return { 
-            //     error: null,
-            //     data: {
-            //         email: data.email
-            //     },
-            //     cached: undefined 
-            // }
-        }
-
-        return { error: userResult.error, data: null, cached: undefined };;
+        return null;
     }
 
     async getAssociatedData(id: string): Promise<DatabaseReturn<UserRecord>> {
@@ -64,7 +66,7 @@ class OAuth {
 
     async isPrivileged(): Promise<boolean | null> {
         const user = await this.getUser();
-        return user.data?.is_admin || null;
+        return user ? user.is_admin : null;
     }
 }
 

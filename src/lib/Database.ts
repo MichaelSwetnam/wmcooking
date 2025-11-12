@@ -50,7 +50,7 @@ class Database {
         }
 
         const rightNow = new Date();
-        const today = new Date(rightNow.getFullYear(), rightNow.getMonth(), rightNow.getDay());
+        const today = new Date(rightNow.getFullYear(), rightNow.getMonth(), rightNow.getDate());
 
         const result = await Supabase
             .from("Events")

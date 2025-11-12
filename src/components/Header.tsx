@@ -2,9 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import logo from "../assets/cooking-logo.png";
 import ResponsiveLink from "./ResponsiveLink";
 import { Supabase } from "../lib/Supabase";
-import { AuthError, type User } from "@supabase/supabase-js";
 import LoadingComponent from "./LoadingComponent";
-import OAuth from "../lib/OAuth";
+import OAuth, { type UserRecord } from "../lib/OAuth";
 
 interface SectionLinkProps {
     to: string;
@@ -17,23 +16,18 @@ function SectionLink({ to, children }: SectionLinkProps) {
 
 // Dropdown component inside the same file
 interface UserDropdownProps {
-    user: User;
+    user: UserRecord;
     onLogout?: () => void;
 }
 
 function UserDropdown({ user, onLogout }: UserDropdownProps) {
     const [open, setOpen] = useState(false);
     const [priveleged, setPriveleged] = useState<null | boolean>(null);
-    const dropdownRef = useRef<HTMLDivElement>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null); 
 
     useEffect(() => {
-        OAuth.isPrivileged(user.id).then(({data, error}) => {
-            if (error) {
-                setPriveleged(false);
-                return;
-            }
-
-            setPriveleged(data);
+        OAuth.isPrivileged().then((result) => {
+            setPriveleged(result || false);
         });
     }, [user.id]);
 
@@ -60,9 +54,9 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
                 className="bg-blue-100 text-blue-900 font-medium px-3 py-1 rounded-full hover:shadow-md transition-shadow"
             >
                 <div className="flex gap-2 items-center justify-center">
-                    {user.user_metadata?.picture ? (
+                    {user.picture ? (
                         <img
-                            src={user.user_metadata!.picture}
+                            src={user.picture}
                             alt="avatar"
                             className="w-8 h-8 rounded-full object-cover"
                         />
@@ -77,7 +71,15 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
             </button>
 
             {open && (
-                <div className="absolute right-0 mt-2 w-32 bg-white shadow-lg rounded-md border border-gray-200 z-10">
+                <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-md border border-gray-200 z-10">
+                    {/* { user.is_admin &&
+                        <button
+                        onClick={() => nav("/manage")}
+                        className="block w-full text-left px-4 py-2 text-blue-900 hover:bg-blue-50 rounded-md transition"
+                    >
+                        Manage Users
+                    </button>
+                    } */}
                     <button
                         onClick={handleLogout}
                         className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-md transition"
@@ -91,26 +93,19 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
 }
 
 export default function Header() {
-    const [user, setUser] = useState<User | null>(null);
-    const [error, setError] = useState<AuthError | null>(null);
+    const [user, setUser] = useState<UserRecord | null>(null);
 
      useEffect(() => {
         (async () => {
-            const { data, error } = await OAuth.getUser();
-            console.log("Data, error: ");
-            console.log(data);
-            console.log(error);
-
-            setUser(null);
-            setError(null);
+            const user = await OAuth.getUser();
+            setUser(user);
         })();
     }, [])
 
     let profileComponent = <LoadingComponent />;
     if (user) {
         profileComponent = <UserDropdown user={user} onLogout={() => setUser(null)} />;
-    }
-    if (error || !user) {
+    } else {
         const signIn = () => {
             Supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.href }});
         };
