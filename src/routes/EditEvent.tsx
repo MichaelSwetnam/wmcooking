@@ -72,7 +72,7 @@ export default function Page() {
                         <AccessabilityInput id="accessability" startValue={event.accessability} onChange={onChange} />
                     </div>
                     <div className="flex flex-row gap-2">
-                        <input type="submit" value="Submit" className="bg-blue-400 text-white font-semibold py-2 px-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow" />
+                        <input type="submit" value="Save" className="bg-blue-400 text-white font-semibold py-2 px-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow" />
                         <button 
                             className="bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
                             onClick={() => {
