@@ -101,6 +101,33 @@ class Database {
 
         return result;
     }
+
+    /**
+     * 
+     * @param id 
+     * @param event 
+     * @returns Whether the update was sucessful
+     */
+    async updateEvent(id: number, event: EventRecord): Promise<boolean> {
+        if (id !== event.id) {
+            throw new Error("Events must match in update requests.");
+        }
+        
+        const { data, error } = await Supabase
+            .from("Events")
+            .update(event)
+            .eq('id', id)
+            .select('1');
+
+        if (error || !data)
+            return false;
+
+        if (this.events.get(id)) {
+            this.events.set(id, event);
+        }
+
+        return true;
+    }
 }
 
 export default new Database();

@@ -4,7 +4,7 @@ import type { EventRecord } from "../lib/Database";
 import type { PostgrestError } from "@supabase/supabase-js";
 import Database from "../lib/Database";
 import ErrorComponent from "../components/Event/ErrorComponent";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import LoadingComponent from "../components/Utility/LoadingComponent";
 import EventPage from "../components/Event/EventPage";
 import { AccessabilityInput, DateInput, InputLabel, LongTextInput, ShortTextInput } from "../components/Form/Inputs";
@@ -15,6 +15,7 @@ export default function Page() {
     const [event, setEvent] = useState<EventRecord | null>(null);
     const [error, setError] = useState<PostgrestError | null>(null);
     const [isModalOpen, setModalOpen] = useState(false);
+    const nav = useNavigate();
 
     useEffect(() => {
         if (!id) return;
@@ -50,7 +51,15 @@ export default function Page() {
 
     function onSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        console.log(event);
+        if (!event) return;
+        
+        Database.updateEvent(event.id, event).then(success => {
+            if (success) {
+                nav("/events/" + event.id);
+            } else {
+                throw new Error("Could not update database.");
+            }
+        });
     }
 
     return (
@@ -74,6 +83,7 @@ export default function Page() {
                     <div className="flex flex-row gap-2">
                         <input type="submit" value="Save" className="bg-blue-400 text-white font-semibold py-2 px-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow" />
                         <button 
+                            type="button"
                             className="bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
                             onClick={() => {
                                 setModalOpen(true);
