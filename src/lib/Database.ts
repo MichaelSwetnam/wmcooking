@@ -23,8 +23,8 @@ export interface DatabaseReturn<T> {
 
 class Database {    
     private events = new Map<number, EventRecord>();
-    private nextEvents: EventRecord[] | undefined = undefined;
     private monthLoaded = new Map<string, number[]>(); // Year-Month -> id[]
+    private nextEvents: number[] | undefined = undefined;
 
     async getEvent(id: number): Promise<DatabaseReturn<EventRecord>> {
         const cache = this.events.get(id);
@@ -47,7 +47,14 @@ class Database {
 
     async getNextEvents(limit: number): Promise<DatabaseReturn<EventRecord[]>> {
         if (this.nextEvents) {
-            return { data: this.nextEvents.slice(0, limit), error: null, cached: true };
+            const eventIds = this.nextEvents.slice(0, limit);
+            const events = await Promise.all(eventIds.map(id => this.getEvent(id)));
+
+            const anyFailed = events.find(r => r.error || !r.data);
+            if (anyFailed)
+                return { data: null, error: anyFailed.error, cached: true };
+
+            return { data: events.map(r => r.data!), error: null, cached: true };
         }
 
         const rightNow = new Date();
@@ -61,7 +68,7 @@ class Database {
             .limit(10);
         
         if (result.data && !result.error) {
-            this.nextEvents = result.data;
+            this.nextEvents = result.data.map(d => d.id);
 
             for (const event of result.data as EventRecord[]) {
                 this.events.set(event.id, event);
