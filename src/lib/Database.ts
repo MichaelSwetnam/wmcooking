@@ -11,7 +11,7 @@ export interface EventRecord {
     name: string;
     start: string;
     background_image: string;
-    signup_link: string | null;
+    signup_link: string;
     requires_signup: boolean;
 }
 

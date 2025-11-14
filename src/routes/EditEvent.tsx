@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import RequireAdminLogin from "../components/Auth/RequireAdminLogin";
 import type { EventRecord } from "../lib/Database";
-import type { PostgrestError } from "@supabase/supabase-js";
 import Database from "../lib/Database";
 import ErrorComponent from "../components/Event/ErrorComponent";
 import { useNavigate, useParams } from "react-router-dom";
@@ -18,7 +17,7 @@ import BooleanInput from "../components/Form/BooleanInput";
 export default function Page() {
     const { id } = useParams();
     const [event, setEvent] = useState<EventRecord | null>(null);
-    const [error, setError] = useState<PostgrestError | null>(null);
+    const [error, setError] = useState<[string, string?] | null>(null);
     const [isModalOpen, setModalOpen] = useState(false);
     const nav = useNavigate();
 
@@ -30,20 +29,26 @@ export default function Page() {
         const getData = async () => {
             const { data, error } = await Database.getEvent(parsedId);
 
-            setError(error);
+            setError(error && ["Error while loading event data.", error.message]);
             setEvent(data);
         }
         getData();
     }, [id])
+
+    if (error) {
+        return <ErrorComponent message={error[0]} technical={error[1]} />
+    }
     
     if (event === null)
         return <LoadingComponent />
-    if (!id || isNaN(parseInt(id)))
-        return <ErrorComponent message="Could not find the event you are looking for." technical={`Expected :id property from router as number. Given: '${id}'`} />
-    if (error)
-        return <ErrorComponent message={"Could not find the event you are looking for."} technical={error.message} />
-    if (!event)
-        return <ErrorComponent message={"Could not find the event you are looking for."} technical="No event data was shipped from database." />
+    if (!id || isNaN(parseInt(id))) {
+        setError(["Could not find the event you were looking for.", "Expected :id property from router as number."]);
+        return;
+    }
+    if (!event) {
+        setError(["Could not find the event you are looking for.", "No event data was shipped from the database."]);
+        return;
+    }
 
     function onChange(id: string, value: unknown) {
         if (!event) return;
@@ -62,7 +67,8 @@ export default function Page() {
             if (error === undefined) {
                 nav("/events/" + event.id);
             } else {
-                throw new Error(error);
+                setError(["Could not save your event changes.", error]);
+                return;
             }
         });
     }
@@ -71,7 +77,7 @@ export default function Page() {
         <RequireAdminLogin>
             <div className="flex flex-col gap-6">
                 <form className="p-3 bg-blue- rounded-md flex flex-col items-center w-full gap-3" onSubmit={onSubmit}>
-                    <div className="grid grid-cols-[1fr_4fr] items-center gap-3 w-full lg:w-2/3">
+                    <div className="grid grid-cols-[1fr_4fr] items-center gap-3 w-full lg:w-3/4">
                         <InputLabel name="Title" />
                         <ShortTextInput id="title" startValue={event.name} onChange={onChange} />
                         <InputLabel name="Location" />
@@ -81,11 +87,15 @@ export default function Page() {
                         <InputLabel name="Event Start" />
                         <DateInput id="start" startValue={event.start} onChange={onChange} />
                         <InputLabel name="Event End" />
-                        <DateInput id="end" startValue={event.start} onChange={onChange} />
+                        <DateInput id="end" startValue={event.end} onChange={onChange} />
                         <InputLabel name="Accessability" />
                         <AccessabilityInput id="accessability" startValue={event.accessability} onChange={onChange} />
                         <InputLabel name="Signup Required?" />
                         <BooleanInput id="requires_signup" startValue={event.requires_signup} onChange={onChange} />
+                        { event.requires_signup && <>
+                            <InputLabel name="Signup Link" />
+                            <ShortTextInput id="signup_link" startValue={event.signup_link} onChange={onChange} />
+                        </>}
                     </div>
                     <div className="flex flex-row gap-2">
                         <input type="submit" value="Save" className="bg-blue-400 text-white font-semibold py-2 px-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow" />
@@ -97,6 +107,13 @@ export default function Page() {
                             }}
                         >
                             Preview
+                        </button>
+                        <button
+                            type="button"
+                            className="bg-red-400 text-white font-semibold py-2 px-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+                            onClick={() => nav(`/events/${event.id}`)}
+                        >
+                            Exit
                         </button>
                     </div>
                 </form>
