@@ -7,7 +7,12 @@ import ErrorComponent from "../components/Event/ErrorComponent";
 import { useNavigate, useParams } from "react-router-dom";
 import LoadingComponent from "../components/Utility/LoadingComponent";
 import EventPage from "../components/Event/EventPage";
-import { AccessabilityInput, DateInput, InputLabel, LongTextInput, ShortTextInput } from "../components/Form/Inputs";
+import { InputLabel } from "../components/Form/Inputs";
+import ShortTextInput from "../components/Form/ShortTextInput";
+import LongTextInput from "../components/Form/LongTextInput";
+import DateInput from "../components/Form/DateInput";
+import AccessabilityInput from "../components/Form/AccessabilityInputs";
+import BooleanInput from "../components/Form/BooleanInput";
 
 
 export default function Page() {
@@ -53,11 +58,11 @@ export default function Page() {
         e.preventDefault();
         if (!event) return;
         
-        Database.updateEvent(event.id, event).then(success => {
-            if (success) {
+        Database.updateEvent(event.id, event).then(error => {
+            if (error === undefined) {
                 nav("/events/" + event.id);
             } else {
-                throw new Error("Could not update database.");
+                throw new Error(error);
             }
         });
     }
@@ -79,6 +84,8 @@ export default function Page() {
                         <DateInput id="end" startValue={event.start} onChange={onChange} />
                         <InputLabel name="Accessability" />
                         <AccessabilityInput id="accessability" startValue={event.accessability} onChange={onChange} />
+                        <InputLabel name="Signup Required?" />
+                        <BooleanInput id="requires_signup" startValue={event.requires_signup} onChange={onChange} />
                     </div>
                     <div className="flex flex-row gap-2">
                         <input type="submit" value="Save" className="bg-blue-400 text-white font-semibold py-2 px-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow" />

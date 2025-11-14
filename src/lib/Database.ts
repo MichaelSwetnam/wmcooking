@@ -1,5 +1,6 @@
 import { PostgrestError } from "@supabase/supabase-js";
 import { Supabase } from "./Supabase";
+import OAuth from "./OAuth";
 
 export interface EventRecord {
     accessability: "AllStudents" | "ClubMembers";
@@ -106,27 +107,34 @@ class Database {
      * 
      * @param id 
      * @param event 
-     * @returns Whether the update was sucessful
+     * @returns Error message or undefined if there was no error
      */
-    async updateEvent(id: number, event: EventRecord): Promise<boolean> {
+    async updateEvent(id: number, event: EventRecord): Promise<string | undefined> {
+        if (!await OAuth.isPrivileged()) {
+            return "User does not have permission to update events.";
+        }
+        
         if (id !== event.id) {
-            throw new Error("Events must match in update requests.");
+            return "Event ids must match in update requests.";
         }
         
         const { data, error } = await Supabase
             .from("Events")
             .update(event)
             .eq('id', id)
-            .select('1');
+            .select('id');
 
-        if (error || !data)
-            return false;
+        if (error)
+            return error.message;
+
+        if (!data)
+            return "Did not update any data.";
 
         if (this.events.get(id)) {
             this.events.set(id, event);
         }
 
-        return true;
+        return undefined;
     }
 }
 
