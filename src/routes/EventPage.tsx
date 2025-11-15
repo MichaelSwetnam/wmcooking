@@ -1,17 +1,17 @@
 import { useNavigate, useParams } from "react-router-dom";
 import ErrorComponent from "../components/Event/ErrorComponent";
-import  Database, { type EventRecord } from "../lib/Database";
 import LoadingComponent from "../components/Utility/LoadingComponent";
 import { useEffect, useState } from "react";
-import type { PostgrestError } from "@supabase/supabase-js";
 import EventPage from "../components/Event/EventPage";
 import OAuth from "../lib/OAuth";
 import Button from "../components/Utility/Button";
+import type { EventRecord } from "../lib/Database/EventRecord";
+import Database from "../lib/Database/Database";
 
 export default function Page() {
     const { id } = useParams();
     const [event, setEvent] = useState<EventRecord | null>(null);
-    const [error, setError] = useState<PostgrestError | null>(null);
+    const [error, setError] = useState<string | null>(null);
     const [isPrivileged, setPrivilege] = useState(false);
     const nav = useNavigate();
 
@@ -21,10 +21,12 @@ export default function Page() {
             const parsedId = parseInt(id);
             if (isNaN(parsedId)) return;
             
-            const { data, error } = await Database.getEvent(parsedId);
-
-            setError(error);
-            setEvent(data);
+            const ret = await Database.getEvent(parsedId);
+            if (ret.isError()) {
+                setError(ret.unwrapError().message)
+            } else {
+                setEvent(ret.unwrapData());
+            }
         }
         const getAuth = async () => {
             const isAuth = await OAuth.isPrivileged();
@@ -45,7 +47,7 @@ export default function Page() {
     }
 
     if (error) {
-        return <ErrorComponent message="Could not find this event" technical={`Database: ${error.code} - ${error.message}`}/>
+        return <ErrorComponent message="Could not find this event" technical={error}/>
     }
 
     if (event === null) {

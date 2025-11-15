@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import RequireAdminLogin from "../components/Auth/RequireAdminLogin";
-import type { EventRecord } from "../lib/Database";
-import Database from "../lib/Database";
 import ErrorComponent from "../components/Event/ErrorComponent";
 import { useNavigate, useParams } from "react-router-dom";
 import LoadingComponent from "../components/Utility/LoadingComponent";
@@ -12,6 +10,8 @@ import LongTextInput from "../components/Form/LongTextInput";
 import DateInput from "../components/Form/DateInput";
 import AccessabilityInput from "../components/Form/AccessabilityInputs";
 import BooleanInput from "../components/Form/BooleanInput";
+import type { EventRecord } from "../lib/Database/EventRecord";
+import Database from "../lib/Database/Database";
 
 
 export default function Page() {
@@ -27,10 +27,13 @@ export default function Page() {
         if (isNaN(parsedId)) return;
 
         const getData = async () => {
-            const { data, error } = await Database.getEvent(parsedId);
+            const ret = await Database.getEvent(parsedId);
 
-            setError(error && ["Error while loading event data.", error.message]);
-            setEvent(data);
+            if (ret.isError()) {
+                setError(["Error while loading event data.", ret.unwrapError().message])
+            } else {
+                setEvent(ret.unwrapData());
+            }
         }
         getData();
     }, [id])
@@ -67,7 +70,7 @@ export default function Page() {
             if (error === undefined) {
                 nav("/events/" + event.id);
             } else {
-                setError(["Could not save your event changes.", error]);
+                setError(["Could not save your event changes.", error.message]);
                 return;
             }
         });

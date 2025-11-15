@@ -1,8 +1,7 @@
 import { useNavigate } from "react-router-dom";
-
-import type { EventRecord } from "../../lib/Database";
 import EventBadge from "./EventBadge";
 import getBadges from "../../lib/getBadges";
+import type { EventRecord } from "../../lib/Database/EventRecord";
 
 export default function EventCard({ event }: { event: EventRecord }) {
     const nav = useNavigate();
@@ -17,7 +16,7 @@ export default function EventCard({ event }: { event: EventRecord }) {
                 <span className={"font-bold text-2xl text-black"}>{ event.name }</span>
             </div>
             <div className="flex flex-wrap gap-2">
-                { getBadges(event).map(t => <EventBadge text={t} />) }
+                { getBadges(event).map((t, i) => <EventBadge text={t} key={i} />) }
             </div>
         </div>
         <div className="p-6 text-gray-800 leading-relaxed text-sm md:text-base">

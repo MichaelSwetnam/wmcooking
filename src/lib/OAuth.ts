@@ -1,6 +1,6 @@
 import type { AuthError, PostgrestError, User } from "@supabase/supabase-js";
 import { Supabase } from "./Supabase";
-import type { DatabaseReturn } from "./Database";
+import DBReturn from "./Database/DBReturn";
 
 export interface UserRecord {
     id: string;
@@ -71,14 +71,15 @@ class OAuth {
      * @param id 
      * @returns 
      */
-    private async getAssociatedData(id: string): Promise<DatabaseReturn<AssociatedData>> {
+    private async getAssociatedData(id: string): Promise<DBReturn<AssociatedData>> {
         const { data, error } = await Supabase
             .from("Profiles")
             .select("*")
             .eq('id', id)
             .single();
 
-        return { data, error };
+
+        return DBReturn.fromSupabase<AssociatedData>(data, error);
     }
 
     /**
@@ -100,15 +101,13 @@ class OAuth {
         }
 
         const userResult = await this.getAssociatedData(user.id);
-        if (userResult.data && !userResult.error) {
-            this.isSignedIn = true;
+        if (userResult.isError()) return null;
 
-            const completeUser = this.composeRecord(user, userResult.data);
-            this.signedInUser = completeUser;
-            return completeUser;
-        }
-
-        return null;
+        const data = userResult.unwrapData();
+        this.isSignedIn = true;
+        const completeUser = this.composeRecord(user, data);
+        this.signedInUser = completeUser;
+        return completeUser;
     }
 
     /**
