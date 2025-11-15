@@ -1,4 +1,4 @@
-import type { EventRecord } from "../../lib/Database/DatabaseOld";
+import type { EventRecord } from "../../lib/Database/EventRecord";
 import getBadges from "../../lib/getBadges";
 import EventBadge from "./EventBadge";
 

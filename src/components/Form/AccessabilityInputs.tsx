@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { EventRecord } from "../../lib/Database/DatabaseOld";
 import type { InputProp } from "./Inputs";
+import type { EventRecord } from "../../lib/Database/EventRecord";
 
 type AccessabilityType = EventRecord["accessability"];
 export default function AccessabilityInput({ id, startValue, onChange}: InputProp<AccessabilityType>) {
