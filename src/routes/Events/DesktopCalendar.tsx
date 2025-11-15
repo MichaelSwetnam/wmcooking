@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import type { EventRecord } from "../../lib/Database/DatabaseOld";
+import type { EventRecord } from "../../lib/Database/EventRecord";
 
 interface DateBaseProps {
   day: Date;

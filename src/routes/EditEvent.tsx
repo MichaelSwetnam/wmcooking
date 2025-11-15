@@ -66,12 +66,11 @@ export default function Page() {
         e.preventDefault();
         if (!event) return;
         
-        Database.updateEvent(event.id, event).then(error => {
-            if (error === undefined) {
-                nav("/events/" + event.id);
+        Database.updateEvent(event.id, event).then(r => {
+            if (r.isError()) {
+                setError(["Could not save your event changes.", r.unwrapError().message]);
             } else {
-                setError(["Could not save your event changes.", error.message]);
-                return;
+                nav(`/events/${r.unwrapData().id}`);
             }
         });
     }

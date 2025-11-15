@@ -87,7 +87,6 @@ export default class Store<T> {
 
             store.data.set(key, val);
         }
-
         return store;
     }
 }

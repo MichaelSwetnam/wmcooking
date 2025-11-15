@@ -30,8 +30,6 @@ function EventsSubpage() {
         return <LoadingComponent />
     }
 
-    console.log(events);
-
     return <div className="flex flex-col gap-5">
         { events.map((e, i) => <EventCard event={e} key={i} />) }
     </div> 
