@@ -69,9 +69,8 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
                         <span className="w-6 h-6 bg-blue-300 text-white rounded-full flex items-center justify-center text-xs">
                             {user.email?.[0].toUpperCase()}
                         </span>
-                    )}
-                    <span>{user.email}</span> */}
-                    This feature will come back soon
+                    )} */ }
+                    <span>{user.id}</span>
                     <span className="transform rotate-3">{ priveleged ? "✅" : ""}</span>
                 </div>
             </button>

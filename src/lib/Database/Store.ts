@@ -1,4 +1,3 @@
-import DBError from "./DBError";
 import DBReturn from "./DBReturn";
 import getMillis from "./getMillis";
 
@@ -44,12 +43,11 @@ export default class Store<T> {
 
         // Grab from fetch method
         const fetched = await this.fetch(id);
-        if (fetched instanceof DBError) {
-            return new DBReturn<T>(fetched);
-        }
+        if (fetched.isError())
+            return fetched;
 
         // Put into cache
-        const data = fetched as T;
+        const data = fetched.unwrapData();
         this.data.set(id, this.wrapData(data));
         this.save();
         return new DBReturn(data);
