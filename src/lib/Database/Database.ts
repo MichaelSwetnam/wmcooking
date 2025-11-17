@@ -1,4 +1,4 @@
-import DatabaseEvents from "./DatabaseEvents";
+import DatabaseEvents from "./Children/DatabaseEvents";
 
 export type DatabaseStorage = {
     events: {

@@ -1,12 +1,12 @@
-import OAuth from "../OAuth";
-import { Supabase } from "../Supabase";
-import type { DatabaseStorage, DBWrapper } from "./Database";
+import OAuth from "../../OAuth";
+import { Supabase } from "../../Supabase";
+import type { DatabaseStorage, DBWrapper } from "../Database";
 import DatabaseChild from "./DatabaseChild";
-import DBError from "./DBError";
-import DBReturn from "./DBReturn";
-import type { EventRecord } from "./EventRecord";
-import getMillis from "./getMillis";
-import Store from "./Store";
+import DBError from "../DBError";
+import DBReturn from "../DBReturn";
+import type { EventRecord } from "../EventRecord";
+import getMillis from "../getMillis";
+import Store from "../Store";
 
 async function getEvent(id: string): Promise<DBReturn<EventRecord>> {
     const parsed = parseInt(id);
