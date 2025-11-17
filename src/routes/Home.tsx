@@ -12,7 +12,7 @@ function EventsSubpage() {
 
     useEffect(() => {
         const load = async () => {
-            const ret  = await Database.getNextEvents(3);
+            const ret  = await Database.events.getNextEvents(3);
             if (ret.isError())
                 setError(ret.unwrapError().message);
             else

@@ -27,7 +27,7 @@ export default function Page() {
         if (isNaN(parsedId)) return;
 
         const getData = async () => {
-            const ret = await Database.getEvent(parsedId);
+            const ret = await Database.events.get(parsedId);
 
             if (ret.isError()) {
                 setError(["Error while loading event data.", ret.unwrapError().message])
@@ -66,7 +66,7 @@ export default function Page() {
         e.preventDefault();
         if (!event) return;
         
-        Database.updateEvent(event.id, event).then(r => {
+        Database.events.update(event.id, event).then(r => {
             if (r.isError()) {
                 setError(["Could not save your event changes.", r.unwrapError().message]);
             } else {

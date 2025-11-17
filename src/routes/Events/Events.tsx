@@ -25,7 +25,7 @@ export default function Events() {
         setData(null);
         setError(null);
         const fx = async () => {
-            const ret = await Database.getEventsInMonth(month, year);
+            const ret = await Database.events.getEventsInMonth(month, year);
             if (ret.isError()) {
                 setError(ret.unwrapError().message)
             } else {

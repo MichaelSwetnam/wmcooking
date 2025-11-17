@@ -21,7 +21,7 @@ export default function Page() {
             const parsedId = parseInt(id);
             if (isNaN(parsedId)) return;
             
-            const ret = await Database.getEvent(parsedId);
+            const ret = await Database.events.get(parsedId);
             if (ret.isError()) {
                 setError(ret.unwrapError().message)
             } else {
