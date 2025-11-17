@@ -1,4 +1,5 @@
 import DatabaseEvents from "./Children/DatabaseEvents";
+import DatabaseProfiles from "./Children/DatabaseProfiles";
 
 export type DatabaseStorage = {
     events: {
@@ -12,7 +13,7 @@ export type DatabaseStorage = {
                 livesUntil: number
             }
         }
-    };
+    }
 };
 
 
@@ -23,6 +24,7 @@ export interface DBWrapper {
 class Database {
     private static readonly DATABASE_STORAGE_KEY = "DATABASE";
     public readonly events = new DatabaseEvents(this);
+    public readonly profiles = new DatabaseProfiles(this);
 
     constructor() {
         const dbStorage = localStorage.getItem(Database.DATABASE_STORAGE_KEY);
@@ -30,12 +32,15 @@ class Database {
             const obj = JSON.parse(dbStorage) as DatabaseStorage;
             if (obj.events)
                 this.events.updateFromCache(obj.events);
+            // if (obj.profiles)
+                // this.profiles.updateFromCache(obj.profiles);
         }
     }
 
     public save() {
         const obj: Partial<DatabaseStorage> = {};
         obj.events = this.events.toCacheObject();
+        // obj.profiles = this.profiles.toCacheObject();
 
         localStorage.setItem(Database.DATABASE_STORAGE_KEY, JSON.stringify(obj));
 

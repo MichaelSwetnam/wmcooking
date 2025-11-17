@@ -44,4 +44,18 @@ export default class DBReturn<T> {
     public isData(): this is T {
         return !this.isError();
     }
+
+    public map<U>(transformer: (v: T) => U): DBReturn<U> {
+        if (this.isError()) 
+            return DBReturn.fromError<U>(this.unwrapError());
+
+        return new DBReturn(transformer(this.unwrapData()));
+    }
+
+    public mapError<U>(): DBReturn<U> {
+        if (this.isData())
+            throw new Error("MapError must received an Error. Found data");
+
+        return new DBReturn<U>(this.unwrapError());
+    }
 }

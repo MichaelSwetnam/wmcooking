@@ -15,7 +15,7 @@ export default class Store<T> {
     private readonly fetch: StoreGetter<T>;
     private readonly data = new Map<string, StoreValue<T>>();
 
-    public constructor(fetch: StoreGetter<T>, storageKey: string) {
+    private constructor(fetch: StoreGetter<T>, storageKey: string) {
         this.fetch = fetch;
         this.storageKey = storageKey;
     }

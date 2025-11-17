@@ -29,7 +29,9 @@ export default function Page() {
             }
         }
         const getAuth = async () => {
-            const isAuth = await OAuth.isPrivileged();
+            const r = await OAuth.isPrivileged();
+            if (r.isError()) setPrivilege(false);
+            const isAuth = r.unwrapData();
             if (isAuth === true)
                 setPrivilege(true);
         }

@@ -2,8 +2,9 @@ import { useEffect, useState, useRef } from "react";
 import logo from "../assets/cooking-logo.png";
 import ResponsiveLink from "./Utility/ResponsiveLink";
 import LoadingComponent from "./Utility/LoadingComponent";
-import OAuth, { type UserRecord } from "../lib/OAuth";
+import OAuth from "../lib/OAuth";
 import SignInButton from "./Auth/SignInButton";
+import type ProfileRecord from "../lib/Database/ProfileRecord";
 
 interface SectionLinkProps {
     to: string;
@@ -16,7 +17,7 @@ function SectionLink({ to, children }: SectionLinkProps) {
 
 // Dropdown component inside the same file
 interface UserDropdownProps {
-    user: UserRecord;
+    user: ProfileRecord;
     onLogout?: () => void;
 }
 
@@ -27,7 +28,11 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
 
     useEffect(() => {
         OAuth.isPrivileged().then((result) => {
-            setPriveleged(result || false);
+            if (result.isError()) {
+                setPriveleged(null);
+            }
+
+            setPriveleged(result.unwrapData());
         });
     }, [user.id]);
 
@@ -54,7 +59,7 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
                 className="bg-blue-100 text-blue-900 font-medium px-3 py-1 rounded-full hover:shadow-md transition-shadow"
             >
                 <div className="flex gap-2 items-center justify-center">
-                    {user.picture ? (
+                    {/* {user.picture ? (
                         <img
                             src={user.picture}
                             alt="avatar"
@@ -65,7 +70,8 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
                             {user.email?.[0].toUpperCase()}
                         </span>
                     )}
-                    <span>{user.email}</span>
+                    <span>{user.email}</span> */}
+                    This feature will come back soon
                     <span className="transform rotate-3">{ priveleged ? "✅" : ""}</span>
                 </div>
             </button>
@@ -93,13 +99,19 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
 }
 
 export default function Header() {
-    const [user, setUser] = useState<UserRecord | null>(null);
+    const [user, setUser] = useState<ProfileRecord | null>(null);
     const [authLoaded, setAuthLoaded] = useState(false);
 
      useEffect(() => {
         (async () => {
             const user = await OAuth.getUser();
-            setUser(user);
+            if (user.isError()) {
+                setUser(null);
+                setAuthLoaded(true);
+                return;
+            }
+
+            setUser(user.unwrapData());
             setAuthLoaded(true);
         })();
     }, []);

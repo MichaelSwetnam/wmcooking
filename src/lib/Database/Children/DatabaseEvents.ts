@@ -22,6 +22,7 @@ async function getEvent(id: string): Promise<DBReturn<EventRecord>> {
 }
 
 const ONE_HOUR = 60 * 60 * 1000;
+type Key = "events";
 export default class DatabaseEvents extends DatabaseChild {
     private static readonly EVENT_STORAGE_KEY = "EVENTS";
 
@@ -152,20 +153,20 @@ export default class DatabaseEvents extends DatabaseChild {
         this.db.save();
     }
 
-    toCacheObject(): DatabaseStorage["events"] {
-        const obj: Partial<DatabaseStorage["events"]> = {};
+    toCacheObject(): DatabaseStorage[Key] {
+        const obj: Partial<DatabaseStorage[Key]> = {};
         obj.nextEvents = this.nextEvents;
         obj.months = this.months;
-        return obj as DatabaseStorage["events"];
+        return obj as DatabaseStorage[Key];
     }
 
-    updateFromCache(o: DatabaseStorage["events"]): void {
+    updateFromCache(o: DatabaseStorage[Key]): void {
         if (o.nextEvents && o.nextEvents.livesUntil > getMillis()) {
             this.nextEvents = o.nextEvents;
         }
         
         for (const key of Object.keys(o.months)) {
-            const data = o.months[key as keyof DatabaseStorage["events"]["months"]];
+            const data = o.months[key as keyof DatabaseStorage[Key]["months"]];
             if (data.livesUntil > getMillis()) this.months[key] = data;
         }
     }
