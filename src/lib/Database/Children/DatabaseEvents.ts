@@ -4,7 +4,7 @@ import type { DatabaseStorage, DBWrapper } from "../Database";
 import DatabaseChild from "./DatabaseChild";
 import DBError from "../DBError";
 import DBReturn from "../DBReturn";
-import type { EventRecord } from "../EventRecord";
+import type { EventRecord } from "../Records/EventRecord";
 import getMillis from "../getMillis";
 import Store from "../Store";
 

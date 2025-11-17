@@ -3,7 +3,7 @@ import ErrorComponent from "../../components/Event/ErrorComponent";
 import LoadingComponent from "../../components/Utility/LoadingComponent";
 import DesktopCalendar from "./DesktopCalendar";
 import MobileCalendar from "./MobileCalendar";
-import type { EventRecord } from "../../lib/Database/EventRecord";
+import type { EventRecord } from "../../lib/Database/Records/EventRecord";
 import Database from "../../lib/Database/Database";
 
 export default function Events() {

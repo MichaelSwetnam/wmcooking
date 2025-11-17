@@ -1,5 +1,6 @@
 import DatabaseEvents from "./Children/DatabaseEvents";
 import DatabaseProfiles from "./Children/DatabaseProfiles";
+import DatabaseSignup from "./Children/DatabaseSignup";
 
 export type DatabaseStorage = {
     events: {
@@ -25,6 +26,7 @@ class Database {
     private static readonly DATABASE_STORAGE_KEY = "DATABASE";
     public readonly events = new DatabaseEvents(this);
     public readonly profiles = new DatabaseProfiles(this);
+    public readonly signups = new DatabaseSignup(this);
 
     constructor() {
         const dbStorage = localStorage.getItem(Database.DATABASE_STORAGE_KEY);

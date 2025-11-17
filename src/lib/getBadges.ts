@@ -1,4 +1,4 @@
-import type { EventRecord } from "./Database/EventRecord";
+import type { EventRecord } from "./Database/Records/EventRecord";
 
 export default function getBadges(event: EventRecord) {
     const badges: string[] = [];

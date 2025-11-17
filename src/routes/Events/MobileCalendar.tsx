@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import type { EventRecord } from "../../lib/Database/EventRecord";
+import type { EventRecord } from "../../lib/Database/Records/EventRecord";
 
 function Day({ events }: { events: EventRecord[] }) {
     const nav = useNavigate();

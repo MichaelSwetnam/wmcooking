@@ -1,7 +1,7 @@
 import { Supabase } from "../../Supabase";
 import type { DBWrapper } from "../Database";
 import DBReturn from "../DBReturn";
-import type ProfileRecord from "../ProfileRecord";
+import type ProfileRecord from "../Records/ProfileRecord";
 import Store from "../Store";
 import DatabaseChild from "./DatabaseChild";
 

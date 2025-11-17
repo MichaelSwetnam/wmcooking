@@ -10,7 +10,7 @@ import LongTextInput from "../components/Form/LongTextInput";
 import DateInput from "../components/Form/DateInput";
 import AccessabilityInput from "../components/Form/AccessabilityInputs";
 import BooleanInput from "../components/Form/BooleanInput";
-import type { EventRecord } from "../lib/Database/EventRecord";
+import type { EventRecord } from "../lib/Database/Records/EventRecord";
 import Database from "../lib/Database/Database";
 
 

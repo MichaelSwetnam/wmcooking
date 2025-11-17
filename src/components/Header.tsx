@@ -4,7 +4,7 @@ import ResponsiveLink from "./Utility/ResponsiveLink";
 import LoadingComponent from "./Utility/LoadingComponent";
 import OAuth from "../lib/OAuth";
 import SignInButton from "./Auth/SignInButton";
-import type ProfileRecord from "../lib/Database/ProfileRecord";
+import type ProfileRecord from "../lib/Database/Records/ProfileRecord";
 
 interface SectionLinkProps {
     to: string;

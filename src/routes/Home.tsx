@@ -3,7 +3,7 @@ import EventCard from "../components/Event/EventCard";
 import { useEffect, useState } from "react";
 import ErrorComponent from "../components/Event/ErrorComponent";
 import LoadingComponent from "../components/Utility/LoadingComponent";
-import type { EventRecord } from "../lib/Database/EventRecord";
+import type { EventRecord } from "../lib/Database/Records/EventRecord";
 import Database from "../lib/Database/Database";
 
 function EventsSubpage() {

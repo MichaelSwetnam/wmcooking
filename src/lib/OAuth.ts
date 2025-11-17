@@ -1,7 +1,7 @@
 import type { PostgrestError } from "@supabase/supabase-js";
 import { Supabase } from "./Supabase";
 import DBReturn from "./Database/DBReturn";
-import type ProfileRecord from "./Database/ProfileRecord";
+import type ProfileRecord from "./Database/Records/ProfileRecord";
 import Database from "./Database/Database";
 
 class OAuth {

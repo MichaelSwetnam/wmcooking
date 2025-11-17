@@ -58,4 +58,15 @@ export default class DBReturn<T> {
 
         return new DBReturn<U>(this.unwrapError());
     }
+
+    public ifData(cb: (d: T) => unknown): DBReturn<T> {
+        if (this.isData()) cb(this.unwrapData());
+        return this;
+    }
+
+    public ifError(cb: (d: DBError) => unknown): DBReturn<T> {
+        if (this.isError()) cb(this.unwrapError());
+
+        return this;
+    }
 }
