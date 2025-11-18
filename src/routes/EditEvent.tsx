@@ -81,7 +81,7 @@ export default function Page() {
                 <form className="p-3 bg-blue- rounded-md flex flex-col items-center w-full gap-3" onSubmit={onSubmit}>
                     <div className="grid grid-cols-[1fr_4fr] items-center gap-3 w-full lg:w-3/4">
                         <InputLabel name="Title" />
-                        <ShortTextInput id="title" startValue={event.name} onChange={onChange} />
+                        <ShortTextInput id="name" startValue={event.name} onChange={onChange} />
                         <InputLabel name="Location" />
                         <ShortTextInput id="location" startValue={event.location} onChange={onChange} />
                         <InputLabel name="Description" />
@@ -94,10 +94,6 @@ export default function Page() {
                         <AccessabilityInput id="accessability" startValue={event.accessability} onChange={onChange} />
                         <InputLabel name="Signup Required?" />
                         <BooleanInput id="requires_signup" startValue={event.requires_signup} onChange={onChange} />
-                        { event.requires_signup && <>
-                            <InputLabel name="Signup Link" />
-                            <ShortTextInput id="signup_link" startValue={event.signup_link} onChange={onChange} />
-                        </>}
                     </div>
                     <div className="flex flex-row gap-2">
                         <input type="submit" value="Save" className="bg-blue-400 text-white font-semibold py-2 px-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow" />

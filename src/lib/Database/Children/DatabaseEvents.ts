@@ -133,13 +133,17 @@ export default class DatabaseEvents extends DatabaseChild {
             return new DBReturn<EventRecord>(DBError.custom("Event ids must match in update requests."));
         }
 
+        const payload: Partial<EventRecord> = event;
+        payload.id = undefined; // Should never be updated;
         const { data, error } = await Supabase
             .from("Events")
-            .update(event)
+            .update(payload)
             .eq('id', id)
             .select('*')
             .single();
-        
+
+        console.log(data, error);
+
         const ret = DBReturn.fromSupabase<EventRecord>(data, error);
         if (ret.isError())
             return ret;

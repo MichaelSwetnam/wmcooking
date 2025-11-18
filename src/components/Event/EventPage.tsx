@@ -78,13 +78,15 @@ export default function EventPage({ event }: { event: EventRecord }) {
         <div className="flex flex-col gap-3 px-6 p-3">
             <p className="text-gray-800 font-semibold">Description:</p>
             <p className="text-gray-800 leading-relaxed text-sm md:text-base">{event.description}</p>
-            <p className="text-gray-800 font-semibold">Attending:</p>
-            <p className="text-gray-800 leading-relaxed text-sm md:text-base">{signups.unwrapData().length} people have RSVP'd.</p>
+            {
+                event.requires_signup && <>
+                <p className="text-gray-800 font-semibold">Attending:</p>
+                <p className="text-gray-800 leading-relaxed text-sm md:text-base">{signups.unwrapData().length} people have RSVP'd.</p>
+            </>}
         </div>
         <div className="flex flex-row justify-center items-center p-3 gap-3">
-            
             { /* User is not logged in */}
-            {(!user || user.isError()) && 
+            {event.requires_signup && (!user || user.isError()) && 
                 <div className="flex flex-col justify-center gap-1">
                     <p>Log in to RSVP:</p>
                     <SignInButton />
@@ -92,7 +94,7 @@ export default function EventPage({ event }: { event: EventRecord }) {
             }
 
             { /* User is logged in  */}
-            {user?.isData() && (
+            {event.requires_signup && user?.isData() && (
                 isRsvpd 
                 ?
                 <button onClick={RSVPButton} className="px-3 py-2 bg-green-300 rounded-lg shadow-mg hover:shadow-lg transition-shadow font-semibold">
