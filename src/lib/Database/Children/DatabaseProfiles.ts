@@ -27,6 +27,12 @@ export default class DatabaseProfiles extends DatabaseChild {
         return this.profiles.get(id);
     }
 
+    logoutWipe() {
+        // When a user logs out we must remove all profile information in case an exec member logs out and allows a non-exec into the browser.
+        localStorage.removeItem(DatabaseProfiles.PROFILE_STORAGE_KEY);
+        this.profiles = Store.fromStorage<ProfileRecord>(DatabaseProfiles.PROFILE_STORAGE_KEY, getProfile);
+    }
+
     toCacheObject(): unknown {
         throw new Error("DatabaseProfiles does not store in DATABASE.");
     }

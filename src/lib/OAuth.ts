@@ -20,6 +20,8 @@ class OAuth {
      * @returns Whether the logout was succesfull
      */
     async logOut(): Promise<boolean> {
+        Database.profiles.logoutWipe();
+        
         const error = await Supabase.auth.signOut();
         this.signedInUser = null;
         
