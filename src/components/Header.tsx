@@ -59,18 +59,7 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
                 className="bg-blue-100 text-blue-900 font-medium px-3 py-1 rounded-full hover:shadow-md transition-shadow"
             >
                 <div className="flex gap-2 items-center justify-center">
-                    {/* {user.picture ? (
-                        <img
-                            src={user.picture}
-                            alt="avatar"
-                            className="w-8 h-8 rounded-full object-cover"
-                        />
-                    ) : (
-                        <span className="w-6 h-6 bg-blue-300 text-white rounded-full flex items-center justify-center text-xs">
-                            {user.email?.[0].toUpperCase()}
-                        </span>
-                    )} */ }
-                    <span>{user.id}</span>
+                    <span>{user.email}</span>
                     <span className="transform rotate-3">{ priveleged ? "✅" : ""}</span>
                 </div>
             </button>
