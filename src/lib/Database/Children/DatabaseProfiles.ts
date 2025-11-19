@@ -1,5 +1,7 @@
+import OAuth from "../../OAuth";
 import { Supabase } from "../../Supabase";
 import type { DBWrapper } from "../Database";
+import DBError from "../DBError";
 import DBReturn from "../DBReturn";
 import type ProfileRecord from "../Records/ProfileRecord";
 import Store from "../Store";
@@ -25,6 +27,30 @@ export default class DatabaseProfiles extends DatabaseChild {
 
     async get(id: string): Promise<DBReturn<ProfileRecord>> {
         return this.profiles.get(id);
+    }
+
+    async updateName(id: string, newName: string): Promise<DBReturn<ProfileRecord>> {
+        const userProfileReturn = await OAuth.getUser();
+        if (userProfileReturn.isError()) return userProfileReturn;
+
+        const userProfile = userProfileReturn.unwrapData();
+        if (id !== userProfile.id)
+            return DBReturn.fromError(DBError.custom("Can only update your own display name, not others."));
+
+        const { data, error } = await Supabase
+            .from("Profiles")
+            .update({ name: newName })
+            .eq('id', userProfile.id)
+            .select("*")
+            .single();
+
+        const ret = DBReturn.fromSupabase<ProfileRecord>(data, error);
+
+        ret.ifData(d => 
+            this.profiles.set(userProfile.id, d)
+        );
+
+        return ret;
     }
 
     logoutWipe() {

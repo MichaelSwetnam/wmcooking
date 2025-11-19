@@ -10,6 +10,7 @@ import WIP from './components/Utility/WIP.tsx';
 import Events from './routes/Events/Events.tsx';
 import EventPage from './routes/EventPage.tsx';
 import EditEvent from './routes/EditEvent.tsx';
+import Profile from './routes/Profile.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter> 
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/events" element={<Events />} />
             <Route path="/events/:id" element={<EventPage />} />
             <Route path="/events/:id/edit" element={<EditEvent />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

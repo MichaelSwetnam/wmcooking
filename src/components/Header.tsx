@@ -5,6 +5,7 @@ import LoadingComponent from "./Utility/LoadingComponent";
 import OAuth from "../lib/OAuth";
 import SignInButton from "./Auth/SignInButton";
 import type ProfileRecord from "../lib/Database/Records/ProfileRecord";
+import { useNavigate } from "react-router-dom";
 
 interface SectionLinkProps {
     to: string;
@@ -22,6 +23,7 @@ interface UserDropdownProps {
 }
 
 function UserDropdown({ user, onLogout }: UserDropdownProps) {
+    const nav = useNavigate();
     const [open, setOpen] = useState(false);
     const [priveleged, setPriveleged] = useState<null | boolean>(null);
     const dropdownRef = useRef<HTMLDivElement>(null); 
@@ -66,14 +68,14 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
 
             {open && (
                 <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-md border border-gray-200 z-10">
-                    {/* { user.is_admin &&
+                    { user.is_admin &&
                         <button
-                        onClick={() => nav("/manage")}
+                        onClick={() => nav("/profile")}
                         className="block w-full text-left px-4 py-2 text-blue-900 hover:bg-blue-50 rounded-md transition"
                     >
-                        Manage Users
+                        Update Profile
                     </button>
-                    } */}
+                    }
                     <button
                         onClick={handleLogout}
                         className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-md transition"
