@@ -59,7 +59,7 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
                 className="bg-blue-100 text-blue-900 font-medium px-3 py-1 rounded-full hover:shadow-md transition-shadow"
             >
                 <div className="flex gap-2 items-center justify-center">
-                    <span>{user.email}</span>
+                    <span>{user.name}</span>
                     <span className="transform rotate-3">{ priveleged ? "✅" : ""}</span>
                 </div>
             </button>
