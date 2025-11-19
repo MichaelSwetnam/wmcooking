@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import logo from "../assets/cooking-logo.png";
 import ResponsiveLink from "./Utility/ResponsiveLink";
 import LoadingComponent from "./Utility/LoadingComponent";
@@ -6,6 +6,7 @@ import OAuth from "../lib/OAuth";
 import SignInButton from "./Auth/SignInButton";
 import type ProfileRecord from "../lib/Database/Records/ProfileRecord";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "./Auth/UserContext";
 
 interface SectionLinkProps {
     to: string;
@@ -89,22 +90,7 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
 }
 
 export default function Header() {
-    const [user, setUser] = useState<ProfileRecord | null>(null);
-    const [authLoaded, setAuthLoaded] = useState(false);
-
-     useEffect(() => {
-        (async () => {
-            const user = await OAuth.getUser();
-            if (user.isError()) {
-                setUser(null);
-                setAuthLoaded(true);
-                return;
-            }
-
-            setUser(user.unwrapData());
-            setAuthLoaded(true);
-        })();
-    }, []);
+    const { user, setUser } = useContext(UserContext);
 
     return (
         <header className="bg-linear-to-r from-blue-300 to-blue-200 py-3 shadow-md w-full">
@@ -127,7 +113,7 @@ export default function Header() {
                         <SectionLink to="/events">Events</SectionLink>
                     </nav>
                     {
-                        !authLoaded && <LoadingComponent />
+                        !user && <LoadingComponent />
                     }
                     {
                         user

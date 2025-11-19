@@ -57,6 +57,7 @@ class OAuth {
      * Get the profile for the signed in user
      */
     async getUser(): Promise<DBReturn<ProfileRecord>> {
+        console.log("Someone called getUser()!!!!!");
         const idRet = await this.getId();
         if (idRet.isError()) 
             return idRet.mapError();
@@ -69,7 +70,7 @@ class OAuth {
      * Whether the currently logged in user is an admin.
      * @returns Null if no user is logged in
      */
-    async isPrivileged(): Promise<DBReturn<boolean>> {
+    async isPrivileged(): Promise<DBReturn<boolean>> {  
         return (await this.getUser()).map(r => r.is_admin);
     }
 }
