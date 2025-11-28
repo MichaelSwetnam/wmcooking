@@ -4,6 +4,30 @@ import DBReturn from "./Database/DBReturn";
 import type ProfileRecord from "./Database/Records/ProfileRecord";
 import Database from "./Database/Database";
 
+export class UserProfile {
+    private record: ProfileRecord;
+
+    constructor(rec: ProfileRecord) {
+        this.record = rec;
+    }
+
+    isPrivileged(): boolean {
+        return this.record.is_admin;
+    }
+
+    getId(): string {
+        return this.record.id;
+    }
+
+    getEmail(): string {
+        return this.record.email;
+    }
+
+    getName(): string {
+        return this.record.name;
+    }
+}
+
 class OAuth {
     private signedInUser: string | null = null; // Key to database cache
  
@@ -56,22 +80,14 @@ class OAuth {
     /**
      * Get the profile for the signed in user
      */
-    async getUser(): Promise<DBReturn<ProfileRecord>> {
+    async getUser(): Promise<DBReturn<UserProfile | null>> {
         console.log("Someone called getUser()!!!!!");
         const idRet = await this.getId();
         if (idRet.isError()) 
             return idRet.mapError();
 
         const id = idRet.unwrapData();
-        return Database.profiles.get(id);
-    }
-
-    /**
-     * Whether the currently logged in user is an admin.
-     * @returns Null if no user is logged in
-     */
-    async isPrivileged(): Promise<DBReturn<boolean>> {  
-        return (await this.getUser()).map(r => r.is_admin);
+        return (await Database.profiles.get(id)).map(d => new UserProfile(d));
     }
 }
 
