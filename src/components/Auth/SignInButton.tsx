@@ -7,14 +7,7 @@ export default function Component() {
 
     const signIn = async () => {
         OAuth.logIn(window.location.href);
-
-        const newUser = await OAuth.getUser();
-        if (newUser.isError()) {
-            setUser(null);
-            return;
-        }
-
-        setUser(newUser.unwrapData());
+        setUser(await OAuth.getUser());
     };
 
     return <button

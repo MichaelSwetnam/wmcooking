@@ -5,19 +5,20 @@ import EventBadge from "./EventBadge";
 import type { SignupRecord } from "../../lib/Database/Records/SignupRecord";
 import Database from "../../lib/Database/Database";
 import DBReturn from "../../lib/Database/DBReturn";
-import OAuth from "../../lib/OAuth";
+import OAuth, { UserProfile } from "../../lib/OAuth";
 import { useNavigate } from "react-router-dom";
 import LoadingComponent from "../Utility/LoadingComponent";
 import ErrorComponent from "./ErrorComponent";
-import type ProfileRecord from "../../lib/Database/Records/ProfileRecord";
 import SignInButton from "../Auth/SignInButton";
 
 export default function EventPage({ event }: { event: EventRecord }) {
     const [signups, setSignups] = useState<DBReturn<SignupRecord[]> | null>(null);
     const [rsvpToggle, setRsvpToggle] = useState(false);
-    const [user, setUser] = useState<DBReturn<ProfileRecord> | null>(null);
     const nav = useNavigate();
 
+    const [user, setUser] = useState<UserProfile | null>(null);
+
+    /** Get information from DB */
     useEffect(() => {
         const getSignups = async () => {
             const r = await Database.signups.getFromEvent(event.id);
@@ -26,14 +27,19 @@ export default function EventPage({ event }: { event: EventRecord }) {
         }
 
         const getAuth = async () => {
-            const r = await OAuth.getUser();
-            setUser(r);
-            return r;
+            setUser(await OAuth.getUser());
         }
 
         getSignups();
         getAuth();
     }, [event.id]);
+
+    /** Unmount component (Save singup to DB) */
+    useEffect(() => {
+        return () => {
+            throw new Error("Implement saving the changes");
+        }
+    }, [])
 
     if (!signups)
         return <LoadingComponent />
@@ -41,22 +47,24 @@ export default function EventPage({ event }: { event: EventRecord }) {
         return <ErrorComponent message={signups.unwrapError().message} />
 
     let isRsvpd: boolean;
-    if (user && user.isData()) {
-        const userId = user.unwrapData().id;
+    if (user) {
+        const userId = user.getId();
         isRsvpd = signups.unwrapData().find(s => s.user_id === userId) !== undefined;
     } else isRsvpd = false;
     
     function RSVPButton() {
+        if (!user) return;
+
         setRsvpToggle(true);
         const SUS = signups!.unwrapData();
 
         if (isRsvpd) {
             // Remove RSVP
-            const index = SUS.findIndex(s => s.user_id === user!.unwrapData().id);
+            const index = SUS.findIndex(s => s.user_id === user.getId());
             SUS.splice(index);
         } else {
             // Add RSVP
-            SUS.push({ id: 1000, user_id: user!.unwrapData().id, event_id: event.id.toString() });
+            SUS.push({ id: 1000, user_id: user.getId(), event_id: event.id.toString() });
         }
 
         setSignups(new DBReturn(SUS));
@@ -81,12 +89,12 @@ export default function EventPage({ event }: { event: EventRecord }) {
             {
                 event.requires_signup && <>
                 <p className="text-gray-800 font-semibold">Attending:</p>
-                <p className="text-gray-800 leading-relaxed text-sm md:text-base">{signups.unwrapData().length} people have RSVP'd.</p>
+                <p className="text-gray-800 leading-relaxed text-sm md:text-base">{signups.unwrapData().length} Attendee(s).</p>
             </>}
         </div>
         <div className="flex flex-row justify-center items-center p-3 gap-3">
             { /* User is not logged in */}
-            {event.requires_signup && (!user || user.isError()) && 
+            {event.requires_signup && !user && 
                 <div className="flex flex-col justify-center gap-1">
                     <p>Log in to RSVP:</p>
                     <SignInButton />
@@ -94,7 +102,7 @@ export default function EventPage({ event }: { event: EventRecord }) {
             }
 
             { /* User is logged in  */}
-            {event.requires_signup && user?.isData() && (
+            {event.requires_signup && user && (
                 isRsvpd 
                 ?
                 <button onClick={RSVPButton} className="px-3 py-2 bg-green-300 rounded-lg shadow-mg hover:shadow-lg transition-shadow font-semibold">
@@ -115,7 +123,7 @@ export default function EventPage({ event }: { event: EventRecord }) {
             )}
 
             { /* User is logged in AND exec */ }
-            {user && user.isData() && user.unwrapData().is_admin &&                
+            {user && user.isPrivileged() &&                
                 <button
                     className="px-3 py-2 bg-blue-300 rounded-lg shadow-md hover:shadow-lg transition-shadow font-semibold"
                     onClick={() => nav(`/events/${event.id}/edit`)}

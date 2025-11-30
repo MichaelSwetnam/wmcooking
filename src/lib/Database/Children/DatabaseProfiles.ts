@@ -30,24 +30,25 @@ export default class DatabaseProfiles extends DatabaseChild {
     }
 
     async updateName(id: string, newName: string): Promise<DBReturn<ProfileRecord>> {
-        const userProfileReturn = await OAuth.getUser();
-        if (userProfileReturn.isError()) return userProfileReturn;
+        const userProfile = await OAuth.getUser();
 
-        const userProfile = userProfileReturn.unwrapData();
-        if (id !== userProfile.id)
+        if (!userProfile) 
+            return DBReturn.fromError(DBError.custom("Cannot updateName on a user that is not logged in."));
+
+        if (id !== userProfile.getId())
             return DBReturn.fromError(DBError.custom("Can only update your own display name, not others."));
 
         const { data, error } = await Supabase
             .from("Profiles")
             .update({ name: newName })
-            .eq('id', userProfile.id)
+            .eq('id', userProfile.getId())
             .select("*")
             .single();
 
         const ret = DBReturn.fromSupabase<ProfileRecord>(data, error);
 
         ret.ifData(d => 
-            this.profiles.set(userProfile.id, d)
+            this.profiles.set(userProfile.getId(), d)
         );
 
         return ret;
@@ -60,11 +61,11 @@ export default class DatabaseProfiles extends DatabaseChild {
     }
 
     toCacheObject(): unknown {
-        throw new Error("DatabaseProfiles does not store in DATABASE.");
+        throw new Error("DatabaseProfiles does not store in LocalStorage.");
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     updateFromCache(_s: unknown): void {
-        throw new Error("DatabaseProfiles does not store in DATABASE.");
+        throw new Error("DatabaseProfiles does not store in LocalStorage.");
     }
 
 }

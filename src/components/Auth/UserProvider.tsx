@@ -7,7 +7,7 @@ export function UserProvider({ children }: { children: React.ReactNode}) {
 
     // Initial profile load - child components should avoid calling OAuth.getUser()
     useEffect(() => {
-        OAuth.getUser().then(user => user.ifData(d => setUser(d)))
+        OAuth.getUser().then(user => setUser(user));
     }, []);
 
     return <UserContext.Provider value={{ user, setUser }}>

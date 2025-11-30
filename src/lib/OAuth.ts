@@ -80,14 +80,18 @@ class OAuth {
     /**
      * Get the profile for the signed in user
      */
-    async getUser(): Promise<DBReturn<UserProfile | null>> {
+    async getUser(): Promise<UserProfile | null> {
         console.log("Someone called getUser()!!!!!");
         const idRet = await this.getId();
         if (idRet.isError()) 
-            return idRet.mapError();
+            return null;
 
         const id = idRet.unwrapData();
-        return (await Database.profiles.get(id)).map(d => new UserProfile(d));
+        const userProfile = await Database.profiles.get(id);
+        if (userProfile.isError())
+            return null;
+
+        return new UserProfile(userProfile.unwrapData());
     }
 }
 
