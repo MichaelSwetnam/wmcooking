@@ -2,39 +2,44 @@ import { useNavigate } from "react-router-dom";
 import { InputLabel } from "../components/Form/Inputs";
 import DisabledTextInput from "../components/Form/DisabledTextInput";
 import ShortTextInput from "../components/Form/ShortTextInput";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Database from "../lib/Database/Database";
 import LoadingComponent from "../components/Utility/LoadingComponent";
 import DBError from "../lib/Database/DBError";
 import ErrorComponent from "../components/Event/ErrorComponent";
 import { UserContext } from "../components/Auth/UserContext";
-import NeedLogin from "../components/Auth/NeedLogin";
+import { UserProfile } from "../lib/OAuth";
 
 export default function Page() {
     const nav = useNavigate();
-    const { user } = useContext(UserContext);
-    const [name, setName] = useState(user?.getName() ?? "");
+    const { user, setUser } = useContext(UserContext);
+    const [name, setName] = useState<string | null>(null);
     const [error, setError] = useState<DBError | null>(null);
-    
-    if (user === null)
-        return <NeedLogin />
+
+    useEffect(() => {
+        if (name || !user) return;
+        setName(user.getName());
+    }, [name, user]);
 
     async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
         if (!user) return;
         const profileReturn = await Database.profiles.updateName(user.getId(), name!);
-        if (profileReturn.isError())
+        if (profileReturn.isError()) {
             setError(profileReturn.unwrapError());
-        if (profileReturn.isData())
-            nav(-1);
+            return;
+        }
+
+        setUser(new UserProfile(profileReturn.unwrapData()));
+        nav(-1);
     }
 
     function onChange(_: string, value: string) {
         setName(value);
     }
 
-    if (user === null)
+    if (user === null || name === null)
         return <LoadingComponent />
 
     if (error)

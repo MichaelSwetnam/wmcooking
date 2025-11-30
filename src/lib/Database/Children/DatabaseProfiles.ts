@@ -46,7 +46,6 @@ export default class DatabaseProfiles extends DatabaseChild {
             .single();
 
         const ret = DBReturn.fromSupabase<ProfileRecord>(data, error);
-
         ret.ifData(d => 
             this.profiles.set(userProfile.getId(), d)
         );
