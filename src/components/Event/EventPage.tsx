@@ -1,73 +1,85 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import type { EventRecord } from "../../lib/Database/Records/EventRecord";
 import getBadges from "../../lib/getBadges";
 import EventBadge from "./EventBadge";
 import type { SignupRecord } from "../../lib/Database/Records/SignupRecord";
 import Database from "../../lib/Database/Database";
-import DBReturn from "../../lib/Database/DBReturn";
-import OAuth, { UserProfile } from "../../lib/OAuth";
 import { useNavigate } from "react-router-dom";
 import LoadingComponent from "../Utility/LoadingComponent";
 import ErrorComponent from "./ErrorComponent";
 import SignInButton from "../Auth/SignInButton";
+import DBError from "../../lib/Database/DBError";
+import { UserContext } from "../Auth/UserContext";
 
 export default function EventPage({ event }: { event: EventRecord }) {
-    const [signups, setSignups] = useState<DBReturn<SignupRecord[]> | null>(null);
+    const [error, setError] = useState<DBError | null>(null); 
+    const [signups, setSignups] = useState<SignupRecord[] | null>(null);
+    const [selfSignup, setSelfSignup] = useState<SignupRecord | null>(null);
+
+    const { user } = useContext(UserContext);
+
+    // Whether the RSVP button has been clicked at least once (changes from "Click to RSVP" -> "Attending")
     const [rsvpToggle, setRsvpToggle] = useState(false);
     const nav = useNavigate();
 
-    const [user, setUser] = useState<UserProfile | null>(null);
+
+    const isRsvpd = selfSignup !== null;
 
     /** Get information from DB */
     useEffect(() => {
         const getSignups = async () => {
             const r = await Database.signups.getFromEvent(event.id);
-            setSignups(r);
-            return r;
-        }
+            if (r.isError()) {
+                setError(r.unwrapError());
+                return;
+            }
 
-        const getAuth = async () => {
-            setUser(await OAuth.getUser());
-        }
+            const data = r.unwrapData();
+            
+            /** If no one is signed in, then there is no self signup */
+            if (!user) {
+                setSignups(data);
+                setSelfSignup(null);
+                return;
+            }
+            
+            /** If the user is signed in, remove their signup from data and put it in selfSignup */
+            const userSignupIndex = data.findIndex(s => event.id.toString() === s.event_id && s.user_id === user.getId());
+            if (userSignupIndex !== -1) {
+                setSelfSignup(data[userSignupIndex]);
+                data.splice(userSignupIndex);
+            }
 
+            setSignups(data);
+        }
         getSignups();
-        getAuth();
-    }, [event.id]);
+    }, [event.id, user]);
 
-    /** Unmount component (Save singup to DB) */
-    useEffect(() => {
-        return () => {
-            throw new Error("Implement saving the changes");
-        }
-    }, [])
-
+    /** Guard Statements */
+    if (error)
+        return <ErrorComponent message={error.message} />
     if (!signups)
         return <LoadingComponent />
-    if (signups.isError()) 
-        return <ErrorComponent message={signups.unwrapError().message} />
 
-    let isRsvpd: boolean;
-    if (user) {
-        const userId = user.getId();
-        isRsvpd = signups.unwrapData().find(s => s.user_id === userId) !== undefined;
-    } else isRsvpd = false;
-    
+    /** Button OnClick */
     function RSVPButton() {
         if (!user) return;
 
         setRsvpToggle(true);
-        const SUS = signups!.unwrapData();
 
-        if (isRsvpd) {
-            // Remove RSVP
-            const index = SUS.findIndex(s => s.user_id === user.getId());
-            SUS.splice(index);
+        if (selfSignup !== null) {
+            // There was a signup - remove it
+            console.log("Remove Signup");
+            setSelfSignup(null);
         } else {
-            // Add RSVP
-            SUS.push({ id: 1000, user_id: user.getId(), event_id: event.id.toString() });
+            // There wasn't a signup - add it
+            console.log("Add Signup");
+            /** Instead of making a fake record - insert into the DB and the use the returned record. */
+            // Might want a loading thing which would suck - think about it.
+            setSelfSignup({ event_id: event.id.toString(), id: 1000, user_id: user.getId()  })
         }
 
-        setSignups(new DBReturn(SUS));
+        console.log(selfSignup);
     }
 
     return <div className="flex flex-col bg-white rounded-3xl overflow-hidden w-full">
@@ -89,7 +101,7 @@ export default function EventPage({ event }: { event: EventRecord }) {
             {
                 event.requires_signup && <>
                 <p className="text-gray-800 font-semibold">Attending:</p>
-                <p className="text-gray-800 leading-relaxed text-sm md:text-base">{signups.unwrapData().length} Attendee(s).</p>
+                <p className="text-gray-800 leading-relaxed text-sm md:text-base">{signups.length} Attendee(s).</p>
             </>}
         </div>
         <div className="flex flex-row justify-center items-center p-3 gap-3">
