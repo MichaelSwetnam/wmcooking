@@ -93,6 +93,14 @@ class OAuth {
 
         return new UserProfile(userProfile.unwrapData());
     }
+
+    async isPrivileged(): Promise<boolean> {
+        const user = await this.getUser();
+        if (!user) 
+            return false;
+        else 
+            return user.isPrivileged();
+    }
 }
 
 export default new OAuth();

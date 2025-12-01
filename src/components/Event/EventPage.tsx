@@ -46,7 +46,7 @@ export default function EventPage({ event }: { event: EventRecord }) {
             const userSignupIndex = data.findIndex(s => event.id.toString() == s.event_id && s.user_id === user.getId());
             if (userSignupIndex !== -1) {
                 setSelfSignup(data[userSignupIndex]);
-                data.splice(userSignupIndex);
+                data.splice(userSignupIndex, 1);
             }
 
             setSignups(data);
@@ -86,6 +86,8 @@ export default function EventPage({ event }: { event: EventRecord }) {
         }
     }
 
+    console.log(signups);
+
     return <div className="flex flex-col bg-white rounded-3xl overflow-hidden w-full">
         <div className={"flex flex-col items-center p-5 gap-1 h-[40vh]"} style={{
             backgroundImage: `url(${event.background_image})`,
@@ -105,7 +107,18 @@ export default function EventPage({ event }: { event: EventRecord }) {
             {
                 event.requires_signup && <>
                 <p className="text-gray-800 font-semibold">Attending:</p>
-                <p className="text-gray-800 leading-relaxed text-sm md:text-base">{signups.length} Attendee(s).</p>
+                {/* <p className="text-gray-800 leading-relaxed text-sm md:text-base">{signups.length + (selfSignup ? 1 : 0)} Attendee(s).</p> */}
+                <ol className="w-full items-center pl-3 list-decimal">
+                    {
+                        selfSignup
+                        ? <li key={0}> {user!.getName()}</li>
+                        : <></>
+                    }
+                    {
+                        signups.map((s, i) => <li key={i + 1}>{s.user_id}</li>)
+                    }
+                </ol>
+                
             </>}
         </div>
         <div className="flex flex-row justify-center items-center p-3 gap-3">
