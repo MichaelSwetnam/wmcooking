@@ -22,7 +22,6 @@ export default function EventPage({ event }: { event: EventRecord }) {
     const [rsvpToggle, setRsvpToggle] = useState(false);
     const nav = useNavigate();
 
-
     const isRsvpd = selfSignup !== null;
 
     /** Get information from DB */
@@ -44,7 +43,7 @@ export default function EventPage({ event }: { event: EventRecord }) {
             }
             
             /** If the user is signed in, remove their signup from data and put it in selfSignup */
-            const userSignupIndex = data.findIndex(s => event.id.toString() === s.event_id && s.user_id === user.getId());
+            const userSignupIndex = data.findIndex(s => event.id.toString() == s.event_id && s.user_id === user.getId());
             if (userSignupIndex !== -1) {
                 setSelfSignup(data[userSignupIndex]);
                 data.splice(userSignupIndex);
@@ -62,24 +61,29 @@ export default function EventPage({ event }: { event: EventRecord }) {
         return <LoadingComponent />
 
     /** Button OnClick */
-    function RSVPButton() {
+    async function RSVPButton() {
         if (!user) return;
 
         setRsvpToggle(true);
 
         if (selfSignup !== null) {
             // There was a signup - remove it
-            console.log("Remove Signup");
+            const r = await Database.signups.delete(selfSignup.id.toString());
+            r.ifError(e => 
+                setError(e)
+            );
+
             setSelfSignup(null);
         } else {
             // There wasn't a signup - add it
-            console.log("Add Signup");
-            /** Instead of making a fake record - insert into the DB and the use the returned record. */
-            // Might want a loading thing which would suck - think about it.
-            setSelfSignup({ event_id: event.id.toString(), id: 1000, user_id: user.getId()  })
+            const r = await Database.signups.insert(event.id.toString(), user.getId());
+            if (r.isError()) {
+                setError(r.unwrapError());
+                return;
+            }
+            
+            setSelfSignup(r.unwrapData());
         }
-
-        console.log(selfSignup);
     }
 
     return <div className="flex flex-col bg-white rounded-3xl overflow-hidden w-full">
