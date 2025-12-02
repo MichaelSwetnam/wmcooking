@@ -4,6 +4,30 @@ import DBReturn from "./Database/DBReturn";
 import type ProfileRecord from "./Database/Records/ProfileRecord";
 import Database from "./Database/Database";
 
+export class UserProfile {
+    private record: ProfileRecord;
+
+    constructor(rec: ProfileRecord) {
+        this.record = rec;
+    }
+
+    isPrivileged(): boolean {
+        return this.record.is_admin;
+    }
+
+    getId(): string {
+        return this.record.id;
+    }
+
+    getEmail(): string {
+        return this.record.email;
+    }
+
+    getName(): string {
+        return this.record.name;
+    }
+}
+
 class OAuth {
     private signedInUser: string | null = null; // Key to database cache
  
@@ -20,6 +44,8 @@ class OAuth {
      * @returns Whether the logout was succesfull
      */
     async logOut(): Promise<boolean> {
+        Database.profiles.logoutWipe();
+        
         const error = await Supabase.auth.signOut();
         this.signedInUser = null;
         
@@ -54,21 +80,26 @@ class OAuth {
     /**
      * Get the profile for the signed in user
      */
-    async getUser(): Promise<DBReturn<ProfileRecord>> {
+    async getUser(): Promise<UserProfile | null> {
+        console.log("Someone called getUser()!!!!!");
         const idRet = await this.getId();
         if (idRet.isError()) 
-            return idRet.mapError();
+            return null;
 
         const id = idRet.unwrapData();
-        return Database.profiles.get(id);
+        const userProfile = await Database.profiles.get(id);
+        if (userProfile.isError())
+            return null;
+
+        return new UserProfile(userProfile.unwrapData());
     }
 
-    /**
-     * Whether the currently logged in user is an admin.
-     * @returns Null if no user is logged in
-     */
-    async isPrivileged(): Promise<DBReturn<boolean>> {
-        return (await this.getUser()).map(r => r.is_admin);
+    async isPrivileged(): Promise<boolean> {
+        const user = await this.getUser();
+        if (!user) 
+            return false;
+        else 
+            return user.isPrivileged();
     }
 }
 

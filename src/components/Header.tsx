@@ -1,10 +1,10 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import logo from "../assets/cooking-logo.png";
 import ResponsiveLink from "./Utility/ResponsiveLink";
-import LoadingComponent from "./Utility/LoadingComponent";
-import OAuth from "../lib/OAuth";
+import OAuth, { UserProfile } from "../lib/OAuth";
 import SignInButton from "./Auth/SignInButton";
-import type ProfileRecord from "../lib/Database/Records/ProfileRecord";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "./Auth/UserContext";
 
 interface SectionLinkProps {
     to: string;
@@ -17,24 +17,16 @@ function SectionLink({ to, children }: SectionLinkProps) {
 
 // Dropdown component inside the same file
 interface UserDropdownProps {
-    user: ProfileRecord;
+    user: UserProfile;
     onLogout?: () => void;
 }
 
 function UserDropdown({ user, onLogout }: UserDropdownProps) {
+    const nav = useNavigate();
     const [open, setOpen] = useState(false);
-    const [priveleged, setPriveleged] = useState<null | boolean>(null);
     const dropdownRef = useRef<HTMLDivElement>(null); 
 
-    useEffect(() => {
-        OAuth.isPrivileged().then((result) => {
-            if (result.isError()) {
-                setPriveleged(null);
-            }
-
-            setPriveleged(result.unwrapData());
-        });
-    }, [user.id]);
+    const priveleged = user.isPrivileged();
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -59,21 +51,22 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
                 className="bg-blue-100 text-blue-900 font-medium px-3 py-1 rounded-full hover:shadow-md transition-shadow"
             >
                 <div className="flex gap-2 items-center justify-center">
-                    <span>{user.email}</span>
+                    <span>{ user.getName() }</span>
                     <span className="transform rotate-3">{ priveleged ? "✅" : ""}</span>
                 </div>
             </button>
 
             {open && (
                 <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-md border border-gray-200 z-10">
-                    {/* { user.is_admin &&
+                    { priveleged &&
                         <button
-                        onClick={() => nav("/manage")}
-                        className="block w-full text-left px-4 py-2 text-blue-900 hover:bg-blue-50 rounded-md transition"
-                    >
-                        Manage Users
-                    </button>
-                    } */}
+                            onClick={() => nav("/profile")}
+                            className="block w-full text-left px-4 py-2 text-blue-900 hover:bg-blue-50 rounded-md transition"
+                        >
+                            Update Profile
+                        </button>
+                    }
+                    
                     <button
                         onClick={handleLogout}
                         className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-md transition"
@@ -87,22 +80,17 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
 }
 
 export default function Header() {
-    const [user, setUser] = useState<ProfileRecord | null>(null);
-    const [authLoaded, setAuthLoaded] = useState(false);
+    const { user, setUser } = useContext(UserContext);
+    const [ loadedRecord, setLoadedRecord ] = useState<UserProfile | null>(null);
 
-     useEffect(() => {
-        (async () => {
-            const user = await OAuth.getUser();
-            if (user.isError()) {
-                setUser(null);
-                setAuthLoaded(true);
-                return;
-            }
+    useEffect(() => {
+        if (!user) {
+            setLoadedRecord(null);
+            return;
+        }
 
-            setUser(user.unwrapData());
-            setAuthLoaded(true);
-        })();
-    }, []);
+        setLoadedRecord(user);
+    }, [user])
 
     return (
         <header className="bg-linear-to-r from-blue-300 to-blue-200 py-3 shadow-md w-full">
@@ -123,13 +111,10 @@ export default function Header() {
                 <div className="flex flex-row gap-6 text-blue-800 font-medium items-center">
                     <nav>
                         <SectionLink to="/events">Events</SectionLink>
-                    </nav>
+                    </nav> 
                     {
-                        !authLoaded && <LoadingComponent />
-                    }
-                    {
-                        user
-                        ? <UserDropdown user={user} onLogout={() => setUser(null)} />
+                        loadedRecord !== null
+                        ? <UserDropdown user={loadedRecord} onLogout={() => setUser(null)} />
                         : <SignInButton />
                     }
                 </div>

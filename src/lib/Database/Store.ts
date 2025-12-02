@@ -31,6 +31,15 @@ export default class Store<T> {
         this.save();
     }
 
+    findExists(cb: (x:T) => boolean) {
+        this.data.forEach(obj => {
+            if (cb(obj.data))
+                return true; 
+        });
+
+        return false;
+    }
+
     async get(id: string): Promise<DBReturn<T>> {
         // Get from cache
         if (this.data.has(id)) {
@@ -52,6 +61,16 @@ export default class Store<T> {
         this.save();
         return new DBReturn(data);
     }
+
+    /**
+     * Deletes a record from the cache
+     * !! Does not interact with database at all !!
+     * @param id 
+     */
+    delete(id: string) {
+        this.data.delete(id);
+        this.save();
+    };
 
     private toStorable(): string {
         const obj: Partial<{[_: string]: StoreValue<T>}>= { };

@@ -1,65 +1,96 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import type { EventRecord } from "../../lib/Database/Records/EventRecord";
 import getBadges from "../../lib/getBadges";
 import EventBadge from "./EventBadge";
 import type { SignupRecord } from "../../lib/Database/Records/SignupRecord";
 import Database from "../../lib/Database/Database";
-import DBReturn from "../../lib/Database/DBReturn";
-import OAuth from "../../lib/OAuth";
 import { useNavigate } from "react-router-dom";
 import LoadingComponent from "../Utility/LoadingComponent";
 import ErrorComponent from "./ErrorComponent";
-import type ProfileRecord from "../../lib/Database/Records/ProfileRecord";
 import SignInButton from "../Auth/SignInButton";
+import DBError from "../../lib/Database/DBError";
+import { UserContext } from "../Auth/UserContext";
 
 export default function EventPage({ event }: { event: EventRecord }) {
-    const [signups, setSignups] = useState<DBReturn<SignupRecord[]> | null>(null);
+    const [error, setError] = useState<DBError | null>(null); 
+    const [signups, setSignups] = useState<SignupRecord[] | null>(null);
+    const [selfSignup, setSelfSignup] = useState<SignupRecord | null>(null);
+
+    const { user } = useContext(UserContext);
+
+    // Whether the RSVP button has been clicked at least once (changes from "Click to RSVP" -> "Attending")
     const [rsvpToggle, setRsvpToggle] = useState(false);
-    const [user, setUser] = useState<DBReturn<ProfileRecord> | null>(null);
     const nav = useNavigate();
 
+    const isRsvpd = selfSignup !== null;
+
+    /** Get information from DB */
     useEffect(() => {
         const getSignups = async () => {
+            if (!event.requires_signup) {
+                setSignups([]);
+                setSelfSignup(null);
+                return;
+            }
+
+            console.log("Getting sign up information!");
             const r = await Database.signups.getFromEvent(event.id);
-            setSignups(r);
-            return r;
-        }
+            if (r.isError()) {
+                setError(r.unwrapError());
+                return;
+            }
 
-        const getAuth = async () => {
-            const r = await OAuth.getUser();
-            setUser(r);
-            return r;
-        }
+            const data = r.unwrapData();
+            
+            /** If no one is signed in, then there is no self signup */
+            if (!user) {
+                setSignups(data);
+                setSelfSignup(null);
+                return;
+            }
+            
+            /** If the user is signed in, remove their signup from data and put it in selfSignup */
+            const userSignupIndex = data.findIndex(s => event.id.toString() == s.event_id && s.user_id === user.getId());
+            if (userSignupIndex !== -1) {
+                setSelfSignup(data[userSignupIndex]);
+                data.splice(userSignupIndex, 1);
+            }
 
+            setSignups(data);
+        }
         getSignups();
-        getAuth();
-    }, [event.id]);
+    }, [event.id, event.requires_signup, user]);
 
+    /** Guard Statements */
+    if (error)
+        return <ErrorComponent message={error.message} />
     if (!signups)
         return <LoadingComponent />
-    if (signups.isError()) 
-        return <ErrorComponent message={signups.unwrapError().message} />
 
-    let isRsvpd: boolean;
-    if (user && user.isData()) {
-        const userId = user.unwrapData().id;
-        isRsvpd = signups.unwrapData().find(s => s.user_id === userId) !== undefined;
-    } else isRsvpd = false;
-    
-    function RSVPButton() {
+    /** Button OnClick */
+    async function RSVPButton() {
+        if (!user) return;
+
         setRsvpToggle(true);
-        const SUS = signups!.unwrapData();
 
-        if (isRsvpd) {
-            // Remove RSVP
-            const index = SUS.findIndex(s => s.user_id === user!.unwrapData().id);
-            SUS.splice(index);
+        if (selfSignup !== null) {
+            // There was a signup - remove it
+            const r = await Database.signups.delete(selfSignup.id.toString());
+            r.ifError(e => 
+                setError(e)
+            );
+
+            setSelfSignup(null);
         } else {
-            // Add RSVP
-            SUS.push({ id: 1000, user_id: user!.unwrapData().id, event_id: event.id.toString() });
+            // There wasn't a signup - add it
+            const r = await Database.signups.insert(event.id.toString(), user.getId());
+            if (r.isError()) {
+                setError(r.unwrapError());
+                return;
+            }
+            
+            setSelfSignup(r.unwrapData());
         }
-
-        setSignups(new DBReturn(SUS));
     }
 
     return <div className="flex flex-col bg-white rounded-3xl overflow-hidden w-full">
@@ -81,12 +112,23 @@ export default function EventPage({ event }: { event: EventRecord }) {
             {
                 event.requires_signup && <>
                 <p className="text-gray-800 font-semibold">Attending:</p>
-                <p className="text-gray-800 leading-relaxed text-sm md:text-base">{signups.unwrapData().length} people have RSVP'd.</p>
+                {/* <p className="text-gray-800 leading-relaxed text-sm md:text-base">{signups.length + (selfSignup ? 1 : 0)} Attendee(s).</p> */}
+                <ol className="w-full items-center pl-3 list-decimal">
+                    {
+                        user && selfSignup
+                        ? <li key={0}> {user.getName()}</li>
+                        : <></>
+                    }
+                    {
+                        signups.map((s, i) => <li key={i + 1}>{s.user_name}</li>)
+                    }
+                </ol>
+                
             </>}
         </div>
         <div className="flex flex-row justify-center items-center p-3 gap-3">
             { /* User is not logged in */}
-            {event.requires_signup && (!user || user.isError()) && 
+            {event.requires_signup && !user && 
                 <div className="flex flex-col justify-center gap-1">
                     <p>Log in to RSVP:</p>
                     <SignInButton />
@@ -94,7 +136,7 @@ export default function EventPage({ event }: { event: EventRecord }) {
             }
 
             { /* User is logged in  */}
-            {event.requires_signup && user?.isData() && (
+            {event.requires_signup && user && (
                 isRsvpd 
                 ?
                 <button onClick={RSVPButton} className="px-3 py-2 bg-green-300 rounded-lg shadow-mg hover:shadow-lg transition-shadow font-semibold">
@@ -115,7 +157,7 @@ export default function EventPage({ event }: { event: EventRecord }) {
             )}
 
             { /* User is logged in AND exec */ }
-            {user && user.isData() && user.unwrapData().is_admin &&                
+            {user && user.isPrivileged() &&                
                 <button
                     className="px-3 py-2 bg-blue-300 rounded-lg shadow-md hover:shadow-lg transition-shadow font-semibold"
                     onClick={() => nav(`/events/${event.id}/edit`)}

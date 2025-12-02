@@ -1,8 +1,13 @@
+import { useContext } from "react";
 import OAuth from "../../lib/OAuth";
+import { UserContext } from "./UserContext";
 
 export default function Component() {
-    const signIn = () => {
+    const { setUser } = useContext(UserContext);
+
+    const signIn = async () => {
         OAuth.logIn(window.location.href);
+        setUser(await OAuth.getUser());
     };
 
     return <button
