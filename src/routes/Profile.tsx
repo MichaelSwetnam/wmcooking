@@ -52,8 +52,10 @@ export default function Page() {
                 <DisabledTextInput value={user.getId()} />
                 <InputLabel name="Email" />
                 <DisabledTextInput value={user.getEmail()} />
-                <InputLabel name="Name" />
+                <InputLabel name="Name*" />
                 <ShortTextInput id="name" startValue={name} onChange={onChange} />
+                <div></div>
+                <p className="gray-200 text-center text-sm">* When you sign up to an event, your name will be publicly shown. Feel free to change this to whatever makes you feel most comfortable. May take up to 10 minutes to update.</p>
             </div>
             <div className="flex flex-row gap-2">
                 <input type="submit" value="Save" className="bg-blue-400 text-white font-semibold py-2 px-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow" />

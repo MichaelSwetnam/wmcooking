@@ -9,10 +9,16 @@ import DatabaseChild from "./DatabaseChild";
 async function getSignup(id: string): Promise<DBReturn<SignupRecord>> {
     const { data, error } = await Supabase
         .from("EventSignup")
-        .select("*")
+        .select(`
+            *,
+            Profiles (
+                name
+            )
+        `)
         .eq('id', id)
         .single();
     
+    throw new Error("Got individual signup! Not implemented.");
     return DBReturn.fromSupabase(data, error);
 }
 
@@ -34,13 +40,35 @@ export default class DatabaseSignup extends DatabaseChild {
     async getFromEvent(eventId: number): Promise<DBReturn<SignupRecord[]>> {
         const { data, error } = await Supabase
         .from("EventSignup")
-        .select("*")
+        .select(`
+            *,
+            "Profiles" (
+                name
+            )
+        `)
         .eq('event_id', eventId);
         
-        const r = DBReturn.fromSupabase<SignupRecord[]>(data, error);
-        r.ifData(d => d.forEach(s => this.signups.set(s.id.toString(), s)))
+        type SupabaseReturn = { Profiles: { name: string }, id: number, user_id: string, event_id: string, date_created: string }[];
 
-        return r;
+        const r = DBReturn.fromSupabase<SupabaseReturn>(data, error);
+        if (r.isError()) return r.mapError();
+        
+        const d = r.unwrapData();
+        const signups: SignupRecord[] = [];
+
+        d.forEach(s =>  {
+                const SURecord: Partial<SignupRecord> = {};
+                SURecord.id = s.id;
+                SURecord.event_id = s.event_id;
+                SURecord.user_id = s.user_id;
+                SURecord.user_name = s.Profiles.name;
+                
+                signups.push(SURecord as SignupRecord);
+                this.signups.set(s.id.toString(), SURecord as SignupRecord);
+            }
+        )
+
+        return new DBReturn(signups);
     }
     
     /**
