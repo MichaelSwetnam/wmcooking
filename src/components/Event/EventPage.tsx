@@ -59,7 +59,7 @@ export default function EventPage({ event }: { event: EventRecord }) {
             setSignups(data);
         }
         getSignups();
-    }, [event.id, user]);
+    }, [event.id, event.requires_signup, user]);
 
     /** Guard Statements */
     if (error)
