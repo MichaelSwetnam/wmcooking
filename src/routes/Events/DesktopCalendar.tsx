@@ -1,16 +1,16 @@
 import { useNavigate } from "react-router-dom";
-import type { EventRecord } from "../../lib/Database/Records/EventRecord";
+import type { EventWrapper } from "../../lib/Database/Records/EventRecord";
 
 interface DateBaseProps {
   day: Date;
-  info: EventRecord[];
+  info: EventWrapper[];
   active: boolean;
 }
 
 function ActiveDate({ day, info }: DateBaseProps) {
   const nav = useNavigate();
   const sorted = [...info].sort(
-    (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime(),
+    (a, b) => a.getStartDate().getTime() - b.getStartDate().getTime(),
   );
 
   return (
@@ -33,7 +33,7 @@ function ActiveDate({ day, info }: DateBaseProps) {
             onClick={() => nav(`/events/${x.id}`)}
           >
             <p className="font-semibold">
-              {new Date(x.start).toLocaleTimeString("en-US", {
+              {x.getStartDate().toLocaleTimeString("en-US", {
                 hour: "numeric",
                 hour12: true,
               })}
@@ -49,7 +49,7 @@ function ActiveDate({ day, info }: DateBaseProps) {
 function InactiveDate({ day, info }: DateBaseProps) {
   const nav = useNavigate();
   const sorted = [...info].sort(
-    (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime(),
+    (a, b) => a.getStartDate().getTime() - b.getStartDate().getTime(),
   );
 
   return (
@@ -77,7 +77,7 @@ function InactiveDate({ day, info }: DateBaseProps) {
             onClick={() => nav(`/events/${x.id}`)}
           >
             <p className="font-semibold">
-              {new Date(x.start).toLocaleTimeString("en-US", {
+              {x.getStartDate().toLocaleTimeString("en-US", {
                 hour: "numeric",
                 hour12: true,
               })}
@@ -93,7 +93,7 @@ function InactiveDate({ day, info }: DateBaseProps) {
 function CurrentDate({ day, info }: DateBaseProps) {
   const nav = useNavigate();
   const sorted = [...info].sort(
-    (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime(),
+    (a, b) => a.getStartDate().getTime() - b.getStartDate().getTime(),
   );
 
   return (
@@ -121,7 +121,7 @@ function CurrentDate({ day, info }: DateBaseProps) {
             onClick={() => nav(`/events/${x.id}`)}
           >
             <p className="font-semibold">
-              {new Date(x.start).toLocaleTimeString("en-US", {
+              {x.getStartDate().toLocaleTimeString("en-US", {
                 hour: "numeric",
                 hour12: true,
               })}
@@ -149,7 +149,7 @@ function DateBuilder({
 }: {
   month: number;
   day: Date;
-  info: EventRecord[];
+  info: EventWrapper[];
 }) {
   if (day.getMonth() != month) {
     return <DateBase day={day} info={info} active={false} />;
@@ -165,7 +165,7 @@ export default function DesktopCalendar({
 }: {
   year: number;
   month: number;
-  info: Map<string, EventRecord[]>;
+  info: Map<string, EventWrapper[]>;
 }) {
   // Create the calendar layout
   const prevMonthLength = new Date(year, month, 0).getDate();

@@ -7,15 +7,16 @@ import EventPage from "../components/Event/EventPage";
 import { InputLabel } from "../components/Form/Inputs";
 import ShortTextInput from "../components/Form/ShortTextInput";
 import LongTextInput from "../components/Form/LongTextInput";
-import DateInput from "../components/Form/DateInput";
 import AccessabilityInput from "../components/Form/AccessabilityInputs";
 import BooleanInput from "../components/Form/BooleanInput";
-import type { EventRecord } from "../lib/Database/Records/EventRecord";
 import Database from "../lib/Database/Database";
+import { EventWrapper } from "../lib/Database/Records/EventRecord";
+import TimeInput from "../components/Form/TimeInput";
+import DateInput from "../components/Form/DateInput";
 
 export default function Page() {
     const { id } = useParams();
-    const [event, setEvent] = useState<EventRecord | null>(null);
+    const [event, setEvent] = useState<EventWrapper | null>(null);
     const [error, setError] = useState<[string, string?] | null>(null);
     const [isModalOpen, setModalOpen] = useState(false);
     const nav = useNavigate();
@@ -58,7 +59,7 @@ export default function Page() {
         const deepCopy = JSON.parse(JSON.stringify(event));
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (deepCopy as any)[id] = value;
-        setEvent(deepCopy);
+        setEvent(new EventWrapper(deepCopy));
     }    
 
     function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -85,10 +86,12 @@ export default function Page() {
                         <ShortTextInput id="location" startValue={event.location} onChange={onChange} />
                         <InputLabel name="Description" />
                         <LongTextInput id="description" startValue={event.description} onChange={onChange} />
-                        <InputLabel name="Event Start" />
-                        <DateInput id="start" startValue={event.start} onChange={onChange} />
-                        <InputLabel name="Event End" />
-                        <DateInput id="end" startValue={event.end} onChange={onChange} />
+                        <InputLabel name="Date" />
+                        <DateInput id="date" startValue={event.date} onChange={onChange} />
+                        <InputLabel name="Start Time" />
+                        <TimeInput id="start_time" startValue={event.start_time} onChange={onChange} />
+                        <InputLabel name="End Time" />
+                        <TimeInput id="end_time" startValue={event.end_time} onChange={onChange} />
                         <InputLabel name="Accessability" />
                         <AccessabilityInput id="accessability" startValue={event.accessability} onChange={onChange} />
                         <InputLabel name="Signup Required?" />

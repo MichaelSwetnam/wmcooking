@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import EventBadge from "./EventBadge";
 import getBadges from "../../lib/getBadges";
-import type { EventRecord } from "../../lib/Database/Records/EventRecord";
+import type { EventWrapper } from "../../lib/Database/Records/EventRecord";
 
-export default function EventCard({ event }: { event: EventRecord }) {
+export default function EventCard({ event }: { event: EventWrapper }) {
     const nav = useNavigate();
 
     return <div className="flex flex-col bg-white shadow-xl rounded-3xl overflow-hidden hover:shadow-2xl transition-shadow duration-300 w-full max-w-3xl cursor-pointer" onClick={() => {nav(`/events/${event.id}`)}}>

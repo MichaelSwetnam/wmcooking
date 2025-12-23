@@ -1,9 +1,9 @@
-import type { EventRecord } from "./Database/Records/EventRecord";
+import type { EventWrapper } from "./Database/Records/EventRecord";
 
-export default function getBadges(event: EventRecord) {
+export default function getBadges(event: EventWrapper) {
     const badges: string[] = [];
-    const startDate = new Date(event.start);
-    const endDate = new Date(event.end);
+    const startDate = new Date(event.getStartDate());
+    const endDate = new Date(event.getEndDate());
 
     badges.push(startDate.toLocaleDateString('en-us', {
         weekday: "short",
