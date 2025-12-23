@@ -57,7 +57,7 @@ export default function Events() {
     // Format data base information into a Map of day -> event[]
     const info = new Map<string, EventWrapper[]>();
     for (const event of data) {
-        const startTime = new Date(event.start);
+        const startTime = event.getStartDate();
         const startDate = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate());
         const dateString = `${startDate.getMonth()}/${startDate.getDate()}`;
 

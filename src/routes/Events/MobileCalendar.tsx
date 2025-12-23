@@ -3,7 +3,7 @@ import type { EventWrapper } from "../../lib/Database/Records/EventRecord";
 
 function Day({ events }: { events: EventWrapper[] }) {
     const nav = useNavigate();
-    const date = new Date(events[0].start);
+    const date = events[0].getStartDate();
 
     const isToday = new Date().toDateString() === date.toDateString();
     const beforeToday = new Date().getTime() > date.getTime();
@@ -24,7 +24,7 @@ function Day({ events }: { events: EventWrapper[] }) {
             { events.map((e, i) => 
             <div key={i} className="flex flex-row gap-2" onClick={() => nav(`/events/${e.id}`)}>
                 <p className="font-semibold">
-                    {new Date(e.start).toLocaleTimeString('en-us', {hour: "numeric"})}
+                    {e.getStartDate().toLocaleTimeString('en-us', {hour: "numeric"})}
                 </p> 
                 <p>
                     {e.name}   
@@ -48,7 +48,7 @@ function Day({ events }: { events: EventWrapper[] }) {
         { events.map((e, i) => 
         <div key={i} className="flex flex-row gap-2" onClick={() => nav(`/events/${e.id}`)}>
             <p className="font-semibold">
-                {new Date(e.start).toLocaleTimeString('en-us', {hour: "numeric"})}
+                {e.getStartDate().toLocaleTimeString('en-us', {hour: "numeric"})}
             </p> 
             <p>
                 {e.name}   

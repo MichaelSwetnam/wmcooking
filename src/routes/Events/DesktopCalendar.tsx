@@ -10,7 +10,7 @@ interface DateBaseProps {
 function ActiveDate({ day, info }: DateBaseProps) {
   const nav = useNavigate();
   const sorted = [...info].sort(
-    (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime(),
+    (a, b) => a.getStartDate().getTime() - b.getStartDate().getTime(),
   );
 
   return (
@@ -33,7 +33,7 @@ function ActiveDate({ day, info }: DateBaseProps) {
             onClick={() => nav(`/events/${x.id}`)}
           >
             <p className="font-semibold">
-              {new Date(x.start).toLocaleTimeString("en-US", {
+              {x.getStartDate().toLocaleTimeString("en-US", {
                 hour: "numeric",
                 hour12: true,
               })}
@@ -49,7 +49,7 @@ function ActiveDate({ day, info }: DateBaseProps) {
 function InactiveDate({ day, info }: DateBaseProps) {
   const nav = useNavigate();
   const sorted = [...info].sort(
-    (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime(),
+    (a, b) => a.getStartDate().getTime() - b.getStartDate().getTime(),
   );
 
   return (
@@ -77,7 +77,7 @@ function InactiveDate({ day, info }: DateBaseProps) {
             onClick={() => nav(`/events/${x.id}`)}
           >
             <p className="font-semibold">
-              {new Date(x.start).toLocaleTimeString("en-US", {
+              {x.getStartDate().toLocaleTimeString("en-US", {
                 hour: "numeric",
                 hour12: true,
               })}
@@ -93,7 +93,7 @@ function InactiveDate({ day, info }: DateBaseProps) {
 function CurrentDate({ day, info }: DateBaseProps) {
   const nav = useNavigate();
   const sorted = [...info].sort(
-    (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime(),
+    (a, b) => a.getStartDate().getTime() - b.getStartDate().getTime(),
   );
 
   return (
@@ -121,7 +121,7 @@ function CurrentDate({ day, info }: DateBaseProps) {
             onClick={() => nav(`/events/${x.id}`)}
           >
             <p className="font-semibold">
-              {new Date(x.start).toLocaleTimeString("en-US", {
+              {x.getStartDate().toLocaleTimeString("en-US", {
                 hour: "numeric",
                 hour12: true,
               })}
