@@ -79,7 +79,7 @@ export default class DatabaseEvents extends DatabaseChild {
         }
 
         this.save();
-        return ret;
+        return ret.map(d => d.slice(0, limit));
     }
 
     async getEventsInMonth(month: number, year: number): Promise<DBReturn<EventRecord[]>> {
