@@ -4,7 +4,7 @@ import type { DatabaseStorage, DBWrapper } from "../Database";
 import DatabaseChild from "./DatabaseChild";
 import DBError from "../DBError";
 import DBReturn from "../DBReturn";
-import type { EventRecord } from "../Records/EventRecord";
+import { EventWrapper, type EventRecord } from "../Records/EventRecord";
 import getMillis from "../getMillis";
 import Store from "../Store";
 
@@ -44,11 +44,11 @@ export default class DatabaseEvents extends DatabaseChild {
 
     }
 
-    async get(id: number): Promise<DBReturn<EventRecord>> {
-        return this.events.get(id.toString());
+    async get(id: number): Promise<DBReturn<EventWrapper>> {
+        return (await this.events.get(id.toString())).map(d => new EventWrapper(d));
     }
 
-    async getNextEvents(limit: number): Promise<DBReturn<EventRecord[]>> {
+    async getNextEvents(limit: number): Promise<DBReturn<EventWrapper[]>> {
         if (this.nextEvents && this.nextEvents.livesUntil > getMillis()) {
             const eventIds = this.nextEvents.d.slice(0, limit);
             const events = await Promise.all(eventIds.map(id => this.get(id)));
@@ -67,7 +67,7 @@ export default class DatabaseEvents extends DatabaseChild {
             .limit(10);
 
         const ret = DBReturn.fromSupabase<EventRecord[]>(data, error);
-        if (ret.isError()) return ret;
+        if (ret.isError()) return ret.mapError();
 
         this.nextEvents = {
             d: data!.map(d => d.id),
@@ -79,10 +79,10 @@ export default class DatabaseEvents extends DatabaseChild {
         }
 
         this.save();
-        return ret.map(d => d.slice(0, limit));
+        return ret.map(d => d.slice(0, limit)).map(d => d.map(e => new EventWrapper(e)));
     }
 
-    async getEventsInMonth(month: number, year: number): Promise<DBReturn<EventRecord[]>> {
+    async getEventsInMonth(month: number, year: number): Promise<DBReturn<EventWrapper[]>> {
         const mapString = `${year}-${month}`;
 
         if (this.months && this.months[mapString] && this.months[mapString].livesUntil > getMillis()) {
@@ -106,7 +106,7 @@ export default class DatabaseEvents extends DatabaseChild {
             .lt("start", endOfMonth);
         
         const ret = DBReturn.fromSupabase<EventRecord[]>(data, error);
-        if (ret.isError()) return ret;
+        if (ret.isError()) return ret.mapError();
 
         this.months[mapString] = {
             d: ret.unwrapData().map(e => e.id),
@@ -117,7 +117,7 @@ export default class DatabaseEvents extends DatabaseChild {
         }
 
         this.save();
-        return ret;
+        return ret.map(d => d.map(e => new EventWrapper(e)));
     }
 
     /**
@@ -125,15 +125,15 @@ export default class DatabaseEvents extends DatabaseChild {
      * @param event 
      * @returns Event date after update.
      */
-    async update(id: number, event: EventRecord): Promise<DBReturn<EventRecord>> {
+    async update(id: number, event: EventWrapper): Promise<DBReturn<EventWrapper>> {
         if (!await OAuth.isPrivileged()) {
-            return new DBReturn<EventRecord>(DBError.custom("User does not have permission to update events."));
+            return new DBReturn<EventWrapper>(DBError.custom("User does not have permission to update events."));
         }
         if (id !== event.id) {
-            return new DBReturn<EventRecord>(DBError.custom("Event ids must match in update requests."));
+            return new DBReturn<EventWrapper>(DBError.custom("Event ids must match in update requests."));
         }
 
-        const payload: Partial<EventRecord> = event;
+        const payload: Partial<EventRecord> = event.toRecord();
         payload.id = undefined; // Should never be updated;
         const { data, error } = await Supabase
             .from("Events")
@@ -146,11 +146,11 @@ export default class DatabaseEvents extends DatabaseChild {
 
         const ret = DBReturn.fromSupabase<EventRecord>(data, error);
         if (ret.isError())
-            return ret;
+            return ret.mapError();
 
         const retData = ret.unwrapData();
         this.events.set(retData.id.toString(), retData);
-        return ret;
+        return ret.map(e => new EventWrapper(e));
     }
 
     private save() {

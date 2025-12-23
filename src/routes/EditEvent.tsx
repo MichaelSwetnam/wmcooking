@@ -10,12 +10,12 @@ import LongTextInput from "../components/Form/LongTextInput";
 import DateInput from "../components/Form/DateInput";
 import AccessabilityInput from "../components/Form/AccessabilityInputs";
 import BooleanInput from "../components/Form/BooleanInput";
-import type { EventRecord } from "../lib/Database/Records/EventRecord";
 import Database from "../lib/Database/Database";
+import type { EventWrapper } from "../lib/Database/Records/EventRecord";
 
 export default function Page() {
     const { id } = useParams();
-    const [event, setEvent] = useState<EventRecord | null>(null);
+    const [event, setEvent] = useState<EventWrapper | null>(null);
     const [error, setError] = useState<[string, string?] | null>(null);
     const [isModalOpen, setModalOpen] = useState(false);
     const nav = useNavigate();

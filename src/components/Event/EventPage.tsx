@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import type { EventRecord } from "../../lib/Database/Records/EventRecord";
+import type { EventWrapper } from "../../lib/Database/Records/EventRecord";
 import getBadges from "../../lib/getBadges";
 import EventBadge from "./EventBadge";
 import type { SignupRecord } from "../../lib/Database/Records/SignupRecord";
@@ -11,7 +11,7 @@ import SignInButton from "../Auth/SignInButton";
 import DBError from "../../lib/Database/DBError";
 import { UserContext } from "../Auth/UserContext";
 
-export default function EventPage({ event }: { event: EventRecord }) {
+export default function EventPage({ event }: { event: EventWrapper }) {
     const [error, setError] = useState<DBError | null>(null); 
     const [signups, setSignups] = useState<SignupRecord[] | null>(null);
     const [selfSignup, setSelfSignup] = useState<SignupRecord | null>(null);
