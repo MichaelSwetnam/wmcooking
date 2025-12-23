@@ -3,11 +3,11 @@ import EventCard from "../components/Event/EventCard";
 import { useEffect, useState } from "react";
 import ErrorComponent from "../components/Event/ErrorComponent";
 import LoadingComponent from "../components/Utility/LoadingComponent";
-import type { EventRecord } from "../lib/Database/Records/EventRecord";
+import type { EventWrapper } from "../lib/Database/Records/EventRecord";
 import Database from "../lib/Database/Database";
 
 function EventsSubpage() {
-    const [events, setEvents] = useState<EventRecord[] | null>(null);
+    const [events, setEvents] = useState<EventWrapper[] | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {

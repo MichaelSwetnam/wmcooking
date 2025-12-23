@@ -3,13 +3,13 @@ import ErrorComponent from "../components/Event/ErrorComponent";
 import LoadingComponent from "../components/Utility/LoadingComponent";
 import { useEffect, useState } from "react";
 import EventPage from "../components/Event/EventPage";
-import type { EventRecord } from "../lib/Database/Records/EventRecord";
+import type { EventWrapper } from "../lib/Database/Records/EventRecord";
 import Database from "../lib/Database/Database";
 import type DBReturn from "../lib/Database/DBReturn";
 
 export default function Page() {
     const { id } = useParams();
-    const [event, setEvent] = useState<DBReturn<EventRecord> | null>(null);
+    const [event, setEvent] = useState<DBReturn<EventWrapper> | null>(null);
     
 
     useEffect(() => {

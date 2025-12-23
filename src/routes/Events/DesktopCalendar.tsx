@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import type { EventRecord } from "../../lib/Database/Records/EventRecord";
+import type { EventWrapper } from "../../lib/Database/Records/EventRecord";
 
 interface DateBaseProps {
   day: Date;
-  info: EventRecord[];
+  info: EventWrapper[];
   active: boolean;
 }
 
@@ -149,7 +149,7 @@ function DateBuilder({
 }: {
   month: number;
   day: Date;
-  info: EventRecord[];
+  info: EventWrapper[];
 }) {
   if (day.getMonth() != month) {
     return <DateBase day={day} info={info} active={false} />;
@@ -165,7 +165,7 @@ export default function DesktopCalendar({
 }: {
   year: number;
   month: number;
-  info: Map<string, EventRecord[]>;
+  info: Map<string, EventWrapper[]>;
 }) {
   // Create the calendar layout
   const prevMonthLength = new Date(year, month, 0).getDate();

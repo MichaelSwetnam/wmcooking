@@ -3,11 +3,11 @@ import ErrorComponent from "../../components/Event/ErrorComponent";
 import LoadingComponent from "../../components/Utility/LoadingComponent";
 import DesktopCalendar from "./DesktopCalendar";
 import MobileCalendar from "./MobileCalendar";
-import type { EventRecord } from "../../lib/Database/Records/EventRecord";
+import { EventWrapper } from "../../lib/Database/Records/EventRecord";
 import Database from "../../lib/Database/Database";
 
 export default function Events() {
-    const [data, setData] = useState<EventRecord[] | null>(null);
+    const [data, setData] = useState<EventWrapper[] | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [[ month, year ], setMonthYear ] = useState([new Date().getMonth(), new Date().getFullYear()]);
     
@@ -55,7 +55,7 @@ export default function Events() {
     }
 
     // Format data base information into a Map of day -> event[]
-    const info = new Map<string, EventRecord[]>();
+    const info = new Map<string, EventWrapper[]>();
     for (const event of data) {
         const startTime = new Date(event.start);
         const startDate = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate());

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import type { EventRecord } from "../../lib/Database/Records/EventRecord";
+import type { EventWrapper } from "../../lib/Database/Records/EventRecord";
 
-function Day({ events }: { events: EventRecord[] }) {
+function Day({ events }: { events: EventWrapper[] }) {
     const nav = useNavigate();
     const date = new Date(events[0].start);
 
@@ -57,7 +57,7 @@ function Day({ events }: { events: EventRecord[] }) {
     </div>;
 }
 
-export default function MobileCalendar({ info }: { info: Map<string, EventRecord[]> }) {
+export default function MobileCalendar({ info }: { info: Map<string, EventWrapper[]> }) {
     const keys = [];
     for (const key of info.keys()) {
         keys.push(key);
