@@ -58,12 +58,14 @@ export default class DatabaseEvents extends DatabaseChild {
 
         const rightNow = new Date();
         const today = new Date(rightNow.getFullYear(), rightNow.getMonth(), rightNow.getDate());
+        const todayISO = today.toISOString().split("T")[0]; // YYYY-MM-DD
 
         const { data, error } = await Supabase
             .from("Events")
             .select("*")
-            .gte("start", today.toISOString())
-            .order("start", { ascending: true })
+            .gte("date", todayISO)
+            .order("date", { ascending: true })
+            .order("start_time", { ascending: true })
             .limit(10);
 
         const ret = DBReturn.fromSupabase<EventRecord[]>(data, error);
@@ -96,14 +98,16 @@ export default class DatabaseEvents extends DatabaseChild {
         }
         
         // Get the dates (start and end of month)
-        const startOfMonth = new Date(year, month, 1).toISOString();
-        const endOfMonth = new Date(year, month + 1, 1).toISOString();
+        const startOfMonth = new Date(year, month, 1).toISOString().split("T")[0];
+        const endOfMonth = new Date(year, month + 1, 1).toISOString().split("T")[0];
 
         const { data, error } = await Supabase
             .from("Events")
             .select("*")
-            .gte("start", startOfMonth)
-            .lt("start", endOfMonth);
+            .gte("date", startOfMonth)
+            .lt("date", endOfMonth)
+            .order("date", { ascending: true }) 
+            .order("start_time", { ascending: true });
         
         const ret = DBReturn.fromSupabase<EventRecord[]>(data, error);
         if (ret.isError()) return ret.mapError();
