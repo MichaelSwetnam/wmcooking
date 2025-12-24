@@ -104,7 +104,8 @@ async function deleteSignup(sb: SupabaseClient, userId: string, signup: SignupRe
 			.from("EventSignup")
 			.delete()
 			.eq('id', signup.id)
-			.select();
+			.select()
+			.single();
 		
 		if (!data || error)
 			throw new Error("Could not remove your signup.");
