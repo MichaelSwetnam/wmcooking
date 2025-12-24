@@ -94,7 +94,7 @@ export default class DatabaseSignup extends DatabaseChild {
             }
         });
 
-        const response = await DBReturn.fromSupabaseFunction<SignupRecord>(data, error);
+        const response = (await DBReturn.fromSupabaseFunction<{ payload: SignupRecord }>(data, error)).map(p => p.payload);
         if (response.isError()) return response;
 
         const payload = response.unwrapData();
@@ -125,7 +125,7 @@ export default class DatabaseSignup extends DatabaseChild {
             }
         });
 
-        const response = await DBReturn.fromSupabaseFunction<SignupRecord>(data, error);
+        const response = (await DBReturn.fromSupabaseFunction<{ payload: SignupRecord }>(data, error)).map(p => p.payload);
         if (response.isError()) return response;
 
         const payload = response.unwrapData();
