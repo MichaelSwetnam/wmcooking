@@ -93,10 +93,14 @@ export default class DatabaseSignup extends DatabaseChild {
                 eventId: signup.event_id
             }
         });
-        console.log("DELETE FUNCTION RESPONSE");
-        console.log(data);
-        console.log(error);
-        return DBReturn.fromError(DBError.custom("Not Implemented."));
+
+        const response = await DBReturn.fromSupabaseFunction<SignupRecord>(data, error);
+        if (response.isError()) return response;
+
+        const payload = response.unwrapData();
+        this.signups.delete(payload.id.toString());
+
+        return response;
     }
 
     /**
@@ -121,10 +125,13 @@ export default class DatabaseSignup extends DatabaseChild {
             }
         });
 
-        console.log("PUT FUNCTION RESPONSE");
-        console.log(data);
-        console.log(error);
-        return DBReturn.fromError(DBError.custom("Not Implemented."));
+        const response = await DBReturn.fromSupabaseFunction<SignupRecord>(data, error);
+        if (response.isError()) return response;
+
+        const payload = response.unwrapData();
+        this.signups.set(payload.id.toString(), payload);
+        
+        return response;
     }
 
     toCacheObject(): unknown {
