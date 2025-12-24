@@ -77,7 +77,7 @@ export default function EventPage({ event }: { event: EventWrapper }) {
 
         if (selfSignup !== null) {
             // There was a signup - remove it
-            const r = await Database.signups.delete(selfSignup.id.toString());
+            const r = await Database.signups.invokeDelete(selfSignup.id.toString());
             r.ifError(e => 
                 setError(e)
             );
@@ -87,7 +87,7 @@ export default function EventPage({ event }: { event: EventWrapper }) {
             if (signupCount >= event.capacity) return; // Don't let someone signup if there are already too many signups.
 
             // There wasn't a signup - add it
-            const r = await Database.signups.insert(event.id.toString(), user.getId());
+            const r = await Database.signups.invokeInsert(event.id.toString(), user.getId());
             if (r.isError()) {
                 setError(r.unwrapError());
                 return;
