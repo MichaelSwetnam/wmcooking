@@ -11,9 +11,11 @@ export default function getBadges(event: EventWrapper) {
         month: 'long'
     }));
     badges.push(startDate.toLocaleTimeString('en-us', {
-        hour: "numeric"
+        hour: "numeric",
+        minute: "2-digit"
     }) + " - " + endDate.toLocaleTimeString('en-us', {
-        hour: "numeric"
+        hour: "numeric",
+        minute: "2-digit"
     }));
     
     badges.push(event.location);
