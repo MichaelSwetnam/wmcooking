@@ -1,3 +1,4 @@
+import OAuth from "../../OAuth";
 import { Supabase } from "../../Supabase";
 import type { DBWrapper } from "../Database";
 import DBError from "../DBError";
@@ -72,52 +73,65 @@ export default class DatabaseSignup extends DatabaseChild {
     }
     
     /**
-     * 
+     * Invokes edge function to delete the signup.
+     * **ENSURE THAT THE USER IS LOGGED IN**
      * @param id 
      * @returns The data that was deleted.
      */
-    async delete(id: string): Promise<DBReturn<SignupRecord>> {
-        // Assumption: If i'm trying to delete a signup - it should have been cached. 
-        // Therefore this await is trivial and I should make sure the record exists here instead of DB layer.
-        const cacheRet = await this.signups.get(id);
-        if (cacheRet.isError()) return DBReturn.fromError(DBError.custom("Cannot delete something which doesn't exist."));
+    async invokeDelete(id: string): Promise<DBReturn<SignupRecord>> {
+        const user = await OAuth.getUser();
+        if (!user) return new DBReturn(DBError.custom("Could not delete a signup, as there is no logged in user.")).mapError();
 
-        // I won't check authorization here, that is the role of RLS on Supabase.
-        const { data, error } = await Supabase.from("EventSignup")
-            .delete()
-            .eq('id',  id)
-            .select()
-            .single();
+        const signupReq = await this.signups.get(id);
+        if (signupReq.isError()) return new DBReturn(DBError.custom("Could not delete a signup, as it does not appear to exist.")).mapError();
 
-        const dbRet = DBReturn.fromSupabase<SignupRecord>(data, error);
-        if (dbRet.isError()) return dbRet;
+        const signup = signupReq.unwrapData();
 
-        // If successful, make sure to delete the record from cache.
-        dbRet.ifData(() => this.signups.delete(id));
+        const { data, error } = await Supabase.functions.invoke("event-signup", {
+            method: "DELETE",
+            body: {
+                eventId: signup.event_id
+            }
+        });
 
-        return dbRet;
+        const response = (await DBReturn.fromSupabaseFunction<{ payload: SignupRecord }>(data, error)).map(p => p.payload);
+        if (response.isError()) return response;
+
+        const payload = response.unwrapData();
+        this.signups.delete(payload.id.toString());
+
+        return response;
     }
 
-    async insert(event_id: string, user_id: string): Promise<DBReturn<SignupRecord>> {
-        // Make sure this doesn't already exist.
+    /**
+     * Invokes edge function to insert a new signup
+     * **ENSURE THAT THE USER IS LOGGED IN**
+     * @param event_id 
+     * @param user_id 
+     * @returns 
+     */
+    async invokeInsert(event_id: string, user_id: string): Promise<DBReturn<SignupRecord>> {
+        const user = await OAuth.getUser();
+        if (!user) return new DBReturn(DBError.custom("Could not insert a signup, as there is no logged in user.")).mapError();
+
         if (this.signups.findExists(x => x.event_id == event_id && x.user_id == user_id)) {
             return DBReturn.fromError(DBError.custom("This entry already exists."));
         }
 
-        const { data, error } = await Supabase
-            .from("EventSignup")
-            .insert({ user_id, event_id, date_created: new Date().toISOString() })
-            .select("*")
-            .single();
+        const { data, error } = await Supabase.functions.invoke("event-signup", {
+            method: "PUT",
+            body: {
+                eventId: event_id
+            }
+        });
 
-        const ret = DBReturn.fromSupabase<SignupRecord>(data as unknown as SignupRecord, error);
-        if (ret.isError()) {
-            return ret;
-        }
+        const response = (await DBReturn.fromSupabaseFunction<{ payload: SignupRecord }>(data, error)).map(p => p.payload);
+        if (response.isError()) return response;
 
-        const signupRecord = ret.unwrapData();
-        this.signups.set(signupRecord.id.toString(), signupRecord);
-        return ret;
+        const payload = response.unwrapData();
+        this.signups.set(payload.id.toString(), payload);
+        
+        return response;
     }
 
     toCacheObject(): unknown {

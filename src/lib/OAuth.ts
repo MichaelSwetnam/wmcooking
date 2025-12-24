@@ -81,7 +81,6 @@ class OAuth {
      * Get the profile for the signed in user
      */
     async getUser(): Promise<UserProfile | null> {
-        console.log("Someone called getUser()!!!!!");
         const idRet = await this.getId();
         if (idRet.isError()) 
             return null;

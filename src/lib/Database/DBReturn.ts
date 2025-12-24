@@ -1,4 +1,4 @@
-import type { PostgrestError } from "@supabase/supabase-js";
+import { FunctionsHttpError, type PostgrestError } from "@supabase/supabase-js";
 import DBError from "./DBError";
 
 export default class DBReturn<T> {
@@ -8,10 +8,23 @@ export default class DBReturn<T> {
         this.value = value;
     }
     
+    public static customError(error: string): DBReturn<never> {
+        return new DBReturn<never>(DBError.custom(error));
+    }
+
     public static fromError<T>(error: DBError): DBReturn<T> {
         return new DBReturn<T>(error);
     }
     
+    public static async fromSupabaseFunction<T>(data: T | null, error: PostgrestError | null): Promise<DBReturn<T>> {
+        if (!data && error && error instanceof FunctionsHttpError) {    
+            const errorMessage = await error.context.json();
+            return DBReturn.customError(errorMessage.message);
+        }
+
+        return DBReturn.fromSupabase(data, error);
+    }
+
     public static fromSupabase<T>(data: T | null, error: PostgrestError | null): DBReturn<T> {
         if (!data || error)
             return new DBReturn<T>(DBError.build(error));
