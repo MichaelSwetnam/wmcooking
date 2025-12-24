@@ -6,6 +6,7 @@ export interface EventRecord {
     name: string;
     background_image: string;
     requires_signup: boolean;
+    capacity: number;
 
     start_time: string;
     end_time: string;
@@ -20,6 +21,7 @@ export class EventWrapper implements EventRecord {
     name: string;
     background_image: string;
     requires_signup: boolean;
+    capacity: number;
 
     start_time: string;
     end_time: string;
@@ -36,6 +38,7 @@ export class EventWrapper implements EventRecord {
         this.start_time = record.start_time;
         this.end_time = record.end_time;
         this.date = record.date;
+        this.capacity = record.capacity;
     }
 
     getStartDate(): Date {

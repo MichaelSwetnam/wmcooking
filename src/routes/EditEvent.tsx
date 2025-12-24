@@ -13,6 +13,7 @@ import Database from "../lib/Database/Database";
 import { EventWrapper } from "../lib/Database/Records/EventRecord";
 import TimeInput from "../components/Form/TimeInput";
 import DateInput from "../components/Form/DateInput";
+import NumberInput from "../components/Form/NumberInput";
 
 export default function Page() {
     const { id } = useParams();
@@ -96,6 +97,12 @@ export default function Page() {
                         <AccessabilityInput id="accessability" startValue={event.accessability} onChange={onChange} />
                         <InputLabel name="Signup Required?" />
                         <BooleanInput id="requires_signup" startValue={event.requires_signup} onChange={onChange} />
+                        {
+                            event.requires_signup && <>
+                                <InputLabel name="Event Capacity" />
+                                <NumberInput id="capacity" startValue={event.capacity} onChange={onChange} min={0} />
+                            </>
+                        }
                     </div>
                     <div className="flex flex-row gap-2">
                         <input type="submit" value="Save" className="bg-blue-400 text-white font-semibold py-2 px-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow" />
