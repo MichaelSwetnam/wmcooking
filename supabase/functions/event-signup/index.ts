@@ -40,9 +40,11 @@ function handleError(err: unknown): Response {
 	let message: string;
 
 	// I am unsure of whether PostgrestError is a child of Error, it probably is.
-	if (err instanceof PostgrestError || err instanceof Error) {
-		message = err.message;
-	} else {
+	if (err instanceof PostgrestError) {
+		message = (err as PostgrestError).message;
+	} if (err instanceof Error) {
+		message = err.message;	
+	}else {
 		message = "Unknown error occured.";
 	}
 	
@@ -52,32 +54,73 @@ function handleError(err: unknown): Response {
 	});
 }
 
-async function putSignup(_sb: SupabaseClient, userId: string, event: EventRecord, signup: SignupRecord | null): Promise<Response> {
-	// Make sure the event window is still open (certain amount of time before the event).
+async function putSignup(sb: SupabaseClient, userId: string, event: EventRecord, signup: SignupRecord | null): Promise<Response> {
+	try {
+		// Make sure they are not already signed up
+		if (signup)
+			throw new Error("You are already signed up for this event.");
 
-	// Make sure user is not already signed up for event.
+		// Make sure the event window is still open (certain amount of time before the event).
+		const now = new Date();
+		const eventStart = new Date(`${event.date}T${event.start_time}`);
 
-	// Sign up user for event.
-	
-	console.log("PUT");
-	console.log(userId);
-	console.log(event);
-	console.log(signup);
-	return json({ message: "Completed!" });
+		if (
+			eventStart.getFullYear()  < now.getFullYear() ||
+			eventStart.getMonth()     < now.getMonth()    ||
+			eventStart.getDate()      < now.getDate()     ||
+			eventStart.getHours()     < now.getHours()
+		) {
+			throw new Error("You cannot sign up for an event that has already started.");
+		}
+		
+		if (
+			eventStart.getFullYear()  === now.getFullYear() &&
+			eventStart.getMonth()     === now.getMonth()    &&
+			eventStart.getDate()      === now.getDate()     &&
+			eventStart.getHours() - 2  <  now.getHours()
+		) {
+			throw new Error("Cannot create signup. Signup closes two hours before the start of an event.");
+		}
+
+		// Sign up user for event.
+		const { data, error } = await sb
+			.from("EventSignup")
+			.insert({ user_id: userId, event_id: event.id })
+			.select("*")
+			.single();
+			
+
+		if (error || !data)
+			throw new Error("Could not add your signup.");
+
+		return json({ payload: data });
+	} catch (e) {
+		return handleError(e);
+	}
 }
 
-async function deleteSignup(_sb: SupabaseClient, userId: string, event: EventRecord, signup: SignupRecord | null): Promise<Response> {
-	// Allow user to delete signup with event window closed.
-	
-	// Make sure user is signed up.
+async function deleteSignup(sb: SupabaseClient, userId: string, event: EventRecord, signup: SignupRecord | null): Promise<Response> {
+	try {
+		if (!signup)
+			throw new Error("You are not signed up for this event, so cannot remove your signup.");
+		
+		if (!userId) 
+			throw new Error("Cannot remove your signup, since you are not signed in.");
 
-	// Delete signup for user.
-	
-	console.log("DELETE");
-	console.log(userId);
-	console.log(event);
-	console.log(signup);
-	return json({ message: "Completed!" });
+		// Delete signup for user.
+		const { data, error } = await sb
+			.from("EventSignup")
+			.delete()
+			.eq('id', signup.id)
+			.select();
+		
+		if (!data || error)
+			throw new Error("Could not remove your signup.");
+
+		return json({ payload: data });	
+	} catch (e) {
+		return handleError(e);
+	}
 }
 
 
