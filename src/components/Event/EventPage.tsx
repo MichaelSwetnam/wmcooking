@@ -69,6 +69,16 @@ export default function EventPage({ event }: { event: EventWrapper }) {
 
     const signupCount = signups.length + (selfSignup ? 1 : 0);
 
+    const now = new Date();
+    const eventStart = event.getStartDate();
+    const diffMs = eventStart.getTime() - now.getTime();
+    const twoHoursMs = 2 * 60 * 60 * 1000;
+
+    const eventStarted = eventStart.getTime() <= now.getTime();
+    const lessThanTwoHours = diffMs < twoHoursMs;
+    
+    const showSignupButton = !eventStarted && !lessThanTwoHours && event.requires_signup && user;
+
     /** Button OnClick */
     async function RSVPButton() {
         if (!user) return;
@@ -119,6 +129,13 @@ export default function EventPage({ event }: { event: EventWrapper }) {
                 {
                     signupCount >= event.capacity && <p className="text-red-500 font-semibold">This event is full. Try signing up for one of our next events!</p>
                 }
+                {
+                    eventStarted && <p className="text-red-500 font-semibold">This event has already started, so you cannot sign up.</p>
+                }
+                {
+                    !eventStarted && twoHoursMs && <p className="text-red-500 font-semibold">You cannot sign up more than two hours before an event. Try asking if you can attend in the GroupMe or emailing us.</p>
+                }
+                
                 <ol className="w-full items-center pl-3 list-decimal">
                     {
                         user && selfSignup
@@ -142,7 +159,7 @@ export default function EventPage({ event }: { event: EventWrapper }) {
             }
 
             { /* User is logged in  */}
-            {event.requires_signup && user && (
+            {showSignupButton && (
                 isRsvpd 
                 ?
                 <button onClick={RSVPButton} className="px-3 py-2 bg-green-300 rounded-lg shadow-mg hover:shadow-lg transition-shadow font-semibold">
