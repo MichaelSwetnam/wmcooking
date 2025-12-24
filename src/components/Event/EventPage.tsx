@@ -67,6 +67,8 @@ export default function EventPage({ event }: { event: EventWrapper }) {
     if (!signups)
         return <LoadingComponent />
 
+    const signupCount = signups.length + (selfSignup ? 1 : 0);
+
     /** Button OnClick */
     async function RSVPButton() {
         if (!user) return;
@@ -82,6 +84,8 @@ export default function EventPage({ event }: { event: EventWrapper }) {
 
             setSelfSignup(null);
         } else {
+            if (signupCount >= event.capacity) return; // Don't let someone signup if there are already too many signups.
+
             // There wasn't a signup - add it
             const r = await Database.signups.insert(event.id.toString(), user.getId());
             if (r.isError()) {
@@ -111,8 +115,10 @@ export default function EventPage({ event }: { event: EventWrapper }) {
             <p className="text-gray-800 leading-relaxed text-sm md:text-base">{event.description}</p>
             {
                 event.requires_signup && <>
-                <p className="text-gray-800 font-semibold">Attending:</p>
-                {/* <p className="text-gray-800 leading-relaxed text-sm md:text-base">{signups.length + (selfSignup ? 1 : 0)} Attendee(s).</p> */}
+                <p className="text-gray-800 font-semibold">Attending: ({signupCount} / {event.capacity})</p>
+                {
+                    signupCount >= event.capacity && <p className="text-red-500 font-semibold">This event is full. Try signing up for one of our next events!</p>
+                }
                 <ol className="w-full items-center pl-3 list-decimal">
                     {
                         user && selfSignup
@@ -144,7 +150,7 @@ export default function EventPage({ event }: { event: EventWrapper }) {
                 </button> 
                 : 
                 (
-                    !rsvpToggle
+                    (!rsvpToggle && signupCount < event.capacity )
                     ?
                     <button onClick={RSVPButton} className="px-3 py-2 bg-blue-300 rounded-lg shadow-mg hover:shadow-lg transition-shadow font-semibold">
                         Click to RSVP
