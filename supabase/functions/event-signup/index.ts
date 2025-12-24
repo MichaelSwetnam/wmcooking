@@ -50,7 +50,7 @@ function handleError(err: unknown): Response {
 	
 	return new Response(JSON.stringify({ message }), {
 		headers: { 'Content-Type': 'application/json', ...corsHeaders },
-		status: 500 
+		status: 400 
 	});
 }
 
@@ -64,24 +64,16 @@ async function putSignup(sb: SupabaseClient, userId: string, event: EventRecord,
 		const now = new Date();
 		const eventStart = new Date(`${event.date}T${event.start_time}`);
 
-		if (
-			eventStart.getFullYear()  < now.getFullYear() ||
-			eventStart.getMonth()     < now.getMonth()    ||
-			eventStart.getDate()      < now.getDate()     ||
-			eventStart.getHours()     < now.getHours()
-		) {
+		if (eventStart.getTime() <= now.getTime())
 			throw new Error("You cannot sign up for an event that has already started.");
-		}
-		
-		if (
-			eventStart.getFullYear()  === now.getFullYear() &&
-			eventStart.getMonth()     === now.getMonth()    &&
-			eventStart.getDate()      === now.getDate()     &&
-			eventStart.getHours() - 2  <  now.getHours()
-		) {
+	
+		const diffMs = eventStart.getTime() - now.getTime();
+		const twoHoursMs = 2 * 60 * 60 * 1000;
+
+		if (diffMs < twoHoursMs) {
 			throw new Error("Cannot create signup. Signup closes two hours before the start of an event.");
 		}
-
+	
 		// Sign up user for event.
 		const { data, error } = await sb
 			.from("EventSignup")
@@ -99,7 +91,7 @@ async function putSignup(sb: SupabaseClient, userId: string, event: EventRecord,
 	}
 }
 
-async function deleteSignup(sb: SupabaseClient, userId: string, event: EventRecord, signup: SignupRecord | null): Promise<Response> {
+async function deleteSignup(sb: SupabaseClient, userId: string, signup: SignupRecord | null): Promise<Response> {
 	try {
 		if (!signup)
 			throw new Error("You are not signed up for this event, so cannot remove your signup.");
@@ -198,7 +190,7 @@ Deno.serve(async (req) => {
 				return putSignup(Supabase, userId, await event, await signup);
 
 			case "DELETE":
-				return deleteSignup(Supabase, userId, await event, await signup);
+				return deleteSignup(Supabase, userId, await signup);
 
 			default:
 				throw new Error("This function only accepts PUT or DELETE requests.");
