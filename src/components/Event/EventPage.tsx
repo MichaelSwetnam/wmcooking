@@ -32,8 +32,7 @@ export default function EventPage({ event }: { event: EventWrapper }) {
                 setSelfSignup(null);
                 return;
             }
-
-            console.log("Getting sign up information!");
+            
             const r = await Database.signups.getFromEvent(event.id);
             if (r.isError()) {
                 setError(r.unwrapError());
