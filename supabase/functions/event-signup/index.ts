@@ -73,7 +73,20 @@ async function putSignup(sb: SupabaseClient, userId: string, event: EventRecord,
 		if (diffMs < twoHoursMs) {
 			throw new Error("Cannot create signup. Signup closes two hours before the start of an event.");
 		}
-	
+
+		// Check event capacity
+		const capacityResult = await sb
+			.from("EventSignup")
+			.select("id")
+			.eq('event_id', event.id);
+
+		if (capacityResult.error || capacityResult.data === null)
+			return json({ message: "Could not determine whether capacity exists in the selected event."}, 500);
+
+		const signupCount = capacityResult.data.length
+		if (signupCount >= event.capacity)
+			throw new Error("There are no available slots for this event.");
+
 		// Sign up user for event.
 		const { data, error } = await sb
 			.from("EventSignup")
