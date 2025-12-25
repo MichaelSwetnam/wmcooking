@@ -133,7 +133,7 @@ export default function EventPage({ event }: { event: EventWrapper }) {
                     eventStarted && <p className="text-red-500 font-semibold">This event has already started, so you cannot sign up.</p>
                 }
                 {
-                    !eventStarted && twoHoursMs && <p className="text-red-500 font-semibold">You cannot sign up more than two hours before an event. Try asking if you can attend in the GroupMe or emailing us.</p>
+                    !eventStarted && lessThanTwoHours && <p className="text-red-500 font-semibold">You cannot sign up less than two hours before an event. Try asking if you can attend in the GroupMe or emailing us.</p>
                 }
                 
                 <ol className="w-full items-center pl-3 list-decimal">
