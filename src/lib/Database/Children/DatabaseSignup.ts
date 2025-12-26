@@ -98,6 +98,7 @@ export default class DatabaseSignup extends DatabaseChild {
         if (response.isError()) return response;
 
         const payload = response.unwrapData();
+        payload.user_name = user.getName(); // This is not set by the supabase function.
         this.signups.delete(payload.id.toString());
 
         return response;
@@ -129,6 +130,7 @@ export default class DatabaseSignup extends DatabaseChild {
         if (response.isError()) return response;
 
         const payload = response.unwrapData();
+        payload.user_name = user.getName(); // This is not set by the supabase function.
         this.signups.set(payload.id.toString(), payload);
         
         return response;

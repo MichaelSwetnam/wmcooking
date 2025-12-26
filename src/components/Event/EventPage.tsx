@@ -112,13 +112,13 @@ export default function EventPage({ event }: { event: EventWrapper}) {
                 return;
             }
 
+            // Here is some very dumb code which gets the signup and then adds the profile name into it. I should have probably reworked signup to include this field but I'm lazy so I did not.
             const r = await Database.signups.getFromEvent(event.id);
             if (r.isError()) {
                 setError(r.unwrapError());
                 return;
             }
-
-            const data = r.unwrapData();
+            const data: SignupRecord[] = [];
 
             /** If no one is signed in, then there is no self signup */
             if (!user) {
