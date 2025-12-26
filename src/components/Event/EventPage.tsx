@@ -1,24 +1,42 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import type { EventWrapper } from "../../lib/Database/Records/EventRecord";
 import getBadges from "../../lib/getBadges";
 import EventBadge from "./EventBadge";
 import { UserContext } from "../Auth/UserContext";
 import SignInButton from "../Auth/SignInButton";
 import { useNavigate } from "react-router-dom";
+import LoadingComponent from "../Utility/LoadingComponent";
+import ErrorComponent from "./ErrorComponent";
+import type { SignupRecord } from "../../lib/Database/Records/SignupRecord";
+import Database from "../../lib/Database/Database";
+import type DBError from "../../lib/Database/DBError";
 
-function RSVPButton({ isRsvpd, callback }: { isRsvpd: boolean, callback: (wasRsvpd: boolean) => void }) {
+function RSVPButton({ isRsvpd, callback }: { isRsvpd: boolean, callback: (wasRsvpd: boolean) => Promise<boolean> }) {
     const [ userTouched, setUserTouched ] = useState(false);
+    const [ loading, setLoading ] = useState(false);
+    const [ error, setError ] = useState<string | null>(null);
+
+    // Error state
+    if (error)
+        return <ErrorComponent message={error} />
+
+    // Loading an update
+    if (loading)
+        return <LoadingComponent />
 
     // Is RSVPD
     if (isRsvpd) {
-        return <button onClick={() => callback(true)} className="px-3 py-2 bg-green-300 rounded-lg shadow-mg hover:shadow-lg transition-shadow font-semibold">
+        return <button onClick={() => callCallback(true)} className="px-3 py-2 bg-green-300 rounded-lg shadow-mg hover:shadow-lg transition-shadow font-semibold">
            ✅ You are attending
         </button> 
     }
 
-    function callCallback(wasRsvpd: boolean) {
+    async function callCallback(wasRsvpd: boolean) {
         setUserTouched(true);
-        callback(wasRsvpd);
+        setLoading(true);
+        const result = await callback(wasRsvpd);
+        if (!result) setError("Failed to update RSVP status.");
+        setLoading(false);
     }
 
     // Is not RSVPD && user has not clicked
@@ -41,58 +59,155 @@ function SigninButtonSection() {
     </div>;
 }
 
-function AttendeeSection() {
-    /**
-    {
-//                 event.requires_signup && <>
-//                 <p className="text-gray-800 font-semibold">Attending: ({signupCount} / {event.capacity})</p>
-//                 {
-//                     signupCount >= event.capacity && <p className="text-red-500 font-semibold">This event is full. Try signing up for one of our next events!</p>
-//                 }
-//                 {
-//                     eventStarted && <p className="text-red-500 font-semibold">This event has already started, so you cannot sign up.</p>
-//                 }
-//                 {
-//                     !eventStarted && lessThanTwoHours && <p className="text-red-500 font-semibold">You cannot sign up less than two hours before an event. Try asking if you can attend in the GroupMe or emailing us.</p>
-//                 }
-                
-//                 <ol className="w-full items-center pl-3 list-decimal">
-//                     {
-//                         user && selfSignup
-//                         ? <li key={0}> {user.getName()}</li>
-//                         : <></>
-//                     }
-//                     {
-//                         signups.map((s, i) => <li key={i + 1}>{s.user_name}</li>)
-//                     }
-//                 </ol>
-                
-//             </>}
-     */
+function AttendeeSection({ signups, selfSignup, event }: { signups: SignupRecord[], selfSignup: SignupRecord | null, event: EventWrapper }) {
+    const eventStart = event.getStartDate();
+    const now = new Date();
+    const diffMs = eventStart.getTime() - now.getTime();
+    const twoHoursMs = 2 * 60 * 60 * 1000;
+    
+    const signupCount = signups.length + (selfSignup ? 1 : 0);
+    const eventFull = signupCount >= event.capacity;
+    const eventStarted = eventStart.getTime() <= now.getTime();
+    const lessThanTwoHours = diffMs < twoHoursMs;
 
-    throw new Error("Not Implemented");
-    return <div>Placeholder</div>;
+    let failureMessage: string | undefined;
+    if (eventFull)
+        failureMessage = "This event is full. Try signing up for one of our next events!";
+    else if (eventStarted)
+        failureMessage = "This event has already started, so you cannot sign up.";
+    else if (lessThanTwoHours)
+        failureMessage = "You cannot sign up less than two hours before an event. Try asking if you can attend in the GroupMe.";
+
+    return <div>
+        <p className="text-gray-800 font-semibold">Attending: ({signupCount} / {event.capacity})</p>
+        { failureMessage && <p className="text-red-500 font-semibold">{failureMessage}</p>}
+        { !failureMessage && 
+            <ol className="w-full items-center pl-3 list-decimal">
+            {
+                selfSignup && <li key={0}> {selfSignup.user_name}</li>
+            }
+            {
+                signups.map((s, i) => <li key={i + 1}>{s.user_name}</li>)
+            }
+            </ol>
+        }
+    </div>
 }
 
 export default function EventPage({ event }: { event: EventWrapper}) {
     const nav = useNavigate();
     const { user } = useContext(UserContext);
+    const [ signups, setSignups ] = useState<SignupRecord[] | null>(null);
+    const [ selfSignup, setSelfSignup ] = useState<SignupRecord | null>(null);
+    const [ loading, setLoading ] = useState(true);
+    const [ error, setError ] = useState<DBError | null>();
 
+    // Get signup information
+    useEffect(() => {
+        (async () => {
+            if (!event.requires_signup) {
+                setSignups(null);
+                setSelfSignup(null);
+                setLoading(false);
+                return;
+            }
+
+            const r = await Database.signups.getFromEvent(event.id);
+            if (r.isError()) {
+                setError(r.unwrapError());
+                return;
+            }
+
+            const data = r.unwrapData();
+
+            /** If no one is signed in, then there is no self signup */
+            if (!user) {
+                setSignups(data);
+                setSelfSignup(null);
+                setLoading(false);
+                return;
+            }
+            
+            /** If the user is signed in, remove their signup from data and put it in selfSignup */
+            const userSignupIndex = data.findIndex(s => event.id.toString() == s.event_id && s.user_id === user.getId());
+            if (userSignupIndex !== -1) {
+                setSelfSignup(data[userSignupIndex]);
+                data.splice(userSignupIndex, 1);
+            }
+
+            setLoading(false);
+            setSignups(data);
+        })();      
+    }, [user, event.id, event.requires_signup]);
+
+    if (error) return <ErrorComponent message={error.message} />
+    if (loading) return <LoadingComponent />;
+
+    // Bools
     const isLoggedIn = !!user;
+    const isRsvpd = !!selfSignup;
     const isExecMember = user && user.isPrivileged();
 
+    // Add / remove signup functions
+    async function addSignup(): Promise<boolean> {
+        if (!user) return false;
+        
+        // There wasn't a signup - add it
+        const r = await Database.signups.invokeInsert(event.id.toString(), user.getId());
+        if (r.isError()) {
+            setError(r.unwrapError());
+        }
+            
+        setSelfSignup(r.unwrapData());
+        return r.isData();
+    }   
+
+    async function removeSignup(): Promise<boolean> {
+        if (!selfSignup) return false;
+
+        const r = await Database.signups.invokeDelete(selfSignup.id.toString());
+        r.ifError(e => 
+            setError(e)
+        );
+        setSelfSignup(null);
+        
+        return r.isData();
+    }
+
+    // Response to RSVP button being pressed
+    async function changeRSVP(was: boolean): Promise<boolean> {
+        if (!user) return false;
+        
+        let result: boolean;
+        switch (was) {
+            case true: 
+                result = await removeSignup();
+                break;
+
+            case false: 
+                result = await addSignup(); 
+                break;
+
+            default: throw new Error("Unreachable");
+        }
+        
+        return result;
+    }
+
+    // Add required buttons.
     const buttons: React.ReactNode[] = [];
     if (event.requires_signup) {
         if (!isLoggedIn) {
-            buttons.push(<SigninButtonSection />);
+            buttons.push(<SigninButtonSection key={0} />);
         } else {
-            buttons.push(<RSVPButton isRsvpd={true} callback={() => { throw new Error("Not Implemented"); }} />);
+            buttons.push(<RSVPButton isRsvpd={isRsvpd} callback={changeRSVP} key={0} />);
         }
     }
 
     if (isExecMember) {
         buttons.push(
             <button
+                key={1}
                 className="px-3 py-2 bg-blue-300 rounded-lg shadow-md hover:shadow-lg transition-shadow font-semibold"
                 onClick={() => nav(`/events/${event.id}/edit`)}
             >
@@ -102,6 +217,7 @@ export default function EventPage({ event }: { event: EventWrapper}) {
     }
 
 
+    // Return
     return (
         <div className="flex flex-col bg-white rounded-3xl overflow-hidden w-full">
             {/* Background image portion */}
@@ -118,10 +234,10 @@ export default function EventPage({ event }: { event: EventWrapper}) {
                 </div>
             </div>
             {/* White background portion */}
-            <div>
+            <div className="p-5">
                 <p className="text-gray-800 font-semibold">Description:</p>
                 <p className="text-gray-800 leading-relaxed text-sm md:text-base">{event.description}</p>
-                <AttendeeSection />
+                { event.requires_signup && signups && <AttendeeSection signups={signups} selfSignup={selfSignup} event={event} />}
                 {/* Buttons */}
                 <div className="flex flex-row justify-center items-center gap-2 pb-5">
                     { ...buttons }
