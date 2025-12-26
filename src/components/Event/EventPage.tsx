@@ -26,7 +26,7 @@ function RSVPButton({ isRsvpd, callback }: { isRsvpd: boolean, callback: (wasRsv
 
     // Is RSVPD
     if (isRsvpd) {
-        return <button onClick={() => callCallback(true)} className="px-3 py-2 bg-green-300 rounded-lg shadow-mg hover:shadow-lg transition-shadow font-semibold">
+        return <button onClick={() => callCallback(true)} className="px-3 py-2 bg-green-300 rounded-lg shadow-mg hover:shadow-lg transition-shadow font-semibold cursor-pointer">
            ✅ You are attending
         </button> 
     }
@@ -41,13 +41,13 @@ function RSVPButton({ isRsvpd, callback }: { isRsvpd: boolean, callback: (wasRsv
 
     // Is not RSVPD && user has not clicked
     if (!userTouched) {
-        return <button onClick={() => callCallback(false)} className="px-3 py-2 bg-blue-300 rounded-lg shadow-mg hover:shadow-lg transition-shadow font-semibold">
+        return <button onClick={() => callCallback(false)} className="px-3 py-2 bg-blue-300 rounded-lg shadow-mg hover:shadow-lg transition-shadow font-semibold cursor-pointer">
             Click to RSVP
         </button>
     }
 
     // Is RSVP and user clicked
-    return <button onClick={() => callCallback(false)} className="px-3 py-2 bg-red-300 rounded-lg shadow-mg hover:shadow-lg transition-shadow font-semibold">
+    return <button onClick={() => callCallback(false)} className="px-3 py-2 bg-red-300 rounded-lg shadow-mg hover:shadow-lg transition-shadow font-semibold cursor-pointer">
         ❌ You are not attending
     </button>
 }
@@ -207,7 +207,7 @@ export default function EventPage({ event }: { event: EventWrapper}) {
         buttons.push(
             <button
                 key={1}
-                className="px-3 py-2 bg-blue-300 rounded-lg shadow-md hover:shadow-lg transition-shadow font-semibold"
+                className="px-3 py-2 bg-blue-300 rounded-lg shadow-md hover:shadow-lg transition-shadow font-semibold cursor-pointer"
                 onClick={() => nav(`/events/${event.id}/edit`)}
             >
                 Edit
