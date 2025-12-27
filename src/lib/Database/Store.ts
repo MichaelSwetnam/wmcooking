@@ -11,10 +11,10 @@ export default class Store<T> {
     private static readonly INVALID_AFTER = 10 * 60 * 1000; // Miliseconds
 
     private readonly storageKey: string;
-    private readonly fetch: StoreGetter<T>;
+    private readonly fetch?: StoreGetter<T>;
     private readonly data = new Map<string, StoreValue<T>>();
 
-    private constructor(fetch: StoreGetter<T>, storageKey: string) {
+    private constructor(fetch: StoreGetter<T> | undefined, storageKey: string) {
         this.fetch = fetch;
         this.storageKey = storageKey;
     }
@@ -44,13 +44,15 @@ export default class Store<T> {
         // Get from cache
         if (this.data.has(id)) {
             const cached = this.data.get(id)!;
-            if (cached.livesUntil > getMillis()) return new DBReturn(cached.data);
+            // It is young enough, or there is no fetch method.
+            if (!this.fetch || cached.livesUntil > getMillis()) return new DBReturn(cached.data);
             else { // Data has lived for two long in the cache
                 this.data.delete(id);
             }
         }
 
         // Grab from fetch method
+        if (!this.fetch) return DBReturn.customError(`Cannot get un-cached values from ${this.storageKey}.`);
         const fetched = await this.fetch(id);
         if (fetched.isError())
             return fetched;
@@ -79,14 +81,14 @@ export default class Store<T> {
             obj[key] = value;
         });
 
-        return JSON.stringify(obj);
+        return btoa(JSON.stringify(obj));
     }
 
     private save() {
         localStorage.setItem(this.storageKey, this.toStorable());
     }
 
-    static fromStorage<T>(storageKey: string, fetch: StoreGetter<T>): Store<T> {
+    static fromStorage<T>(storageKey: string, fetch?: StoreGetter<T>): Store<T> {
         const stored = localStorage.getItem(storageKey);
         const store = new Store<T>(fetch, storageKey);
 
@@ -94,7 +96,7 @@ export default class Store<T> {
             return store; // Return empty store
         }
 
-        const obj = JSON.parse(stored); 
+        const obj = JSON.parse(atob(stored)); 
         
         for (const key of Object.keys(obj)) {
             if (!obj[key]) continue;

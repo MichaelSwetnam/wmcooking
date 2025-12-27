@@ -7,25 +7,12 @@ import type { SignupRecord } from "../Records/SignupRecord";
 import Store from "../Store";
 import DatabaseChild from "./DatabaseChild";
 
-async function getSignup(id: string): Promise<DBReturn<SignupRecord>> {
-    const { data, error } = await Supabase
-        .from("EventSignup")
-        .select(`
-            *,
-            Profiles (
-                name
-            )
-        `)
-        .eq('id', id)
-        .single();
-    
-    throw new Error("Got individual signup! Not implemented.");
-    return DBReturn.fromSupabase(data, error);
-}
-
+/**
+ * Signups don't cache in localStorage, but they will keep data between page navigation.
+ */
 export default class DatabaseSignup extends DatabaseChild {
     private static readonly SIGNUP_STORAGE_KEY = "SIGNUPS";
-    private readonly signups = Store.fromStorage<SignupRecord>(DatabaseSignup.SIGNUP_STORAGE_KEY, getSignup);
+    private readonly signups = Store.fromStorage<SignupRecord>(DatabaseSignup.SIGNUP_STORAGE_KEY);
 
     constructor(db: DBWrapper) {
         super(db);

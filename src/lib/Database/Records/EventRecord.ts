@@ -1,3 +1,6 @@
+import Database from "../Database";
+import type DBReturn from "../DBReturn";
+
 export interface EventRecord {
     accessability: "AllStudents" | "ClubMembers";
     description: string;
@@ -39,6 +42,10 @@ export class EventWrapper implements EventRecord {
         this.end_time = record.end_time;
         this.date = record.date;
         this.capacity = record.capacity;
+    }
+
+    async getAllergyLabels(): Promise<DBReturn<string[]>> {
+        return Database.allergies.getAllergiesForEvent(this.id.toString());
     }
 
     getStartDate(): Date {
