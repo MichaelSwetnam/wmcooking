@@ -2,12 +2,12 @@ import { useNavigate } from "react-router-dom";
 import EventBadge from "./EventBadge";
 import getBadges from "../../lib/getBadges";
 import type { EventWrapper } from "../../lib/Database/Records/EventRecord";
+import AllergyBadge from "./AllergyBadge";
 
 export default function EventCard({ event }: { event: EventWrapper }) {
     const nav = useNavigate();
-
     return <div className="flex flex-col bg-white shadow-xl rounded-3xl overflow-hidden hover:shadow-2xl transition-shadow duration-300 w-full max-w-3xl cursor-pointer" onClick={() => {nav(`/events/${event.id}`)}}>
-        <div className={"flex flex-col items-center p-5 gap-1"} style={{
+        <div className={"flex flex-col items-center p-2 gap-1"} style={{
             backgroundImage: `url(${event.background_image})`,
             backgroundPosition: "center",
             backgroundSize: "cover"
@@ -17,6 +17,9 @@ export default function EventCard({ event }: { event: EventWrapper }) {
             </div>
             <div className="flex flex-wrap gap-2">
                 { getBadges(event).map((t, i) => <EventBadge text={t} key={i} />) }
+            </div>
+            <div className="p-1 flex flex-wrap items-center justify-center gap-2">
+                <AllergyBadge event={event} />
             </div>
         </div>
         <div className="p-6 text-gray-800 leading-relaxed text-sm md:text-base">

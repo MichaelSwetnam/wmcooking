@@ -10,6 +10,7 @@ import ErrorComponent from "./ErrorComponent";
 import type { SignupRecord } from "../../lib/Database/Records/SignupRecord";
 import Database from "../../lib/Database/Database";
 import type DBError from "../../lib/Database/DBError";
+import AllergySection from "./AllergySection";
 
 function RSVPButton({ isRsvpd, callback }: { isRsvpd: boolean, callback: (wasRsvpd: boolean) => Promise<boolean> }) {
     const [ userTouched, setUserTouched ] = useState(false);
@@ -233,9 +234,12 @@ export default function EventPage({ event }: { event: EventWrapper}) {
                 </div>
             </div>
             {/* White background portion */}
-            <div className="p-5">
-                <p className="text-gray-800 font-semibold">Description:</p>
-                <p className="text-gray-800 leading-relaxed text-sm md:text-base">{event.description}</p>
+            <div className="p-5 flex flex-col gap-3">
+                <div>
+                    <p className="text-gray-800 font-semibold">Description:</p>
+                    <p className="text-gray-800 leading-relaxed text-sm md:text-base">{event.description}</p>
+                </div>
+                <AllergySection event={event} />
                 { event.requires_signup && signups && <AttendeeSection signups={signups} selfSignup={selfSignup} event={event} />}
                 {/* Buttons */}
                 <div className="flex flex-row justify-center items-center gap-2 pb-5">
