@@ -8,6 +8,10 @@ export default class DBReturn<T> {
         this.value = value;
     }
     
+    public static success<T>(data: T): DBReturn<T> {
+        return new DBReturn<T>(data);
+    }
+
     public static customError(error: string): DBReturn<never> {
         return new DBReturn<never>(DBError.custom(error));
     }
