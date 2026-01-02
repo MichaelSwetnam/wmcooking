@@ -1,5 +1,5 @@
 import Database from "../Database";
-import type DBReturn from "../DBReturn";
+import DBReturn from "../DBReturn";
 
 export interface EventRecord {
     accessability: "AllStudents" | "ClubMembers";
@@ -30,6 +30,8 @@ export class EventWrapper implements EventRecord {
     end_time: string;
     date: string;
 
+    private allergens: string[] | undefined;
+
     constructor(record: EventRecord) {
         this.accessability = record.accessability;
         this.description = record.description;
@@ -44,8 +46,36 @@ export class EventWrapper implements EventRecord {
         this.capacity = record.capacity;
     }
 
+    /**
+     * Pulls allergy labels from the database and stores them in the wrapper class.
+     * @returns Allergies listed for event.
+     */
     async getAllergyLabels(): Promise<DBReturn<string[]>> {
-        return Database.allergies.getAllergiesForEvent(this.id.toString());
+        if (this.allergens) return new DBReturn(this.allergens);
+
+        const r = await Database.allergies.getAllergiesForEvent(this.id.toString());
+        r.ifData(arr => this.allergens = arr);
+        return r;
+    }
+
+    /**
+     * Sets the allergy labels on the client copy of the event. These changes will not set to DB unless #saveAllergyLabels is called.
+     * @param labels 
+     */
+    async setAllergyLabels(labels: string[]) {
+        this.allergens = labels;
+    }
+
+    /**
+     * Updates stored allergy information to the database and local storage.
+     * @returns Updates set of allergens from the database.
+     */
+    async saveAllergyLabels(): Promise<DBReturn<string[]>> {
+        if (!this.allergens) this.getAllergyLabels();
+        
+        const r = await Database.allergies.updateAllergiesForEvent(this.id.toString(), this.allergens!);
+        r.ifData(arr => this.allergens = arr);
+        return r;
     }
 
     getStartDate(): Date {
@@ -56,5 +86,9 @@ export class EventWrapper implements EventRecord {
         return new Date(`${this.date}T${this.end_time}`)
     }
 
-    toRecord(): EventRecord { return { ...this }; }
+    toRecord(): EventRecord { 
+        const r = { ...this };
+        r.allergens = undefined;
+        return r;
+    }
 }

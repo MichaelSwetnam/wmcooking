@@ -14,6 +14,7 @@ import { EventWrapper } from "../lib/Database/Records/EventRecord";
 import TimeInput from "../components/Form/TimeInput";
 import DateInput from "../components/Form/DateInput";
 import NumberInput from "../components/Form/NumberInput";
+import AllergySelectInput from "../components/Form/AllergySelectInput";
 
 export default function Page() {
     const { id } = useParams();
@@ -39,12 +40,9 @@ export default function Page() {
         getData();
     }, [id])
 
-    if (error) {
-        return <ErrorComponent message={error[0]} technical={error[1]} />
-    }
-    
-    if (event === null)
-        return <LoadingComponent />
+    if (error) return <ErrorComponent message={error[0]} technical={error[1]} />
+    if (event === null) return <LoadingComponent />
+
     if (!id || isNaN(parseInt(id))) {
         setError(["Could not find the event you were looking for.", "Expected :id property from router as number."]);
         return;
@@ -66,14 +64,17 @@ export default function Page() {
     function onSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!event) return;
-        
-        Database.events.update(event.id, event).then(r => {
-            if (r.isError()) {
-                setError(["Could not save your event changes.", r.unwrapError().message]);
-            } else {
-                nav(`/events/${r.unwrapData().id}`);
-            }
-        });
+
+        Promise.all([Database.events.update(event.id, event), event.saveAllergyLabels()])
+            .then(([updateReturn, allergyReturn]) => {
+                if (updateReturn.isError()) {
+                    setError(["Could not save your event changes.", updateReturn.unwrapError().message]);
+                } else if (allergyReturn.isError()) {
+                    setError(["Could not save your event changes.", allergyReturn.unwrapError().message]);
+                } else {
+                    nav(`/events/${updateReturn.unwrapData().id}`);
+                }
+            });
     }
 
     return (
@@ -95,6 +96,8 @@ export default function Page() {
                         <TimeInput id="end_time" startValue={event.end_time} onChange={onChange} />
                         <InputLabel name="Accessability" />
                         <AccessabilityInput id="accessability" startValue={event.accessability} onChange={onChange} />
+                        <InputLabel name="Allergens" />
+                        <AllergySelectInput event={event} />
                         <InputLabel name="Signup Required?" />
                         <BooleanInput id="requires_signup" startValue={event.requires_signup} onChange={onChange} />
                         {

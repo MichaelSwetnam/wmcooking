@@ -14,7 +14,7 @@ export default function ErrorComponent({ message, technical, reveal }: Props) {
         if (reveal || clicked)
             technicalComp = <span className="text-gray-200 text-sm">{technical}</span>;
         else
-            <a className="text-gray-200 text-sm underline" onClick={() => setClicked(true)}>Click here for technical reason</a>
+            technicalComp = <a className="text-gray-200 text-sm underline" onClick={() => setClicked(true)}>Click here for technical reason</a>
     } else {
         technicalComp = <></>;
     }

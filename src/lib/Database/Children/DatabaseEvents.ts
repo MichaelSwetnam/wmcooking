@@ -146,8 +146,6 @@ export default class DatabaseEvents extends DatabaseChild {
             .select('*')
             .single();
 
-        console.log(data, error);
-
         const ret = DBReturn.fromSupabase<EventRecord>(data, error);
         if (ret.isError())
             return ret.mapError();
