@@ -96,7 +96,14 @@ export default class Store<T> {
             return store; // Return empty store
         }
 
-        const obj = JSON.parse(atob(stored)); 
+        let obj;
+        try {
+            obj = JSON.parse(atob(stored)); 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (_) {
+            // If we can't decode what is stored, just pretend nothing was stored at all.
+            obj = {};
+        }
         
         for (const key of Object.keys(obj)) {
             if (!obj[key]) continue;

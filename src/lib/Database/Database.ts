@@ -35,7 +35,15 @@ class Database {
     constructor() {
         const dbStorage = localStorage.getItem(Database.DATABASE_STORAGE_KEY);
         if (dbStorage) {
-            const obj = JSON.parse(atob(dbStorage)) as DatabaseStorage;
+            let obj: Partial<DatabaseStorage>;
+            try {
+                obj = JSON.parse(atob(dbStorage));
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (_) {
+                // If we can't decode what is stored, just ignore it.
+                obj = {};
+            }
+
             if (obj.events)
                 this.events.updateFromCache(obj.events);
             if (obj.allergies)
