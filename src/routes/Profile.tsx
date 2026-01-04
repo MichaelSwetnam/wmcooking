@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { InputLabel } from "../components/Form/Inputs";
-import DisabledTextInput from "../components/Form/DisabledTextInput";
-import ShortTextInput from "../components/Form/ShortTextInput";
+import DisabledTextInput from "../components/Form/Text/DisabledTextInput";
+import ShortTextInput from "../components/Form/Text/ShortTextInput";
 import { useContext, useEffect, useState } from "react";
 import Database from "../lib/Database/Database";
 import LoadingComponent from "../components/Utility/LoadingComponent";

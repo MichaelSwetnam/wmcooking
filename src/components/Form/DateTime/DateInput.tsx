@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { InputProp } from "./Inputs";
+import type { InputProp } from "../Inputs";
 
 function isValidYMD(year: number, month: number, day: number): boolean {
     const d = new Date(year, month - 1, day);

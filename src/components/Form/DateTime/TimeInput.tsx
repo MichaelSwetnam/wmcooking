@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { InputProp } from "./Inputs";
+import type { InputProp } from "../Inputs";
 
 function isValid12Hour(hour: number, minute: number): boolean {
     return (

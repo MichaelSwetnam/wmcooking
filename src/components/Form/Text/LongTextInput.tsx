@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { InputProp } from "./Inputs";
+import type { InputProp } from "../Inputs";
 
 export default function LongTextInput({ id, startValue, onChange }: InputProp<string>) {
     const [value, setValue] = useState(startValue);

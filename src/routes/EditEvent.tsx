@@ -5,16 +5,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import LoadingComponent from "../components/Utility/LoadingComponent";
 import EventPage from "../components/Event/EventPage";
 import { InputLabel } from "../components/Form/Inputs";
-import ShortTextInput from "../components/Form/ShortTextInput";
-import LongTextInput from "../components/Form/LongTextInput";
-import AccessabilityInput from "../components/Form/AccessabilityInputs";
-import BooleanInput from "../components/Form/BooleanInput";
-import Database from "../lib/Database/Database";
 import { EventWrapper } from "../lib/Database/Records/EventRecord";
-import TimeInput from "../components/Form/TimeInput";
-import DateInput from "../components/Form/DateInput";
-import NumberInput from "../components/Form/NumberInput";
+import ShortTextInput from "../components/Form/Text/ShortTextInput";
+import LongTextInput from "../components/Form/Text/LongTextInput";
+import DateInput from "../components/Form/DateTime/DateInput";
+import TimeInput from "../components/Form/DateTime/TimeInput";
+import AccessabilityInput from "../components/Form/AccessabilityInputs";
 import AllergySelectInput from "../components/Form/AllergySelectInput";
+import BooleanInput from "../components/Form/Simple/BooleanInput";
+import NumberInput from "../components/Form/Simple/NumberInput";
+import Database from "../lib/Database/Database";
 
 export default function Page() {
     const { id } = useParams();
