@@ -16,7 +16,7 @@ function SelectComponent({ id, displayText, startValue, callback }: { id: string
         }}
         className={`py-1 px-10 rounded-sm cursor-pointer hover:shadow-md transition-shadow ` + (value ? "bg-blue-600 text-white" : "bg-gray-300 text-black")}
     >
-        {displayText}
+        {value ? "⚠️" : "❌"} {displayText}
     </button>
 }
 
@@ -66,10 +66,16 @@ export default function AccessabilityInput({ event }: { event: EventWrapper }) {
         setSelected(selected);
     }
 
-    return <div className="flex flex-wrap p-2 bg-white shadow-sm rounded-sm gap-2">
-        { allergyOptions.map((v, i) => {
-            const isSelected = selectedAllergies.find(x => x === v) !== undefined;  
-            return <SelectComponent key={i} id={v} displayText={v[0] + v.slice(1).toLowerCase()} startValue={isSelected} callback={handleChange}/>;
-        })}
-    </div> 
+    return <div className="p-2 bg-white shadow-sm rounded-sm gap-1">
+        <div className="flex flex-wrap gap-2">
+            { allergyOptions.map((v, i) => {
+                const isSelected = selectedAllergies.find(x => x === v) !== undefined;  
+                return <SelectComponent key={i} id={v} displayText={v[0] + v.slice(1).toLowerCase()} startValue={isSelected} callback={handleChange}/>;
+            })}
+        </div> 
+        <div className="flex flex-row gap-4">
+            <p className="text-gray text-sm font-normal text-center">⚠️: Event may contain this allergen.</p>
+            <p className="text-gray text-sm font-normal text-center">❌: Event does not contain this allergen.</p>
+        </div>
+    </div>
 }
