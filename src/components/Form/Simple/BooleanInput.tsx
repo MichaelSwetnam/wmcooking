@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { InputProp } from "./Inputs";
+import type { InputProp } from "../Inputs";
 
 export default function BooleanInput({ id, startValue, onChange }: InputProp<boolean>) {
     const [value, setValue] = useState(startValue);

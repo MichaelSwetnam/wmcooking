@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { InputProp } from "./Inputs";
+import type { InputProp } from "../Inputs";
 
 export default function ShortTextInput({ id, startValue, onChange, min, max }: InputProp<number> & { min?: number, max?: number }) {
     const [value, setValue] = useState(startValue);
