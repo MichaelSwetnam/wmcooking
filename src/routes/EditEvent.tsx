@@ -81,7 +81,7 @@ export default function Page() {
         <RequireAdminLogin>
             <div className="flex flex-col gap-6">
                 <form className="p-3 bg-blue- rounded-md flex flex-col items-center w-full gap-3" onSubmit={onSubmit}>
-                    <div className="grid grid-cols-[1fr_4fr] items-center gap-3 w-full lg:w-3/4">
+                    <div className="w-full flex flex-col  gap-3 md:grid grid-cols-[1fr_4fr] md:items-center lg:w-3/4">
                         <InputLabel name="Title" />
                         <ShortTextInput id="name" startValue={event.name} onChange={onChange} />
                         <InputLabel name="Location" />
@@ -131,7 +131,7 @@ export default function Page() {
 
             {/* Modal  */}
             { isModalOpen &&
-                <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-3">
+                <div className="fixed inset-0 flex justify-center bg-black/50 z-50 p-3">
                     <div className="flex flex-col gap-3">
                         <EventPage event={event} />
                         <button 

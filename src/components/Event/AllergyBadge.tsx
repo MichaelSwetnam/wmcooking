@@ -23,7 +23,7 @@ export default function AllergyBadge({ event }: { event: EventWrapper }) {
     
     if (allergies.length <= 0) return <></>
 
-    return <div className="bg-amber-300 p-2 rounded-xl shadow-sm hover:shadow-md transition duration-300">
+    return <div className="bg-amber-300 p-2 rounded-xl shadow-sm">
         <span className="font-semibold">May contain: {
             allergies
             .sort()

@@ -12,13 +12,13 @@ export default function EventCard({ event }: { event: EventWrapper }) {
             backgroundPosition: "center",
             backgroundSize: "cover"
         }}>
-            <div className="mb-60 p-2 rounded-xl bg-white shadow-sm">
+            <div className="mb-40 md:mb-60 p-2 rounded-xl bg-white shadow-sm">
                 <span className={"font-bold text-2xl text-black"}>{ event.name }</span>
             </div>
             <div className="flex flex-wrap gap-2">
                 { getBadges(event).map((t, i) => <EventBadge text={t} key={i} />) }
             </div>
-            <div className="p-1 flex flex-wrap items-center justify-center gap-2">
+            <div className="w-full flex justify-start md:justify-center">
                 <AllergyBadge event={event} />
             </div>
         </div>
