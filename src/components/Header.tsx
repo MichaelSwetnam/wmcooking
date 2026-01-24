@@ -6,14 +6,6 @@ import SignInButton from "./Auth/SignInButton";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "./Auth/UserContext";
 
-interface SectionLinkProps {
-    to: string;
-    children: React.ReactNode;
-}
-
-function SectionLink({ to, children }: SectionLinkProps) {
-    return <ResponsiveLink to={to}>{children}</ResponsiveLink>;
-}
 
 // Dropdown component inside the same file
 interface UserDropdownProps {
@@ -110,8 +102,11 @@ export default function Header() {
 
                 <div className="flex flex-row gap-6 text-blue-800 font-medium items-center">
                     <nav>
-                        <SectionLink to="/events">Events</SectionLink>
+                        <ResponsiveLink to="/events">Events</ResponsiveLink>
                     </nav> 
+                    <nav>
+                        <ResponsiveLink to="/health">Health & Safety</ResponsiveLink>
+                    </nav>
                     {
                         loadedRecord !== null
                         ? <UserDropdown user={loadedRecord} onLogout={() => setUser(null)} />

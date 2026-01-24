@@ -6,12 +6,12 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from './routes/Home.tsx'
 import NotFound from './routes/NotFound.tsx';
 import Footer from './components/Footer.tsx';
-import WIP from './components/Utility/WIP.tsx';
 import Events from './routes/Events/Events.tsx';
 import EventPage from './routes/EventPage.tsx';
 import EditEvent from './routes/EditEvent.tsx';
 import Profile from './routes/Profile.tsx';
 import { UserProvider } from './components/Auth/UserProvider.tsx';
+import Health from './routes/Health.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter> 
@@ -22,7 +22,7 @@ createRoot(document.getElementById('root')!).render(
           <div className='w-full bg-linear-to-b from-orange-50 via-white to-orange-100 rounded-xl p-3'>
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/wip" element={<WIP />} />
+              <Route path="/health" element={<Health />} />
               <Route path="/events" element={<Events />} />
               <Route path="/events/:id" element={<EventPage />} />
               <Route path="/events/:id/edit" element={<EditEvent />} />
