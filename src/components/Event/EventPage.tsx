@@ -242,7 +242,7 @@ export default function EventPage({ event }: { event: EventWrapper}) {
                 {
                     event.notable_link && <div>
                         <p className="text-gray-800 font-semibold">More information here:</p>
-                        <a className="text-blue-600 underline" href={event.notable_link}>{event.notable_link}</a>
+                        <a target="_blank" className="text-blue-600 underline" href={event.notable_link}>{event.notable_link}</a>
                     </div>
                 }
 

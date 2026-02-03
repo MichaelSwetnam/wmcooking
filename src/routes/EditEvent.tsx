@@ -84,20 +84,42 @@ export default function Page() {
                     <div className="w-full flex flex-col  gap-3 md:grid grid-cols-[1fr_4fr] md:items-center lg:w-3/4">
                         <InputLabel name="Title" />
                         <ShortTextInput id="name" startValue={event.name} onChange={onChange} />
+                        
                         <InputLabel name="Location" />
                         <ShortTextInput id="location" startValue={event.location} onChange={onChange} />
-                        <InputLabel name="Description" />
-                        <LongTextInput id="description" startValue={event.description} onChange={onChange} />
+                        
                         <InputLabel name="Date" />
                         <DateInput id="date" startValue={event.date} onChange={onChange} />
+                        
                         <InputLabel name="Start Time" />
                         <TimeInput id="start_time" startValue={event.start_time} onChange={onChange} />
+                        
                         <InputLabel name="End Time" />
-                        <TimeInput id="end_time" startValue={event.end_time} onChange={onChange} />
+                        <TimeInput id="end_time" startValue={event.end_time} onChange={onChange} />                       
+
+                        <InputLabel name="Description" />
+                        <LongTextInput id="description" startValue={event.description} onChange={onChange} />
+
+                        <InputLabel name="Notable Link (empty = none)" />
+                        <ShortTextInput 
+                            id="notable_link" 
+                            startValue={event.notable_link || ""} 
+                            onChange={(id, val) => {
+                                // Match "" => null
+                                let value: string | null = val;
+                                if (value === "") 
+                                    value = null;
+                                
+                                onChange(id, value);
+                            }} 
+                        />
+
                         <InputLabel name="Accessability" />
                         <AccessabilityInput id="accessability" startValue={event.accessability} onChange={onChange} />
+                        
                         <InputLabel name="Allergens" />
                         <AllergySelectInput event={event} />
+                        
                         <InputLabel name="Signup Required?" />
                         <BooleanInput id="requires_signup" startValue={event.requires_signup} onChange={onChange} />
                         {

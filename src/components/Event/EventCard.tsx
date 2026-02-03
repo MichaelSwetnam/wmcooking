@@ -25,7 +25,7 @@ export default function EventCard({ event }: { event: EventWrapper }) {
         <div className="py-2 px-6 text-gray-800 leading-relaxed text-sm md:text-base">
             <p className="whitespace-pre-wrap">{ event.description }</p>
             { event.notable_link && 
-                <p>More information here: <a className="text-blue-600 underline" href={event.notable_link}>{event.notable_link}</a></p>
+                <p>More information here: <a target="_blank" className="text-blue-600 underline" href={event.notable_link}>{event.notable_link}</a></p>
             }
         </div>
         {
