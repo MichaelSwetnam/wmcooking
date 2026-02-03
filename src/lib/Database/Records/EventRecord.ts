@@ -10,6 +10,7 @@ export interface EventRecord {
     background_image: string;
     requires_signup: boolean;
     capacity: number;
+    notable_link: string | null;
 
     start_time: string;
     end_time: string;
@@ -17,14 +18,15 @@ export interface EventRecord {
 }
 
 export class EventWrapper implements EventRecord {
-    accessability: "AllStudents" | "ClubMembers";
-    description: string;
-    id: number;
-    location: string;
-    name: string;
-    background_image: string;
-    requires_signup: boolean;
-    capacity: number;
+    readonly accessability: "AllStudents" | "ClubMembers";
+    readonly description: string;
+    readonly id: number;
+    readonly location: string;
+    readonly name: string;
+    readonly background_image: string;
+    readonly requires_signup: boolean;
+    readonly capacity: number;
+    readonly notable_link: string | null;
 
     start_time: string;
     end_time: string;
@@ -44,6 +46,9 @@ export class EventWrapper implements EventRecord {
         this.end_time = record.end_time;
         this.date = record.date;
         this.capacity = record.capacity;
+        this.notable_link = record.notable_link;
+
+        console.log(this);
     }
 
     /**

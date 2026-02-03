@@ -22,14 +22,17 @@ export default function EventCard({ event }: { event: EventWrapper }) {
                 <AllergyBadge event={event} />
             </div>
         </div>
-        <div className="p-6 text-gray-800 leading-relaxed text-sm md:text-base">
-            { event.description }
+        <div className="py-2 px-6 text-gray-800 leading-relaxed text-sm md:text-base">
+            <p className="whitespace-pre-wrap">{ event.description }</p>
+            { event.notable_link && 
+                <p>More information here: <a className="text-blue-600 underline" href={event.notable_link}>{event.notable_link}</a></p>
+            }
         </div>
         {
-            (event.requires_signup) && <p className="pb-4 text-center text-gray-800 font-semibold">Click here to sign up!</p>
+            (event.requires_signup) && <p className="px-4 py-2 text-center text-gray-800 font-semibold">Click here to sign up!</p>
         }
         {
-            !event.requires_signup && <p className="pb-4 text-center text-gray-800 font-semibold">No signup required.</p>
+            !event.requires_signup && <p className="px-4 py-2 text-center text-gray-800 font-semibold">No signup required.</p>
         }
     </div>
 }

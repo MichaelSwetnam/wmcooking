@@ -237,8 +237,15 @@ export default function EventPage({ event }: { event: EventWrapper}) {
             <div className="p-5 flex flex-col gap-3">
                 <div>
                     <p className="text-gray-800 font-semibold">Description:</p>
-                    <p className="text-gray-800 leading-relaxed text-sm md:text-base">{event.description}</p>
+                    <p className="text-gray-800 leading-relaxed text-sm md:text-base whitespace-pre-wrap">{event.description}</p>
                 </div>
+                {
+                    event.notable_link && <div>
+                        <p className="text-gray-800 font-semibold">More information here:</p>
+                        <a className="text-blue-600 underline" href={event.notable_link}>{event.notable_link}</a>
+                    </div>
+                }
+
                 <AllergySection event={event} />
                 { event.requires_signup && signups && <AttendeeSection signups={signups} selfSignup={selfSignup} event={event} />}
                 {/* Buttons */}
