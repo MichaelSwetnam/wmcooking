@@ -124,6 +124,24 @@ export default class DatabaseEvents extends DatabaseChild {
         return ret.map(d => d.map(e => new EventWrapper(e)));
     }
 
+    async newEvent(): Promise<DBReturn<EventWrapper>> {            
+        const { data, error } = await Supabase
+            .from("Events")
+            .insert(EventWrapper.placeholder())
+            .select("*")
+            .single();
+
+        const r = DBReturn.fromSupabase<EventRecord>(data, error);
+        r.ifData(d => {
+            this.events.set(d.id.toString(), d);
+        })
+
+        console.log(this);
+
+        this.save();
+        return r.map(d => new EventWrapper(d));
+    }
+
     /**
      * @param id 
      * @param event 
@@ -152,6 +170,12 @@ export default class DatabaseEvents extends DatabaseChild {
 
         const retData = ret.unwrapData();
         this.events.set(retData.id.toString(), retData);
+
+
+        // Reset next events
+        this.nextEvents = undefined;
+        this.getNextEvents(10);
+
         return ret.map(e => new EventWrapper(e));
     }
 

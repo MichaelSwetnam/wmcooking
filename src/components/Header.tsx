@@ -5,6 +5,10 @@ import OAuth, { UserProfile } from "../lib/OAuth";
 import SignInButton from "./Auth/SignInButton";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "./Auth/UserContext";
+import RequireAdminLogin from "./Auth/RequireAdminLogin";
+import Database from "../lib/Database/Database";
+import DBError from "../lib/Database/DBError";
+import ErrorComponent from "./Event/ErrorComponent";
 
 
 // Dropdown component inside the same file
@@ -71,6 +75,48 @@ function UserDropdown({ user, onLogout }: UserDropdownProps) {
     );
 }
 
+function AddEvent() {
+    const nav = useNavigate();
+    const { user } = useContext(UserContext);
+    const [error, setError] = useState<DBError | null>(null);
+    const [clicked, setClicked] = useState(false);
+
+    if (error) {
+        return <ErrorComponent message="Failed to add new event." technical={error.message} />
+    }
+
+    async function _addEvent() {
+        // Only allow this function to run once - it should redirect if successful.
+        if (clicked) return;
+        setClicked(true);
+        
+        // Force user to be logged in
+        if (!user) throw new Error("A logged out user cannot add a new event.");
+        if (!user.isPrivileged()) throw new Error("A non-admin user cannot add a new event");
+
+        // Create new event
+        const event = await Database.events.newEvent();
+        if (event.isError()) {
+            setError(event.unwrapError());
+            return;
+        }
+
+        // Redirect to event edit page.
+        const eData = event.unwrapData();
+        nav(`/events/${eData.id}/edit`);
+        return;
+    }
+
+    return <RequireAdminLogin>
+        <button 
+            className="cursor-pointer flex items-center justify-center bg-blue-100 text-blue-900 font-medium px-3 py-1 rounded-full hover:shadow-md transition-shadow"
+            onClick={_addEvent}
+        >
+            Add Event
+        </button>
+    </RequireAdminLogin>;
+}
+
 export default function Header() {
     const { user, setUser } = useContext(UserContext);
     const [ loadedRecord, setLoadedRecord ] = useState<UserProfile | null>(null);
@@ -107,6 +153,7 @@ export default function Header() {
                     <nav>
                         <ResponsiveLink to="/health">Health & Safety</ResponsiveLink>
                     </nav>
+                    { user?.isPrivileged() && <AddEvent /> }
                     {
                         loadedRecord !== null
                         ? <UserDropdown user={loadedRecord} onLogout={() => setUser(null)} />

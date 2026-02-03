@@ -47,8 +47,6 @@ export class EventWrapper implements EventRecord {
         this.date = record.date;
         this.capacity = record.capacity;
         this.notable_link = record.notable_link;
-
-        console.log(this);
     }
 
     /**
@@ -95,5 +93,25 @@ export class EventWrapper implements EventRecord {
         const r = { ...this };
         r.allergens = undefined;
         return r;
+    }
+
+    static placeholder(): Partial<EventRecord> {
+        const startTime = new Date();
+        const dateString = `${startTime.getFullYear()}-${startTime.getMonth() + 1}-${startTime.getDate()}`
+        const startTimeString = `${startTime.getHours()}:${startTime.getMinutes()}:00`;
+
+        return {
+            accessability: "ClubMembers",
+            description: "Placeholder event description",
+            location: "Location: TBA",
+            name: "Placeholder Event",
+            background_image: "https://ysqrkscfqagmvjdglxcb.supabase.co/storage/v1/object/public/Images/placeholder.webp",
+            requires_signup: false,
+            capacity: 20,
+            notable_link: null,
+            start_time: startTimeString,
+            end_time: startTimeString,
+            date: dateString,
+        }
     }
 }
