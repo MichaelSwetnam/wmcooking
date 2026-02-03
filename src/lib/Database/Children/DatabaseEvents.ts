@@ -136,8 +136,6 @@ export default class DatabaseEvents extends DatabaseChild {
             this.events.set(d.id.toString(), d);
         })
 
-        console.log(this);
-
         this.save();
         return r.map(d => new EventWrapper(d));
     }
