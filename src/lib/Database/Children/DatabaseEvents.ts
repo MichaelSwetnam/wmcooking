@@ -125,6 +125,10 @@ export default class DatabaseEvents extends DatabaseChild {
     }
 
     async newEvent(): Promise<DBReturn<EventWrapper>> {            
+        if (!await OAuth.isPrivileged()) {
+            return new DBReturn<EventWrapper>(DBError.custom("User does not have permission to add events."));
+        }
+
         const { data, error } = await Supabase
             .from("Events")
             .insert(EventWrapper.placeholder())
@@ -169,12 +173,44 @@ export default class DatabaseEvents extends DatabaseChild {
         const retData = ret.unwrapData();
         this.events.set(retData.id.toString(), retData);
 
+        // Reset next events
+        this.nextEvents = undefined;
+        this.getNextEvents(10);
+
+        this.save();
+        return ret.map(e => new EventWrapper(e));
+    }
+
+    async delete(id: number): Promise<DBReturn<true>> {
+        if (!await OAuth.isPrivileged()) {
+            return new DBReturn<true>(DBError.custom("User does not have permission to delete events."));
+        }
+
+        const { data, error } = await Supabase 
+            .from("Events")
+            .delete()
+            .eq('id', id)
+            .select("id")
+            .single();
+
+        console.log(data);
+        console.log(error);
+
+
+        const result = DBReturn.fromSupabase<{ id: string }>(data, error);
+        if (result.isError()) {
+            result.mapError();
+        }
+
+        // Update cache
+        this.events.delete(id.toString());
 
         // Reset next events
         this.nextEvents = undefined;
         this.getNextEvents(10);
 
-        return ret.map(e => new EventWrapper(e));
+        this.save();
+        return DBReturn.success(true);
     }
 
     private save() {

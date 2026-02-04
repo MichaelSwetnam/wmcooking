@@ -9,8 +9,81 @@ import LoadingComponent from "../Utility/LoadingComponent";
 import ErrorComponent from "./ErrorComponent";
 import type { SignupRecord } from "../../lib/Database/Records/SignupRecord";
 import Database from "../../lib/Database/Database";
-import type DBError from "../../lib/Database/DBError";
+import DBError from "../../lib/Database/DBError";
 import AllergySection from "./AllergySection";
+
+function DeleteButton({ event } : { event: EventWrapper }) {
+    const nav = useNavigate();
+    const [buttonState, setButtonState] = useState<"Unclicked" | "Unconfirmed" | "LoadingDeleted" | "Deleted">("Unclicked");
+    const [error, setError] = useState<DBError | null>(null);
+
+    const { user } = useContext(UserContext);
+    if (!user || !user.isPrivileged()) return <ErrorComponent message="You cannot delete events without admin access." />
+
+    async function onClick() {
+        // Cannot delete twice
+        if (buttonState === "Deleted") return;
+        
+        // Make sure the user confirms delete
+        if (buttonState === "Unclicked") {
+            setButtonState("Unconfirmed");
+            return;
+        }
+
+        // Start deleting the event
+        if (buttonState === "Unconfirmed") {
+            setButtonState("LoadingDeleted");
+
+            // Do the work
+            const result = await Database.events.delete(event.id);
+            if (result.isError()) {
+                setError(result.unwrapError());
+            }
+
+            result.unwrapData(); // Delete succeeded.
+
+            // Event is deleted successfully => should navigate now.
+            setButtonState("Deleted");
+            nav("/");
+            return;
+        }
+    }
+
+    if (error) {
+        return <ErrorComponent message="Could not delete event." technical={error.message} />
+    }
+
+    switch (buttonState) {
+        case "Unclicked":
+            return <button
+                className="px-3 py-2 bg-red-400 rounded-lg shadow-md hover:shadow-lg transition-shadow font-semibold cursor-pointer"
+                onClick={onClick}
+            >
+                Delete
+            </button>
+        
+        case "Unconfirmed":
+            return <button
+                className="px-3 py-2 bg-red-400 rounded-lg shadow-md hover:shadow-lg transition-shadow font-semibold cursor-pointer"
+                onClick={onClick}
+            >
+                ⚠️Click again to delete⚠️
+            </button>
+
+        case "LoadingDeleted":
+            return <LoadingComponent />
+
+        case "Deleted":
+            return <ErrorComponent message="Event is deleted. You should have been redirected." />
+    }
+
+    return <button
+        className="px-3 py-2 bg-red-400 rounded-lg shadow-md hover:shadow-lg transition-shadow font-semibold cursor-pointer"
+        onClick={onClick}
+    >
+        Delete
+    </button>
+}   
 
 function RSVPButton({ isRsvpd, callback }: { isRsvpd: boolean, callback: (wasRsvpd: boolean) => Promise<boolean> }) {
     const [ userTouched, setUserTouched ] = useState(false);
@@ -214,6 +287,9 @@ export default function EventPage({ event }: { event: EventWrapper}) {
                 Edit
             </button>
         );
+        buttons.push(
+            <DeleteButton event={event} />
+        )
     }
 
 
