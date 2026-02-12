@@ -48,6 +48,8 @@ function handleError(err: unknown): Response {
 		message = "Unknown error occured.";
 	}
 	
+	console.error(`Signup request failed: ${message}`);
+
 	return new Response(JSON.stringify({ message }), {
 		headers: { 'Content-Type': 'application/json', ...corsHeaders },
 		status: 400 
@@ -64,6 +66,9 @@ async function putSignup(sb: SupabaseClient, userId: string, event: EventRecord,
 		const now = new Date();
 		const eventStart = new Date(`${event.date}T${event.start_time}`);
 
+		console.log(`now: ${now}`);
+		console.log(`event_start: ${eventStart}`);
+
 		if (eventStart.getTime() <= now.getTime())
 			throw new Error("You cannot sign up for an event that has already started.");
 	
@@ -71,7 +76,7 @@ async function putSignup(sb: SupabaseClient, userId: string, event: EventRecord,
 		const twoHoursMs = 2 * 60 * 60 * 1000;
 
 		if (diffMs < twoHoursMs) {
-			throw new Error("Cannot create signup. Signup closes two hours before the start of an event.");
+			throw new Error("Signup closes two hours before the start of an event.");
 		}
 
 		// Check event capacity
