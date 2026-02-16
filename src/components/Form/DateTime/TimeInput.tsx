@@ -72,9 +72,10 @@ export default function TimeInput({ id, startValue, onChange }: InputProp<string
     }
 
     return (
-        <div className="flex flex-col flex-1 shadow-sm rounded-sm p-1 gap-2">
-            <div className="flex flex-row flex-1 bg-white gap-4 items-center">
+        <div>
+            <div className="flex flex-row flex-1 bg-white p-2 rounded-sm shadow-sm gap-4 items-center">
                 <input
+                    className="border border-gray-400 rounded-sm p-1"
                     type="number"
                     value={hour}
                     onChange={(e) => update("hour", e.target.value)}
@@ -83,13 +84,14 @@ export default function TimeInput({ id, startValue, onChange }: InputProp<string
                 />
                 <p>:</p>
                 <input
+                    className="border border-gray-400 rounded-sm p-1"
                     type="number"
                     value={minute}
                     onChange={(e) => update("minute", e.target.value)}
                     min={0}
                     max={59}
                 />
-                <select value={period} onChange={(e) => update("period", e.target.value)}>
+                <select className="border border-gray-400 rounded-sm p-1" value={period} onChange={(e) => update("period", e.target.value)}>
                     <option value="AM">AM</option>
                     <option value="PM">PM</option>
                 </select>

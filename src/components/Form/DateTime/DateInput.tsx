@@ -47,7 +47,7 @@ export default function DateInput({ id, startValue, onChange }: InputProp<string
                 break;
         }
 
-        const newValue = `${year}-${month}-${day}`;
+        const newValue = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
         setValue(newValue);
 
         if (!isValidYMD(year, month, day)) {
@@ -59,21 +59,24 @@ export default function DateInput({ id, startValue, onChange }: InputProp<string
     }
 
     return (
-        <div className="flex flex-col flex-1 shadow-sm rounded-sm p-1 gap-2">
-            <div className="flex flex-row flex-1 bg-white gap-4">
+        <div>
+            <div className="flex flex-row bg-white shadow-sm rounded-sm gap-4 p-2">
                 <input
+                    className="border border-gray-400 rounded-sm p-1 max-w-1/8"
                     type="number"
                     value={month}
                     onChange={(e) => registerChange(e.target.value, "month")}
                 />
                 <p>/</p>
                 <input
+                    className="border border-gray-400 rounded-sm p-1 max-w-1/8"
                     type="number"
                     value={day}
                     onChange={(e) => registerChange(e.target.value, "day")}
                 />
                 <p>/</p>
                 <input
+                    className="border border-gray-400 rounded-sm p-1 max-w-1/4"
                     type="number"
                     value={year}
                     onChange={(e) => registerChange(e.target.value, "year")}

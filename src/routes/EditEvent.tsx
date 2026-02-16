@@ -8,13 +8,12 @@ import { InputLabel } from "../components/Form/Inputs";
 import { EventWrapper } from "../lib/Database/Records/EventRecord";
 import ShortTextInput from "../components/Form/Text/ShortTextInput";
 import LongTextInput from "../components/Form/Text/LongTextInput";
-import DateInput from "../components/Form/DateTime/DateInput";
-import TimeInput from "../components/Form/DateTime/TimeInput";
 import AccessabilityInput from "../components/Form/AccessabilityInputs";
 import AllergySelectInput from "../components/Form/AllergySelectInput";
 import BooleanInput from "../components/Form/Simple/BooleanInput";
 import NumberInput from "../components/Form/Simple/NumberInput";
 import Database from "../lib/Database/Database";
+import DateTimeInput from "../components/Form/DateTime/DateTimeInput";
 
 export default function Page() {
     const { id } = useParams();
@@ -54,10 +53,17 @@ export default function Page() {
 
     function onChange(id: string, value: unknown) {
         if (!event) return;
-        
+
+        console.log(id, value);
+
         const deepCopy = JSON.parse(JSON.stringify(event));
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (deepCopy as any)[id] = value;
+
+        console.log("---");
+        console.log(deepCopy.start_timestamp);
+        console.log(deepCopy.end_timestamp);
+
         setEvent(new EventWrapper(deepCopy));
     }    
 
@@ -88,14 +94,11 @@ export default function Page() {
                         <InputLabel name="Location" />
                         <ShortTextInput id="location" startValue={event.location} onChange={onChange} />
                         
-                        <InputLabel name="Date" />
-                        <DateInput id="date" startValue={event.date} onChange={onChange} />
-                        
-                        <InputLabel name="Start Time" />
-                        <TimeInput id="start_time" startValue={event.start_time} onChange={onChange} />
-                        
-                        <InputLabel name="End Time" />
-                        <TimeInput id="end_time" startValue={event.end_time} onChange={onChange} />                       
+                        <InputLabel name="Start" />
+                        <DateTimeInput id="start_timestamp" startValue={event.getStartDate()} onChange={onChange} />
+
+                        <InputLabel name="End" />
+                        <DateTimeInput id="end_timestamp" startValue={event.getEndDate()} onChange={onChange} />
 
                         <InputLabel name="Description" />
                         <LongTextInput id="description" startValue={event.description} onChange={onChange} />

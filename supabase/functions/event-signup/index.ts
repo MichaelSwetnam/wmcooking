@@ -11,11 +11,10 @@ type EventRecord = {
     background_image: string;
     requires_signup: boolean;
     capacity: number;
-
-    start_time: string;
-    end_time: string;
-    date: string;	
+	start_timestamp: string,
+	end_timestamp: string
 };
+
 type SignupRecord = {
     id: number,
     event_id: string,
@@ -66,7 +65,7 @@ async function putSignup(sb: SupabaseClient, userId: string, event: EventRecord,
 
 		// Make sure the event window is still open (certain amount of time before the event).
 		const now = new Date();
-		const eventStart = new Date(`${event.date}T${event.start_time}`);
+		const eventStart = new Date(event.start_timestamp);
 
 		console.log(`now: ${now}`);
 		console.log(`event_start: ${eventStart}`);
