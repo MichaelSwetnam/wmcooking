@@ -155,16 +155,14 @@ function AttendeeSection({ signups, selfSignup, event }: { signups: SignupRecord
     return <div>
         <p className="text-gray-800 font-semibold">Attending: ({signupCount} / {event.capacity})</p>
         { failureMessage && <p className="text-red-500 font-semibold">{failureMessage}</p>}
-        { !failureMessage && 
-            <ol className="w-full items-center pl-3 list-decimal">
-            {
-                selfSignup && <li key={0}> {selfSignup.user_name}</li>
-            }
-            {
-                signups.map((s, i) => <li key={i + 1}>{s.user_name}</li>)
-            }
-            </ol>
+        <ol className="w-full items-center pl-3 list-decimal">
+        {
+            selfSignup && <li key={0}> {selfSignup.user_name}</li>
         }
+        {
+            signups.map((s, i) => <li key={i + 1}>{s.user_name}</li>)
+        }
+        </ol>
     </div>
 }
 

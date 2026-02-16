@@ -12,9 +12,8 @@ export interface EventRecord {
     capacity: number;
     notable_link: string | null;
 
-    start_time: string;
-    end_time: string;
-    date: string;
+    start_timestamp: string;
+    end_timestamp: string;
 }
 
 export class EventWrapper implements EventRecord {
@@ -28,9 +27,8 @@ export class EventWrapper implements EventRecord {
     readonly capacity: number;
     readonly notable_link: string | null;
 
-    start_time: string;
-    end_time: string;
-    date: string;
+    readonly start_timestamp: string;
+    readonly end_timestamp: string;
 
     private allergens: string[] | undefined;
 
@@ -42,9 +40,8 @@ export class EventWrapper implements EventRecord {
         this.name = record.name;
         this.background_image = record.background_image;
         this.requires_signup = record.requires_signup;
-        this.start_time = record.start_time;
-        this.end_time = record.end_time;
-        this.date = record.date;
+        this.start_timestamp = record.start_timestamp;
+        this.end_timestamp = record.end_timestamp;
         this.capacity = record.capacity;
         this.notable_link = record.notable_link;
     }
@@ -82,11 +79,11 @@ export class EventWrapper implements EventRecord {
     }
 
     getStartDate(): Date {
-        return new Date(`${this.date}T${this.start_time}`)
+        return new Date(this.start_timestamp + 'Z')
     }
 
     getEndDate(): Date {
-        return new Date(`${this.date}T${this.end_time}`)
+        return new Date(this.end_timestamp + 'Z')
     }
 
     toRecord(): EventRecord { 
@@ -96,10 +93,6 @@ export class EventWrapper implements EventRecord {
     }
 
     static placeholder(): Partial<EventRecord> {
-        const startTime = new Date();
-        const dateString = `${startTime.getFullYear()}-${startTime.getMonth() + 1}-${startTime.getDate()}`
-        const startTimeString = `${startTime.getHours()}:${startTime.getMinutes()}:00`;
-
         return {
             accessability: "ClubMembers",
             description: "Placeholder event description",
@@ -109,9 +102,8 @@ export class EventWrapper implements EventRecord {
             requires_signup: false,
             capacity: 20,
             notable_link: null,
-            start_time: startTimeString,
-            end_time: startTimeString,
-            date: dateString,
+            start_timestamp: new Date().toISOString(),
+            end_timestamp: new Date().toISOString(),
         }
     }
 }

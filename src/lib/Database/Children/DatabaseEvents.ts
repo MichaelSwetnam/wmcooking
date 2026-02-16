@@ -58,14 +58,13 @@ export default class DatabaseEvents extends DatabaseChild {
 
         const rightNow = new Date();
         const today = new Date(rightNow.getFullYear(), rightNow.getMonth(), rightNow.getDate());
-        const todayISO = today.toISOString().split("T")[0]; // YYYY-MM-DD
+        const todayISO = today.toISOString(); // YYYY-MM-DD
 
         const { data, error } = await Supabase
             .from("Events")
             .select("*")
-            .gte("date", todayISO)
-            .order("date", { ascending: true })
-            .order("start_time", { ascending: true })
+            .gte("start_timestamp", todayISO)
+            .order("start_timestamp", { ascending: true })
             .limit(10);
 
         const ret = DBReturn.fromSupabase<EventRecord[]>(data, error);
@@ -98,16 +97,15 @@ export default class DatabaseEvents extends DatabaseChild {
         }
         
         // Get the dates (start and end of month)
-        const startOfMonth = new Date(year, month, 1).toISOString().split("T")[0];
-        const endOfMonth = new Date(year, month + 1, 1).toISOString().split("T")[0];
+        const startOfMonth = new Date(year, month, 1).toISOString();
+        const endOfMonth = new Date(year, month + 1, 1).toISOString();
 
         const { data, error } = await Supabase
             .from("Events")
             .select("*")
-            .gte("date", startOfMonth)
-            .lt("date", endOfMonth)
-            .order("date", { ascending: true }) 
-            .order("start_time", { ascending: true });
+            .gte("start_timestamp", startOfMonth)
+            .lt("start_timestamp", endOfMonth)
+            .order("start_timestamp", { ascending: true });
         
         const ret = DBReturn.fromSupabase<EventRecord[]>(data, error);
         if (ret.isError()) return ret.mapError();
@@ -192,10 +190,6 @@ export default class DatabaseEvents extends DatabaseChild {
             .eq('id', id)
             .select("id")
             .single();
-
-        console.log(data);
-        console.log(error);
-
 
         const result = DBReturn.fromSupabase<{ id: string }>(data, error);
         if (result.isError()) {
