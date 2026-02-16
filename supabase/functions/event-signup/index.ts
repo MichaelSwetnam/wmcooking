@@ -56,9 +56,7 @@ function handleError(err: unknown): Response {
 }
 
 async function putSignup(sb: SupabaseClient, userId: string, event: EventRecord, signup: SignupRecord | null): Promise<Response> {
-	try {
-		throw new Error("Feature Disabled.");
-		
+	try {		
 		// Make sure they are not already signed up
 		if (signup)
 			throw new Error("You are already signed up for this event.");
