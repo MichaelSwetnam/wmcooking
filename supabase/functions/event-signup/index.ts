@@ -65,9 +65,6 @@ async function putSignup(sb: SupabaseClient, userId: string, event: EventRecord,
 		const now = new Date();
 		const eventStart = new Date(event.start_timestamp);
 
-		console.log(`now: ${now}`);
-		console.log(`event_start: ${eventStart}`);
-
 		if (eventStart.getTime() <= now.getTime())
 			throw new Error("You cannot sign up for an event that has already started.");
 	
