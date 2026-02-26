@@ -29,7 +29,5 @@ export default function getBadges(event: EventWrapper) {
             break;
     }
 
-    if (event.requires_signup) badges.push("Signup Required");
-
     return badges;
 }
