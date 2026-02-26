@@ -123,7 +123,7 @@ export default function Page() {
                         <InputLabel name="Allergens" />
                         <AllergySelectInput event={event} />
                         
-                        <InputLabel name="Signup Required?" />
+                        <InputLabel name="Signups allowed?" />
                         <BooleanInput id="requires_signup" startValue={event.requires_signup} onChange={onChange} />
                         {
                             event.requires_signup && <>
