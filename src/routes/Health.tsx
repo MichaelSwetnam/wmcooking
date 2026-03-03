@@ -1,37 +1,26 @@
-import type React from "react";
-
-function T({ children }: { children: React.ReactNode }) {
-    return <p><b>{children}</b></p>
-}
-
 export default function Page() {
-    return <div className="flex flex-col items-center justify-center gap-2">
+    return <div className="flex flex-col items-center justify-center">
         <div className="flex flex-col gap-2">
-            <h2 className="pt-5 text-3xl font-semibold text-orange-700 text-center">Our commitment to high standards:</h2>
-            <p className="text-center">
-                We take every step to ensure a safe, clean, and high-quality environment for preparing and serving food. 
-            </p>
-            <div className="bg-white rounded-md shadow-md p-7 w-full">   
-                <p><u>Our practices include:</u></p>
-                <T>Maintaining a clean space</T>
-                <p>
-                    We thoroughly clean and sanitize all tables, dishes, utensils, and food-contact surfaces to uphold strict hygiene standards.
-                </p>
-                <T>Preventing Cross-Contamination</T>
-                <p> Ingredients and tools that could introduce contaminants are carefully separated. We follow strict protocols to keep raw and cooked foods apart at all times.</p>
-                <T>Washing All Produce</T>
-                <p>All fruits and vegetables are washed thoroughly before preparation to ensure they are safe and ready for use.</p>
-                <T>Using Dedicated Equipment</T>
-                <p> Different equipment is assigned for specific types of food—for example, separate tools for handling raw and cooked ingredients—to prevent cross-handling and contamination.</p>
-                <T>Monitoring Food Temperature</T>
-                <p> We adhere to proper cooking, cooling, and refrigeration standards to ensure all foods are kept at safe temperatures from preparation to storage.</p>
-            </div>
-        </div>
-        <div className="flex flex-col gap-2">
-            <h2 className="pt-5 text-3xl font-semibold text-orange-700 text-center">Allergen awareness:</h2>
-            <p className="text-center">
-                We take allergens seriously. Our team tracks when allergens are used and clearly identifies them in current and past recipes. Previous recipes and their associated allergens are kept as examples for reference to help us maintain transparency and safety for all members.
-            </p>
+            <h2 className="pt-5 text-3xl font-semibold text-orange-700 text-center">Our commitment to food safety:</h2>
+            <p className="text-center">We at Club Cooking strive to create a safe, clean, and fun environment for preparing and serving food!</p>
+            <ul className="text-center">
+                <li>
+                    <h3 className="pt-5 text-xl font-semibold text-blue-700 text-center">Keeping our space clean!</h3>
+                    <p>We thoroughly clean all dishes, surfaces, and ingredients (if needed) to ensure our cooking space is a healthy one! </p>
+                </li>
+                <li>
+                    <h3 className="pt-5 text-xl font-semibold text-blue-700 text-center">Keeping our space clean!</h3>
+                    <p>We always make sure to keep raw and cooked foods apart from each other when cooking!</p>
+                </li>
+                <li>
+                    <h3 className="pt-5 text-xl font-semibold text-blue-700 text-center">Washing All Produce!</h3>
+                    <p>All fruits and vegetables are washed before preparation to ensure they are safe and ready for use!</p>
+                </li>
+                <li>
+                    <h3 className="pt-5 text-xl font-semibold text-blue-700 text-center">Monitoring Food Temperature!</h3>
+                    <p>We at Club Cooking adhere to proper cooking, cooling, and refrigeration standards to ensure that all foods are kept at a safe temperature while being either prepared or stored!</p>
+                </li>
+            </ul>    
         </div>
         <div className="flex flex-col gap-2">
             <h2 className="pt-5 text-3xl font-semibold text-orange-700 text-center">Our website:</h2>
