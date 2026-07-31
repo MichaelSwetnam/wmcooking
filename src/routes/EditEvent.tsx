@@ -14,6 +14,7 @@ import BooleanInput from "../components/Form/Simple/BooleanInput";
 import NumberInput from "../components/Form/Simple/NumberInput";
 import Database from "../lib/Database/Database";
 import DateTimeInput from "../components/Form/DateTime/DateTimeInput";
+import BackgroundLinkSelect from "../components/Form/BackgroundLinkSelect";
 
 export default function Page() {
     const { id } = useParams();
@@ -125,6 +126,9 @@ export default function Page() {
                                 <NumberInput id="capacity" startValue={event.capacity} onChange={onChange} min={0} />
                             </>
                         }
+
+                        <InputLabel name="Background Image" />
+                        <BackgroundLinkSelect id="background_image" startValue={event.background_image} onChange={onChange} />
                     </div>
                     <div className="flex flex-row gap-2">
                         <input type="submit" value="Save" className="bg-blue-400 text-white font-semibold py-2 px-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow" />
