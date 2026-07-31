@@ -138,18 +138,18 @@ function AttendeeSection({ signups, selfSignup, event }: { signups: SignupRecord
     const now = new Date();
     const diffMs = eventStart.getTime() - now.getTime();
     const twoHoursMs = 2 * 60 * 60 * 1000;
-    
+
     const signupCount = signups.length + (selfSignup ? 1 : 0);
     const eventFull = signupCount >= event.capacity;
     const eventStarted = eventStart.getTime() <= now.getTime();
     const lessThanTwoHours = diffMs < twoHoursMs;
 
     let failureMessage: string | undefined;
-    if (eventFull)
+    if (eventFull && !selfSignup)
         failureMessage = "This event is full. Try signing up for one of our next events!";
-    else if (eventStarted)
+    else if (eventStarted && !selfSignup)
         failureMessage = "This event has already started, so you cannot sign up.";
-    else if (lessThanTwoHours)
+    else if (lessThanTwoHours && !selfSignup)
         failureMessage = "You cannot sign up less than two hours before an event. Try asking if you can attend in the GroupMe.";
 
     return <div>
