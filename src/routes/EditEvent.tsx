@@ -54,15 +54,9 @@ export default function Page() {
     function onChange(id: string, value: unknown) {
         if (!event) return;
 
-        console.log(id, value);
-
         const deepCopy = JSON.parse(JSON.stringify(event));
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (deepCopy as any)[id] = value;
-
-        console.log("---");
-        console.log(deepCopy.start_timestamp);
-        console.log(deepCopy.end_timestamp);
 
         setEvent(new EventWrapper(deepCopy));
     }    
