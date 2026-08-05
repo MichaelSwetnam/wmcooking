@@ -1,5 +1,6 @@
 import DatabaseAllergy from "./Children/DatabaseAllergy";
 import DatabaseEvents from "./Children/DatabaseEvents";
+import DatabaseImages from "./Children/DatabaseImages";
 import DatabaseProfiles from "./Children/DatabaseProfiles";
 import DatabaseSignup from "./Children/DatabaseSignup";
 
@@ -31,7 +32,8 @@ class Database {
     public readonly profiles = new DatabaseProfiles(this);
     public readonly signups = new DatabaseSignup(this);
     public readonly allergies = new DatabaseAllergy(this);
-
+    public readonly images = new DatabaseImages(this);
+    
     constructor() {
         const dbStorage = localStorage.getItem(Database.DATABASE_STORAGE_KEY);
         if (dbStorage) {
