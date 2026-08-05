@@ -53,6 +53,8 @@ export default function Component({ id, startValue, onChange }: InputProp<string
                     loadedUrls && loadedUrls.map(url => <ImageComp onClick={setUrl} url={url} />)
                 }
             </div>
+            <span className="text-gray text-sm font-normal text-center">✅: These links are permanent and will never be invalid.</span>
+            <span className="text-gray text-sm font-normal text-center">ℹ️: There's not currently a way to add new stored images, other than manually through the database.</span>
         </div>
     </div>
 }
