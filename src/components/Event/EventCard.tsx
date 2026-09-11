@@ -1,11 +1,34 @@
 import { useNavigate } from "react-router-dom";
 import type CookingEvent from "../../lib/CookingEvent";
-// import EventBadge from "./EventBadge";
-// import getBadges from "../../lib/getBadges";
-// import type { EventWrapper } from "../../lib/Database/Records/EventRecord";
-// import AllergyBadge from "./AllergyBadge";
+import EventBadge from "./Badges";
+import { useEffect, useState } from "react";
+import LoadingComponent from "../Utility/LoadingComponent";
+
+function AllergySection({ event }: { event: CookingEvent }) {
+    const [allergens, setAllergens] = useState<string[] | null>(null);
+
+    useEffect(() => {
+        event.getAllergens().then(a => setAllergens(a));
+    }, [event]);
+
+    if (!allergens) return <LoadingComponent />
+
+     return <div className="bg-amber-300 p-2 rounded-xl shadow-sm">
+        <span className="font-semibold">May contain: {
+            allergens
+            .sort()
+            .map((s, i) => 
+                (i === 0 && s[0].toUpperCase() + s.slice(1).toLowerCase())
+                || ( i !== allergens.length - 1 && s.toLowerCase())
+                || ` and ${s.toLowerCase()}`
+            ).join(", ")
+        }</span>
+    </div>
+}
 
 export default function EventCard({ event }: { event: CookingEvent }) {
+    
+
     const nav = useNavigate();
     return <div className="flex flex-col bg-white shadow-xl rounded-3xl overflow-hidden hover:shadow-2xl transition-shadow duration-300 w-full max-w-3xl cursor-pointer" onClick={() => {nav(`/events/${event.id}`)}}>
         <div className={"flex flex-col items-center p-2 gap-1"} style={{
@@ -16,12 +39,10 @@ export default function EventCard({ event }: { event: CookingEvent }) {
             <div className="mb-40 md:mb-60 p-2 rounded-xl bg-white shadow-sm">
                 <span className={"font-bold text-2xl text-black"}>{ event.name }</span>
             </div>
-            {/* <div className="flex flex-wrap gap-2"> */}
-                {/* { getBadges(event).map((t, i) => <EventBadge text={t} key={i} />) } */}
-            {/* </div> */}
-            {/* <div className="w-full flex justify-start md:justify-center"> */}
-                {/* <AllergyBadge event={event} /> */}
-            {/* </div> */}
+            <div className="flex flex-wrap gap-2">
+                { event.getBadges().map((t, i) => <EventBadge text={t} key={i} /> ) }
+            </div>
+            <AllergySection event={event} />
         </div>
         <div className="py-2 px-6 text-gray-800 leading-relaxed text-sm md:text-base">
             <p className="whitespace-pre-wrap">{ event.description }</p>

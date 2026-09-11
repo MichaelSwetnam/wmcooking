@@ -61,6 +61,54 @@ export default class CookingEvent {
     get notableLink() { return this.data.notable_link }
     get requiresSignup() { return this.data.requires_signup }
 
-    // end_timestamp
-    // start_timestamp
+    getStartDate(): Date {
+        return new Date(this.data.start_timestamp + 'Z')
+    }
+
+    getEndDate(): Date {
+        return new Date(this.data.end_timestamp + 'Z')
+    }
+
+    getBadges(): string[] {
+        const badges = [];
+        const startDate = this.getStartDate();
+        const endDate = this.getEndDate();
+
+        badges.push(startDate.toLocaleDateString('en-us', {
+            weekday: "short",
+            day: 'numeric',
+            month: 'long'
+        }));
+        badges.push(startDate.toLocaleTimeString('en-us', {
+            hour: "numeric",
+            minute: "2-digit"
+        }) + " - " + endDate.toLocaleTimeString('en-us', {
+            hour: "numeric",
+            minute: "2-digit"
+        }));
+        badges.push(this.location);
+
+        switch (this.accessability) {
+            case "AllStudents":
+            badges.push("All Students");
+            break;
+        case "ClubMembers":
+            badges.push("Club Members");
+            break;
+        }
+
+        return badges;
+    }
+
+    async getAllergens(): Promise<string[]> {
+        const { data, error } = await Supabase
+            .from("EventAllergies") 
+            .select(`allergy_id, "AllergyLabel" (text)`)
+            .eq('event_id', this.id);
+        
+        if (error || !data) throw new Error("Not implemented");
+
+        const allergens = data.map(t => t.AllergyLabel.text);
+        return allergens;
+    }
 }
