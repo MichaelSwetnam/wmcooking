@@ -1,7 +1,17 @@
+import { useEffect, useState } from "react";
 import { InstagramEmbed } from "react-social-media-embed";
+import CookingEvent from "../lib/CookingEvent";
+import EventCard from "../components/Event/EventCard";
+import LoadingComponent from "../components/Utility/LoadingComponent";
 
 
 export default function Home() {
+    const [events, setEvents] = useState<CookingEvent[] | null>(null);
+
+    useEffect(() => {
+        CookingEvent.GetNextEvents(10).then(events => setEvents(events));        
+    }, []);
+
     return <div className="flex-1 flex flex-col md:flex-row justify-center items-center md:items-start gap-8">
         { /* Main Content */ }
         <div className="flex-2 flex flex-col items-center gap-5">
@@ -12,7 +22,9 @@ export default function Home() {
                 </p>
             </div>
             {/* <EventsSubpage /> */}
-            <h1 className="font-bold text-xl">Event preview out of order</h1>
+            {!events && <LoadingComponent />}
+            {events && events.map((e, i) => <EventCard key={i} event={e} />)} 
+            
             <div className="p-2 text-xl font-semibold bg-white rounded-xl shadow-md">
                 Stay tuned for more events coming soon.
             </div>
