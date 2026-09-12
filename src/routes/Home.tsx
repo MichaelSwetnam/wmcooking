@@ -3,14 +3,13 @@ import { InstagramEmbed } from "react-social-media-embed";
 import CookingEvent from "../lib/CookingEvent";
 import EventCard from "../components/Event/EventCard";
 import LoadingComponent from "../components/Utility/LoadingComponent";
-import type { DBReturn } from "../lib/database/DBReturn";
 
 
 export default function Home() {
-    const [events, setEvents] = useState<DBReturn<CookingEvent[]> | null>(null);
+    const [events, setEvents] = useState<CookingEvent[] | null>(null);
 
     useEffect(() => {
-        CookingEvent.GetNextEvents(10).then(events => setEvents(events));        
+        CookingEvent.GetNextEvents().then(events => setEvents(events));        
     }, []);
 
     return <div className="flex-1 flex flex-col md:flex-row justify-center items-center md:items-start gap-8">
@@ -24,8 +23,7 @@ export default function Home() {
             </div>
             {/* <EventsSubpage /> */}
             { !events && <LoadingComponent /> }
-            { events && events.isError() && events.getErrorJSX() }
-            { events && events.isData() && events.getData().map((e, i) => <EventCard key={i} event={e} /> )}
+            { events && events.map((e, i) => <EventCard key={i} event={e} /> )}
             
             <div className="p-2 text-xl font-semibold bg-white rounded-xl shadow-md">
                 Stay tuned for more events coming soon.

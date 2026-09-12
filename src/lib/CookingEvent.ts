@@ -1,56 +1,63 @@
-import DBCache from "./database/DBCache";
-import { DBReturn } from "./database/DBReturn";
 import type { Tables } from "./database/gen-types";
+import QueryClient from "./database/QueryClient";
 import { Supabase } from "./database/Supabase";
 
 type EventData = Tables<"Events">;
-
-async function fetchEvent(id: number): Promise<DBReturn<EventData>> {
-    const { data, error } = await Supabase
-        .from("Events")
-        .select("*")
-        .eq('id', id)
-        .single();
-
-    return DBReturn.FromDB(data, error);
-}
-
-throw new Error("GetNextEvents should cache result!");
-throw new Error("Allergens should cache result!");
 export default class CookingEvent {
-    private static Cache = new DBCache<number, EventData>(fetchEvent);
-
-    public static async Get(key: number): Promise<DBReturn<CookingEvent>> {
-        return (await CookingEvent.Cache.get(key)).map(d => new CookingEvent(d));
-    }
-
-    public static async GetNextEvents(num: number): Promise<DBReturn<CookingEvent[]>> {
-        if (num > 10) throw new Error("Using num > 10 is not supported.");
-
+    public static readonly QueryKeys = {
+        single: (id: number) => ["event", id] as const,
+        next: () => ["events", "next"] as const,
+        allergens: (id: number) =>
+            ["event", id, "allergens"] as const,
+    };
+    
+    public static async GetNextEvents(): Promise<CookingEvent[]> {
         const rightNow = new Date();
         const today = new Date(rightNow.getFullYear(), rightNow.getMonth(), rightNow.getDate());
         const todayISO = today.toISOString(); // YYYY-MM-DD
 
-        const { data, error } = await Supabase
-            .from("Events")
-            .select("*")
-            .gte("start_timestamp", todayISO)
-            .order("start_timestamp", { ascending: true })
-            .limit(num);
+        const data = await QueryClient.query({
+            queryKey: this.QueryKeys.next(),
+            queryFn: async () => {
+                const { data, error } = await Supabase
+                .from("Events")
+                .select("*")
+                .gte("start_timestamp", todayISO)
+                .order("start_timestamp", { ascending: true })
+                .limit(5);
 
-        const dbret = DBReturn.FromDB(data, error);
-
-        if (dbret.isData()) {
-            for (const event of dbret.getData()) {
-                CookingEvent.Cache.set(event.id, event);
+                if (error) throw error;
+                return data;
             }
+        })
+
+        const events = data.map(t => new CookingEvent(t));
+        for (const event of events) {
+            QueryClient.setQueryData(this.QueryKeys.single(event.id), event)
         }
 
-        return dbret.map(arr => arr.map(q => new CookingEvent(q)));
+        return events;
+    }
+
+    public static async Get(id: number): Promise<CookingEvent> {
+        const event = await QueryClient.query({
+            queryKey: this.QueryKeys.single(id),
+            queryFn: async () => {
+                const { data, error } = await Supabase
+                .from("Events")
+                .select("*")
+                .eq('id', id)
+                .single();
+
+                if (error) throw error;
+                return data;
+            }
+        });
+
+        return new CookingEvent(event);
     }
 
     private data: EventData;
-    private allergens?: string[];
     private constructor(data: EventData) {
         this.data = data;
     }
@@ -104,22 +111,20 @@ export default class CookingEvent {
         return badges;
     }
 
-    async getAllergens(): Promise<DBReturn<string[]>> {
-        if (!this.allergens) {
-            const { data, error } = await Supabase
-            .from("EventAllergies") 
-            .select(`allergy_id, "AllergyLabel" (text)`)
-            .eq('event_id', this.id);
-        
+    async getAllergens(): Promise<string[]> {
+        const allergens = await QueryClient.query({
+            queryKey: CookingEvent.QueryKeys.allergens(this.id),
+            queryFn: async () => {
+                const { data, error } = await Supabase
+                .from("EventAllergies") 
+                .select(`allergy_id, "AllergyLabel" (text)`)
+                .eq('event_id', this.id);
 
-            const dbRet = DBReturn.FromDB(data, error).map(d => d.map(t => t.AllergyLabel.text));
-            if (dbRet.isData()) {
-                this.allergens = dbRet.getData();
+                if (error) throw error;
+                return data.map(t => t.AllergyLabel.text);
             }
+        });
 
-            return dbRet;
-        }
-
-        return DBReturn.fromData(this.allergens);
+        return allergens;
     }
 }

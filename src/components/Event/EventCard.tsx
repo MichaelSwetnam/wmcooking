@@ -3,27 +3,24 @@ import type CookingEvent from "../../lib/CookingEvent";
 import EventBadge from "./Badges";
 import { useEffect, useState } from "react";
 import LoadingComponent from "../Utility/LoadingComponent";
-import type { DBReturn } from "../../lib/database/DBReturn";
 
 function AllergySection({ event }: { event: CookingEvent }) {
-    const [allergens, setAllergens] = useState<DBReturn<string[]> | null>(null);
+    const [allergens, setAllergens] = useState<string[] | null>(null);
 
     useEffect(() => {
         event.getAllergens().then(a => setAllergens(a));
     }, [event]);
 
     if (!allergens) return <LoadingComponent />
-    if (allergens && allergens.isError()) return allergens.getErrorJSX();
 
-    const aData = allergens.getData();
 
      return <div className="bg-amber-300 p-2 rounded-xl shadow-sm">
         <span className="font-semibold">May contain: {
-            aData
+            allergens
             .sort()
             .map((s, i) => 
                 (i === 0 && s[0].toUpperCase() + s.slice(1).toLowerCase())
-                || ( i !== aData.length - 1 && s.toLowerCase())
+                || ( i !== allergens.length - 1 && s.toLowerCase())
                 || ` and ${s.toLowerCase()}`
             ).join(", ")
         }</span>
