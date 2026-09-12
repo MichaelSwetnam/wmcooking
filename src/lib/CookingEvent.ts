@@ -1,64 +1,74 @@
+import { useQuery } from "@tanstack/react-query";
 import type { Tables } from "./database/gen-types";
 import QueryClient from "./database/QueryClient";
 import { Supabase } from "./database/Supabase";
 
-type EventData = Tables<"Events">;
-export default class CookingEvent {
-    public static readonly QueryKeys = {
-        single: (id: number) => ["event", id] as const,
-        next: () => ["events", "next"] as const,
-        allergens: (id: number) =>
-            ["event", id, "allergens"] as const,
-    };
-    
-    public static async GetNextEvents(): Promise<CookingEvent[]> {
-        const rightNow = new Date();
-        const today = new Date(rightNow.getFullYear(), rightNow.getMonth(), rightNow.getDate());
-        const todayISO = today.toISOString(); // YYYY-MM-DD
+const QueryKeys = {
+    single: (id: number) => ["event", id] as const,
+    next: () => ["events", "next"] as const,
+    allergens: (id: number) =>
+        ["event", id, "allergens"] as const,
+};
 
-        const data = await QueryClient.query({
-            queryKey: this.QueryKeys.next(),
-            queryFn: async () => {
-                const { data, error } = await Supabase
-                .from("Events")
-                .select("*")
-                .gte("start_timestamp", todayISO)
-                .order("start_timestamp", { ascending: true })
-                .limit(5);
+export function useCookingEvent(id: number) {
+    return useQuery({
+        queryKey: QueryKeys.single(id),
+        queryFn: async () => {
+            const { data, error } = await Supabase
+            .from("Events")
+            .select("*")
+            .eq('id', id)
+            .single();
 
-                if (error) throw error;
-                return data;
-            }
-        })
-
-        const events = data.map(t => new CookingEvent(t));
-        for (const event of events) {
-            QueryClient.setQueryData(this.QueryKeys.single(event.id), event)
+            if (error) throw error;
+            return new CookingEvent(data);
         }
+    })
+}
 
-        return events;
-    }
+export function useNextCookingEvents() {
+    const rightNow = new Date();
+    const today = new Date(rightNow.getFullYear(), rightNow.getMonth(), rightNow.getDate());
+    const todayISO = today.toISOString(); // YYYY-MM-DD
 
-    public static async Get(id: number): Promise<CookingEvent> {
-        const event = await QueryClient.query({
-            queryKey: this.QueryKeys.single(id),
-            queryFn: async () => {
-                const { data, error } = await Supabase
-                .from("Events")
-                .select("*")
-                .eq('id', id)
-                .single();
+    return useQuery({
+        queryKey: QueryKeys.next(),
+        queryFn: async () => {
+            const { data, error } = await Supabase
+            .from("Events")
+            .select("*")
+            .gte("start_timestamp", todayISO)
+            .order("start_timestamp", { ascending: true })
+            .limit(5);
 
-                if (error) throw error;
-                return data;
-            }
-        });
+            if (error) throw error;
+            const events = data.map(t => new CookingEvent(t));
+            events.forEach(e => QueryClient.setQueryData(QueryKeys.single(e.id), e))
 
-        return new CookingEvent(event);
-    }
+            return events;
+        }
+    });
+}
 
+export function useCookingEventAllergens(id: number) {
+    return useQuery({
+        queryKey: QueryKeys.allergens(id),
+        queryFn: async () => {
+            const { data, error } = await Supabase
+            .from("EventAllergies") 
+            .select(`allergy_id, "AllergyLabel" (text)`)
+            .eq('event_id', id);
+
+            if (error) throw error;
+            return data.map(t => t.AllergyLabel.text);
+        }
+    })
+}
+
+type EventData = Tables<"Events">;
+export class CookingEvent {
     private data: EventData;
-    private constructor(data: EventData) {
+    constructor(data: EventData) {
         this.data = data;
     }
 
@@ -109,22 +119,5 @@ export default class CookingEvent {
         }
 
         return badges;
-    }
-
-    async getAllergens(): Promise<string[]> {
-        const allergens = await QueryClient.query({
-            queryKey: CookingEvent.QueryKeys.allergens(this.id),
-            queryFn: async () => {
-                const { data, error } = await Supabase
-                .from("EventAllergies") 
-                .select(`allergy_id, "AllergyLabel" (text)`)
-                .eq('event_id', this.id);
-
-                if (error) throw error;
-                return data.map(t => t.AllergyLabel.text);
-            }
-        });
-
-        return allergens;
     }
 }

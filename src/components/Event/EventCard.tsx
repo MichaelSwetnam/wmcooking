@@ -1,26 +1,22 @@
 import { useNavigate } from "react-router-dom";
-import type CookingEvent from "../../lib/CookingEvent";
 import EventBadge from "./Badges";
-import { useEffect, useState } from "react";
 import LoadingComponent from "../Utility/LoadingComponent";
+import { CookingEvent, useCookingEventAllergens } from "../../lib/CookingEvent";
+import ErrorComponent from "../Utility/ErrorComponent";
 
 function AllergySection({ event }: { event: CookingEvent }) {
-    const [allergens, setAllergens] = useState<string[] | null>(null);
+    const { data: allergens, isLoading, isError, error } = useCookingEventAllergens(event.id);
 
-    useEffect(() => {
-        event.getAllergens().then(a => setAllergens(a));
-    }, [event]);
-
-    if (!allergens) return <LoadingComponent />
-
+    if (isLoading) return <LoadingComponent />
+    if (isError) return <ErrorComponent message={error!.message} />
 
      return <div className="bg-amber-300 p-2 rounded-xl shadow-sm">
         <span className="font-semibold">May contain: {
-            allergens
+            allergens!
             .sort()
             .map((s, i) => 
                 (i === 0 && s[0].toUpperCase() + s.slice(1).toLowerCase())
-                || ( i !== allergens.length - 1 && s.toLowerCase())
+                || ( i !== allergens!.length - 1 && s.toLowerCase())
                 || ` and ${s.toLowerCase()}`
             ).join(", ")
         }</span>
