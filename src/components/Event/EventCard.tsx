@@ -3,23 +3,27 @@ import type CookingEvent from "../../lib/CookingEvent";
 import EventBadge from "./Badges";
 import { useEffect, useState } from "react";
 import LoadingComponent from "../Utility/LoadingComponent";
+import type { DBReturn } from "../../lib/database/DBReturn";
 
 function AllergySection({ event }: { event: CookingEvent }) {
-    const [allergens, setAllergens] = useState<string[] | null>(null);
+    const [allergens, setAllergens] = useState<DBReturn<string[]> | null>(null);
 
     useEffect(() => {
         event.getAllergens().then(a => setAllergens(a));
     }, [event]);
 
     if (!allergens) return <LoadingComponent />
+    if (allergens && allergens.isError()) return allergens.getErrorJSX();
+
+    const aData = allergens.getData();
 
      return <div className="bg-amber-300 p-2 rounded-xl shadow-sm">
         <span className="font-semibold">May contain: {
-            allergens
+            aData
             .sort()
             .map((s, i) => 
                 (i === 0 && s[0].toUpperCase() + s.slice(1).toLowerCase())
-                || ( i !== allergens.length - 1 && s.toLowerCase())
+                || ( i !== aData.length - 1 && s.toLowerCase())
                 || ` and ${s.toLowerCase()}`
             ).join(", ")
         }</span>
@@ -27,8 +31,6 @@ function AllergySection({ event }: { event: CookingEvent }) {
 }
 
 export default function EventCard({ event }: { event: CookingEvent }) {
-    
-
     const nav = useNavigate();
     return <div className="flex flex-col bg-white shadow-xl rounded-3xl overflow-hidden hover:shadow-2xl transition-shadow duration-300 w-full max-w-3xl cursor-pointer" onClick={() => {nav(`/events/${event.id}`)}}>
         <div className={"flex flex-col items-center p-2 gap-1"} style={{

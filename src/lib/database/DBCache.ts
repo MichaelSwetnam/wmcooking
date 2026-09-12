@@ -1,9 +1,11 @@
+import { DBReturn } from "./DBReturn";
+
 interface DBEntry<T> {
     data: T,
     expires: Date
 }
 
-type FetchFunction<K extends number | string, T> = (id: K) => Promise<T>;
+type FetchFunction<K extends number | string, T> = (id: K) => Promise<DBReturn<T>>;
 
 const DEFAULT_VALID_LENGTH = 5 * 60; // in seconds
 export default class Cache<K extends number | string, T> {
@@ -16,19 +18,21 @@ export default class Cache<K extends number | string, T> {
         this.fetchFx = fetchFx;      
     }
 
-    private async fetch(key: K): Promise<T> {
+    private async fetch(key: K): Promise<DBReturn<T>> {
         const data = await this.fetchFx(key);
-        this.set(key, data);
+        if (data.isData())
+            this.set(key, data.getData());
+
         return data;
     }
 
-    async get(key: K): Promise<T> {
+    async get(key: K): Promise<DBReturn<T>> {
         const entry = this.cache.get(key);
         if (!entry || entry.expires < new Date()) {
             return await this.fetch(key);
         };
 
-        return entry.data;
+        return DBReturn.fromData(entry.data);
     }
 
     set(key: K, data: T) {

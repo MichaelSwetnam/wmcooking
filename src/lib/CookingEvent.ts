@@ -1,29 +1,30 @@
 import DBCache from "./database/DBCache";
+import { DBReturn } from "./database/DBReturn";
 import type { Tables } from "./database/gen-types";
 import { Supabase } from "./database/Supabase";
 
 type EventData = Tables<"Events">;
 
-async function fetchEvent(id: number): Promise<EventData> {
+async function fetchEvent(id: number): Promise<DBReturn<EventData>> {
     const { data, error } = await Supabase
         .from("Events")
         .select("*")
         .eq('id', id)
         .single();
 
-    if (error || !data) throw new Error("Not implemented");
-
-    return data;
+    return DBReturn.FromDB(data, error);
 }
 
+throw new Error("GetNextEvents should cache result!");
+throw new Error("Allergens should cache result!");
 export default class CookingEvent {
     private static Cache = new DBCache<number, EventData>(fetchEvent);
 
-    public static async Get(key: number): Promise<CookingEvent> {
-        return new CookingEvent(await CookingEvent.Cache.get(key));
+    public static async Get(key: number): Promise<DBReturn<CookingEvent>> {
+        return (await CookingEvent.Cache.get(key)).map(d => new CookingEvent(d));
     }
 
-    public static async GetNextEvents(num: number): Promise<CookingEvent[]> {
+    public static async GetNextEvents(num: number): Promise<DBReturn<CookingEvent[]>> {
         if (num > 10) throw new Error("Using num > 10 is not supported.");
 
         const rightNow = new Date();
@@ -37,16 +38,19 @@ export default class CookingEvent {
             .order("start_timestamp", { ascending: true })
             .limit(num);
 
-        if (error || !data) throw new Error("Not implemented");
+        const dbret = DBReturn.FromDB(data, error);
 
-        for (const event of data) {
-            CookingEvent.Cache.set(event.id, event);
+        if (dbret.isData()) {
+            for (const event of dbret.getData()) {
+                CookingEvent.Cache.set(event.id, event);
+            }
         }
 
-        return data.map(q => new CookingEvent(q));
+        return dbret.map(arr => arr.map(q => new CookingEvent(q)));
     }
 
     private data: EventData;
+    private allergens?: string[];
     private constructor(data: EventData) {
         this.data = data;
     }
@@ -100,15 +104,22 @@ export default class CookingEvent {
         return badges;
     }
 
-    async getAllergens(): Promise<string[]> {
-        const { data, error } = await Supabase
+    async getAllergens(): Promise<DBReturn<string[]>> {
+        if (!this.allergens) {
+            const { data, error } = await Supabase
             .from("EventAllergies") 
             .select(`allergy_id, "AllergyLabel" (text)`)
             .eq('event_id', this.id);
         
-        if (error || !data) throw new Error("Not implemented");
 
-        const allergens = data.map(t => t.AllergyLabel.text);
-        return allergens;
+            const dbRet = DBReturn.FromDB(data, error).map(d => d.map(t => t.AllergyLabel.text));
+            if (dbRet.isData()) {
+                this.allergens = dbRet.getData();
+            }
+
+            return dbRet;
+        }
+
+        return DBReturn.fromData(this.allergens);
     }
 }
