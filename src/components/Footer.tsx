@@ -8,6 +8,7 @@ export default function Footer() {
                     <span className="font-semibold">Contact Us!</span>
                     <span>
                         Send us an email at <a href="mailto:cooking@wm.edu" className="underline hover:text-blue-600 transition">cooking@wm.edu</a>
+			<p>Insert!</p>
                     </span>
                     <span>
                         or message <a href="https://www.instagram.com/wmclubcooking" className="underline hover:text-blue-600 transition">@wmclubcooking</a> on Instagram!

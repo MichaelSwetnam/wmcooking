@@ -10,6 +10,9 @@ function AllergySection({ event }: { event: CookingEvent }) {
     if (isLoading) return <LoadingComponent />
     if (isError) return <ErrorComponent message={error!.message} />
 
+    if (allergens.length <= 0)
+	 return <></>;
+
      return <div className="bg-amber-300 p-2 rounded-xl shadow-sm">
         <span className="font-semibold">May contain: {
             allergens!
