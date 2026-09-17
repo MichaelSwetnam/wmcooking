@@ -1,33 +1,6 @@
 import { Supabase } from "./database/Supabase";
-import type { Tables } from "./database/gen-types";
-import { getProfile } from "./Profile";
+import { getProfile, Profile } from "./Profile";
 import { AuthSessionMissingError } from "@supabase/supabase-js";
-
-type ProfileRecord = Tables<"Profiles">;
-
-export class UserProfile {
-    private record: ProfileRecord;
-
-    constructor(rec: ProfileRecord) {
-        this.record = rec;
-    }
-
-    isPrivileged(): boolean {
-        return this.record.is_admin;
-    }
-
-    getId(): string {
-        return this.record.id;
-    }
-
-    getEmail(): string {
-        return this.record.email;
-    }
-
-    getName(): string {
-        return this.record.name;
-    }
-}
 
 class OAuth {
     private signedInUser: string | null = null; // Key to database cache
@@ -62,9 +35,10 @@ class OAuth {
 
         const { data, error } = await Supabase.auth.getUser();
 	if (error) throw error;
-	if (data.user === undefined) throw new Error("userData.user is undefined!");
+	if (data.user === null) throw new Error("userData.user is undefined!");
 
 	this.signedInUser = data.user!.id;
+	return this.signedInUser;
     }
 
     hasUser(): boolean {
@@ -74,7 +48,7 @@ class OAuth {
     /**
      * Get the profile for the signed in user
      */
-    async getUser(): Promise<UserProfile | null> {
+    async getUser(): Promise<Profile | null> {
 	 let id: string;
 	 try {
 	      // AuthSessionMissingError thrown if no logged in user
@@ -85,9 +59,9 @@ class OAuth {
 
 	      return null;
 	 }
-	const userProfile = await getProfile(id);
 
-        return new UserProfile(userProfile);
+	const userProfile = await getProfile(id);
+        return new Profile(userProfile);
     }
 
     async isPrivileged(): Promise<boolean> {
@@ -95,7 +69,7 @@ class OAuth {
         if (!user) 
             return false;
         else 
-            return user.isPrivileged();
+            return user.isAdmin;
     }
 }
 

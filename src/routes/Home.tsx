@@ -3,15 +3,9 @@ import { useNextCookingEvents } from "../lib/CookingEvent";
 import EventCard from "../components/Event/EventCard";
 import LoadingComponent from "../components/Utility/LoadingComponent";
 import ErrorComponent from "../components/Utility/ErrorComponent";
-import { useContext } from "react";
-import { UserContext } from "../components/Auth/UserContext";
-
 
 export default function Home() {
     const { data: events, isLoading, isError, error } = useNextCookingEvents();
-    const { user } = useContext(UserContext)
-
-    console.log(user);
 
     return <div className="flex-1 flex flex-col md:flex-row justify-center items-center md:items-start gap-8">
         { /* Main Content */ }

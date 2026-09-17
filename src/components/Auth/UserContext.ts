@@ -1,7 +1,8 @@
 import { createContext } from "react";
-import type { UserProfile } from "../../lib/OAuth";
+import type { Profile } from "../../lib/Profile";
 
 export const UserContext = createContext<{
-    user: UserProfile | null,
-    setUser: React.Dispatch<React.SetStateAction<UserProfile | null>>
-}>({ user: null, setUser: () => null});
+    user: Profile | null,
+    setUser: React.Dispatch<React.SetStateAction<Profile | null>>,
+    loaded: boolean
+}>({ user: null, setUser: () => null, loaded: false });

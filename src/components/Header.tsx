@@ -1,7 +1,14 @@
 import logo from "../assets/cooking-logo.png";
 import ResponsiveLink from "./Utility/ResponsiveLink";
+import SignInButton from "./Auth/SignInButton.tsx";
+import { useContext } from "react";
+import { UserContext } from "./Auth/UserContext";
+import LoadingComponent from "./Utility/LoadingComponent.tsx";
+import UserDropdown from "./UserDropdown.tsx";
 
 export default function Header() {
+     const { user, setUser, loaded } = useContext(UserContext);
+
     return (
         <header className="bg-linear-to-r from-blue-300 to-blue-200 py-3 shadow-md w-full">
             <div className="flex flex-col md:flex-row items-center justify-between px-6">
@@ -25,11 +32,13 @@ export default function Header() {
                     <nav>
                         <ResponsiveLink to="/health">Health & Safety</ResponsiveLink>
                     </nav>
+		    { !loaded && <LoadingComponent /> }
+		    { loaded && (user 
+			 ? <UserDropdown user={user} onLogout={() => setUser(null)} />
+			 : <SignInButton />
+			 )
+		    }
                     {/* { user?.isPrivileged() && <AddEvent /> }
-                    {
-                        loadedRecord !== null
-                        ? <UserDropdown user={loadedRecord} onLogout={() => setUser(null)} />
-                        : <SignInButton />
                     } */}
                 </div>
             </div>
