@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import EventBadge from "../Event/Badges";
 import { UserContext } from "../Auth/UserContext";
 import SignInButton from "../Auth/SignInButton";
@@ -6,10 +6,8 @@ import { useNavigate } from "react-router-dom";
 import LoadingComponent from "../Utility/LoadingComponent";
 import ErrorComponent from "../Utility/ErrorComponent";
 import { CookingEvent, deleteCookingEvent } from "../../lib/CookingEvent";
-import type { Tables } from "../../lib/database/gen-types";
 import AllergySection from "./AllergySection";
-
-type SignupRecord = Tables<"EventSignup">;
+import { EventSignup, useSignupsFromEvent } from "../../lib/EventSignup";
 
 function DeleteButton({ event } : { event: CookingEvent }) {
     const nav = useNavigate();
@@ -123,7 +121,7 @@ function SigninButtonSection() {
     </div>;
 }
 
-function AttendeeSection({ signups, selfSignup, event }: { signups: SignupRecord[], selfSignup: SignupRecord | null, event: CookingEvent }) {
+function AttendeeSection({ signups, selfSignup, event }: { signups: EventSignup[], selfSignup: EventSignup | null, event: CookingEvent }) {
     const eventStart = event.getStartDate();
     const now = new Date();
     const diffMs = eventStart.getTime() - now.getTime();
@@ -149,10 +147,10 @@ function AttendeeSection({ signups, selfSignup, event }: { signups: SignupRecord
 
 	{/* TODO: Get signup name instead of id  */}
         {
-            selfSignup && <li key={0}> {selfSignup.id}</li>
+            selfSignup && <li key={0}> {selfSignup.profileName}</li>
         }
         {
-            signups.map((s, i) => <li key={i + 1}>{s.id}</li>)
+            signups.map((s, i) => <li key={i + 1}>{s.profileName}</li>)
         }
         </ol>
     </div>
@@ -161,53 +159,41 @@ function AttendeeSection({ signups, selfSignup, event }: { signups: SignupRecord
 export default function EventPage({ event }: { event: CookingEvent }) {
     const nav = useNavigate();
     const { user } = useContext(UserContext);
-    const [ signups, setSignups ] = useState<SignupRecord[] | null>(null);
-    const [ selfSignup, setSelfSignup ] = useState<SignupRecord | null>(null);
-    const [ loading, setLoading ] = useState(true);
-    const [ error, setError ] = useState<string | null>();
 
-    // Get signup information
-    useEffect(() => {
-        (async () => {
-            if (!event.requiresSignup) {
-                setSignups(null);
-                setSelfSignup(null);
-                setLoading(false);
-                return;
-            }
+    let signups: EventSignup[] | null;
+    let selfSignup: EventSignup | null;
+    if (!event.requiresSignup) {
+	 signups = null;
+	 selfSignup = null;
+    }
 
-	    // TODO
-            // const r = await Database.signups.getFromEvent(event.id);
-            // if (r.isError()) {
-            //     setError(r.unwrapError());
-            //     return;
-            // }
-            // const data = r.unwrapData();
-	    const data: SignupRecord[] = [];
+    const { data: signupsData, error, isLoading } = useSignupsFromEvent(event.id);
 
-            /** If no one is signed in, then there is no self signup */
-            if (!user) {
-                setSignups(data);
-                setSelfSignup(null);
-                setLoading(false);
-                return;
-            }
-            
-	    // TODO
-            /** If the user is signed in, remove their signup from data and put it in selfSignup */
-            // const userSignupIndex = data.findIndex(s => event.id.toString() == s.event_id && s.user_id === user.getId());
-            // if (userSignupIndex !== -1) {
-            //     setSelfSignup(data[userSignupIndex]);
-            //     data.splice(userSignupIndex, 1);
-            // }
+    if (error) return <ErrorComponent message={error.message} />
+    if (isLoading) return <LoadingComponent />;
 
-            setLoading(false);
-            setSignups(data);
-        })();      
-    }, [user, event.id, event.requiresSignup]);
+    signupsData.sort((a, b) => b.getDateCreated().getTime() - a.getDateCreated().getTime());
 
-    if (error) return <ErrorComponent message={error} />
-    if (loading) return <LoadingComponent />;
+    if (signupsData && !user) {
+	 // If there is no logged in user, there is no self signup
+	 selfSignup = null;
+	 signups = signupsData;
+    }
+
+    if (signupsData && user) {
+	 // Remove selfSignup from signups
+	 const selfIndex = signupsData.findIndex(d => d.profileId === user.id);
+	 if (selfIndex !== -1) {
+	      selfSignup = signupsData[selfIndex];
+	      signupsData.splice(selfIndex, 1);
+	 } else {
+	      selfSignup = null;
+	 }
+
+	 signups = signupsData;
+    }
+
+    console.log(signupsData);
 
     // Bools
     const isLoggedIn = !!user;
