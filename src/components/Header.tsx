@@ -5,6 +5,7 @@ import { useContext } from "react";
 import { UserContext } from "./Auth/UserContext";
 import LoadingComponent from "./Utility/LoadingComponent.tsx";
 import UserDropdown from "./UserDropdown.tsx";
+import AddEvent from "../components/AddEvent.tsx";
 
 export default function Header() {
      const { user, setUser, loaded } = useContext(UserContext);
@@ -32,14 +33,13 @@ export default function Header() {
                     <nav>
                         <ResponsiveLink to="/health">Health & Safety</ResponsiveLink>
                     </nav>
+		    { user?.isAdmin && <AddEvent /> }
 		    { !loaded && <LoadingComponent /> }
 		    { loaded && (user 
 			 ? <UserDropdown user={user} onLogout={() => setUser(null)} />
 			 : <SignInButton />
 			 )
 		    }
-                    {/* { user?.isPrivileged() && <AddEvent /> }
-                    } */}
                 </div>
             </div>
         </header>
