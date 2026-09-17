@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Tables } from "./database/gen-types";
 import QueryClient from "./database/QueryClient";
 import { Supabase } from "./database/Supabase";
+import OAuth from "./OAuth";
 
 const QueryKeys = {
     single: (id: number) => ["event", id] as const,
@@ -63,6 +64,24 @@ export function useCookingEventAllergens(id: number) {
             return data.map(t => t.AllergyLabel.text);
         }
     })
+}
+
+export async function deleteCookingEvent(id: number) {
+     if (!OAuth.isPrivileged()) throw new Error("Logged in user does not have permission to delete events");
+
+     // Request deletion
+     const { error } = await Supabase
+	  .from("Events")
+	  .delete()
+	  .eq('id', id)
+	  .single(); 
+
+     if (error) throw error;
+
+     // Invalidate affected caches:
+     QueryClient.removeQueries({ queryKey: QueryKeys.single(id) });
+     QueryClient.removeQueries({ queryKey: QueryKeys.allergens(id) });
+     QueryClient.removeQueries({ queryKey: QueryKeys.next() });
 }
 
 type EventData = Tables<"Events">;
