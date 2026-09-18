@@ -185,7 +185,11 @@ export default function EventPage({ event }: { event: CookingEvent }) {
 	 const selfIndex = signupsData.findIndex(d => d.profileId === user.id);
 	 if (selfIndex !== -1) {
 	      selfSignup = signupsData[selfIndex];
+<<<<<<< HEAD
 	      signups = signupsData.toSpliced(selfIndex, 1);
+=======
+	      signups = signupsData.slice(selfIndex, 1);
+>>>>>>> 3dc12cee78807d31ba65031af1a5204b735137e1
 	 } else {
 	      selfSignup = null;
 	      signups = signupsData;
