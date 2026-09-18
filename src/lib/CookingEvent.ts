@@ -7,8 +7,8 @@ import OAuth from "./OAuth";
 const QueryKeys = {
     single: (id: number) => ["event", id] as const,
     next: () => ["events", "next"] as const,
-    allergens: (id: number) =>
-        ["event", id, "allergens"] as const,
+    allergens: (id: number) => ["event", id, "allergens"] as const,
+    month: (month: number, year: number) => ["events", "cal", year, month ] as const,
 };
 
 export function useCookingEvent(id: number) {
@@ -25,6 +25,34 @@ export function useCookingEvent(id: number) {
             return new CookingEvent(data);
         }
     })
+}
+
+export function useCookingEventsInMonth(month: number, year: number) {
+     return useQuery({
+	  queryKey: QueryKeys.month(month, year),
+	  queryFn: async () => {
+	       // Get the dates (start and end of month)
+	       const startOfMonth = new Date(year, month, 1).toISOString();
+	       const endOfMonth = new Date(year, month + 1, 1).toISOString();
+
+	       const { data, error } = await Supabase
+		      .from("Events")
+		      .select("*")
+		      .gte("start_timestamp", startOfMonth)
+		      .lt("start_timestamp", endOfMonth)
+		      .order("start_timestamp", { ascending: true });
+
+	       if (error) throw error;
+
+	       const events = data.map(d => new CookingEvent(d));
+
+	       // Map single error
+	       events.forEach(e => QueryClient.setQueryData(QueryKeys.single(e.id), e));
+	       
+	       // Map month data
+	       return events;
+	  }
+     });
 }
 
 export function useNextCookingEvents() {
