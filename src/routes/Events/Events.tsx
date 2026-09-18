@@ -1,5 +1,6 @@
 import { useLayoutEffect, useState } from "react";
 import MobileCalendar from "./MobileCalendar";
+import DesktopCalendar from "./DesktopCalendar";
 
 export default function Events() {
     const [[ month, year ], setMonthYear ] = useState([new Date().getMonth(), new Date().getFullYear()]); 
@@ -44,22 +45,16 @@ export default function Events() {
             </div>
         </div>
         { /* Tailwind CSS uses 48rem for md screens = 768 px https://tailwindcss.com/docs/responsive-design */ }
-	<MobileCalendar 
-	  year={year}
-	  month={month}
-	/>
-	{/*
         {
             width < 768
             ? <MobileCalendar
                 year={year}
 		month={month}
             />
-            : <DesktopCalendar 
+            : <DesktopCalendar
                 year={year} 
                 month={month} 
             />
         } 
-	*/}
     </div>
 }
