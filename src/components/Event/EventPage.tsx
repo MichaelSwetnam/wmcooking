@@ -185,15 +185,13 @@ export default function EventPage({ event }: { event: CookingEvent }) {
 	 const selfIndex = signupsData.findIndex(d => d.profileId === user.id);
 	 if (selfIndex !== -1) {
 	      selfSignup = signupsData[selfIndex];
-	      signupsData.splice(selfIndex, 1);
+	      signups = signupsData.slice(selfIndex, 1);
 	 } else {
 	      selfSignup = null;
+	      signups = signupsData;
 	 }
 
-	 signups = signupsData;
     }
-
-    console.log(signupsData);
 
     // Bools
     const isLoggedIn = !!user;
