@@ -7,7 +7,7 @@ import LoadingComponent from "../Utility/LoadingComponent";
 import ErrorComponent from "../Utility/ErrorComponent";
 import { CookingEvent, deleteCookingEvent } from "../../lib/CookingEvent";
 import AllergySection from "./AllergySection";
-import { EventSignup, useSignupsFromEvent } from "../../lib/EventSignup";
+import { EventSignup, invokeDeleteSignup, invokeInsertSignup, useSignupsFromEvent } from "../../lib/EventSignup";
 
 function DeleteButton({ event } : { event: CookingEvent }) {
     const nav = useNavigate();
@@ -201,30 +201,15 @@ export default function EventPage({ event }: { event: CookingEvent }) {
     // Add / remove signup functions
     async function addSignup(): Promise<boolean> {
         if (!user) return false;
+	await invokeInsertSignup(event);
      
-	// TODO 
-        // There wasn't a signup - add it
-        // const r = await Database.signups.invokeInsert(event.id.toString(), user.getId());
-        // if (r.isError()) {
-        //     setError(r.unwrapError());
-        // }
-        //
-        // setSelfSignup(r.unwrapData());
-        // return r.isData();
 	return true;
     }   
 
     async function removeSignup(): Promise<boolean> {
         if (!selfSignup) return false;
+	await invokeDeleteSignup(selfSignup);
 
-	// TODO
-        // const r = await Database.signups.invokeDelete(selfSignup.id.toString());
-        // r.ifError(e => 
-        //     setError(e)
-        // );
-        // setSelfSignup(null);
-        
-        // return r.isData();
 	return true;
     }
 
