@@ -1,14 +1,50 @@
 import { useForm } from "@tanstack/react-form"
-import type { AnyFieldApi } from "@tanstack/react-form";
+import type { AnyFieldApi, AnyFormApi } from "@tanstack/react-form";
 
 type ValidatorProp = { value: string };
 type ValidatorFn = (_: ValidatorProp) => string | undefined;
 
 const onChangeComp = (fn: ValidatorFn) => ({ onChange: (prop: ValidatorProp) => fn(prop) });
 const Validators = {
+     // Generic
      required: () => onChangeComp(({value}) => !value ? 'This field is required.' : undefined ),
+     
+     // String 
      lengthGreaterEqual: (x: number) => onChangeComp(({value}) => value && (value.length <= x ? `This field must contain ${x} or more characters.` : undefined ) ),
-     lengthGreater: (x: number) => Validators.lengthGreaterEqual(x+1),
+     isHyperlink: () => onChangeComp(({ value }) => {
+	  if (!value) return undefined;
+	  try {
+	       // This is not the best method ever but it will work for now!
+	       new URL(value)
+	       return undefined; // Was a valid link
+	  } catch (e) {
+	       if (e instanceof TypeError) return 'This field must be a valid URL.'
+	       throw e;
+	  }
+
+     }),
+
+     // lengthGreater: (x: number) => Validators.lengthGreaterEqual(x+1),
+
+     // Numeric
+     // Text input does not return a value unless it is a valid number apparently.
+     // isNumber: () => onChangeComp(({value}) => value && (isNaN(parseInt(value)) ? 'This field must be a number.' : undefined )),
+     isInt: () => onChangeComp(({ value }) => {
+	  if (!value) undefined; 
+	  const num = parseFloat(value);
+	  if (isNaN(num)) return 'This field must contain a valid number.'; 
+	  if (Math.ceil(num) !== num) return 'This field must contain a whole number (no decimal component)';
+	  return undefined;
+     }),
+     isGreaterThan: (x: number) => onChangeComp(({ value }) => {
+	  if (!value) return undefined; 
+	  const num = parseFloat(value);
+	  if (isNaN(num)) return 'This field must contain a valid number.'; 
+	  if (num <= x) return `This field must contain a number greater than ${x}`;
+	  return undefined;
+     }),
+     isPositive: () => Validators.isGreaterThan(0),
+
 
      // For now, only onChange is supported. 
      compose(fns: { onChange: ValidatorFn }[]) {
@@ -44,6 +80,7 @@ function InputWrapper({ field, children }: { field: AnyFieldApi, children: React
 function TextInput({ field }: { field: AnyFieldApi }) {
      return <InputWrapper field={field}> 
 	  <input 
+	       type="text"
 	       className="bg-white p-1 rounded-sm shadow-sm w-full text-center"
 	       id={field.name}
 	       name={field.name}
@@ -54,8 +91,33 @@ function TextInput({ field }: { field: AnyFieldApi }) {
      </InputWrapper>
 }
 
+function NumberInput({ field }: { field: AnyFieldApi }) {
+     return <InputWrapper field={field}>
+	  <input 
+	       type="number"
+	       step="any"
+	       className="bg-white p-1 rounded-sm shadow-sm w-full text-center"
+	       id={field.name}
+	       name={field.name}
+	       value={field.state.value}
+	       onBlur={field.handleBlur}
+	       onChange={e => field.handleChange(e.target.value)}
+	  />
+     </InputWrapper>
+}
+
+function SubmitButton({ form, text}: { form: AnyFormApi, text: string }) {
+     return <button
+	  className="font-bold text-white bg-blue-400 p-3 rounded-md shadow-md"
+	  type="submit"
+	  onClick={() => { form.handleSubmit({ submitACtion: 'backToMenu' })}}
+     >{text}</button>
+}
+
 const Components = {
-     TextInput: (field: AnyFieldApi) => <TextInput field={field} />
+     Text: (field: AnyFieldApi) => <TextInput field={field} />,
+     Number: (field: AnyFieldApi) => <NumberInput field={field} />,
+     Submit: SubmitButton
 }
 
 export default function EditEvent() {
@@ -64,7 +126,7 @@ export default function EditEvent() {
 	       title: '',
 	       location: '',
 	  },
-	  onSubmit: async ({ value }) => alert(JSON.stringify(value))
+	  onSubmit: ({ value }) => console.log(value) 
      });
      
      return <form
@@ -78,12 +140,27 @@ export default function EditEvent() {
 	  <form.Field
 	       name="title"
 	       validators={Validators.required()}
-	       children = {Components.TextInput} 
+	       children = {Components.Text} 
 	  />
 	  <form.Field
 	       name="location"
 	       validators={Validators.compose([Validators.required(), Validators.lengthGreaterEqual(3)])}
-	       children = {Components.TextInput} 
+	       children = {Components.Text} 
 	  />
+	  <p>start</p>
+	  <p>end</p>
+	  <form.Field name="description" children={Components.Text} /> 
+	  <form.Field name="notable_link" children={Components.Text} validators={Validators.isHyperlink()} />
+	  <p>accessability</p>
+	  <p>allergens</p>
+	  <p>signups allowed</p>
+	  <form.Field 
+	       name="event_capacity" 
+	       validators={Validators.compose([Validators.isInt(), Validators.isPositive()])}
+	       children={Components.Number}
+	  />
+	  <p>event capacity</p>
+	  <p>background image</p>
+	  {<Components.Submit form={form} text="Submit" />}
      </form>
 }
