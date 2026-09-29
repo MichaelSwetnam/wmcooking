@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form"
-import Validators from "../components/Input/Validators";
+import Validators, { InputValidatorBuilder } from "../components/Input/Validators";
 import Components from "../components/Input/InputComponents";
 
 export default function EditEvent() {
@@ -30,7 +30,7 @@ export default function EditEvent() {
      >
 	  <form.Field
 	       name="title"
-	       validators={Validators.required()}
+	       validators={InputValidatorBuilder.Single(Validators.required()).build()}
 	       children = {Components.Text} 
 	  />
 	  <form.Field
