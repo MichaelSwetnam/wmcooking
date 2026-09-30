@@ -4,33 +4,33 @@ type ValidatorProp = { value: string, fieldApi: AnyFieldApi };
 type ValidatorFn = (_: ValidatorProp) => string | undefined;
 
 /** Note! This builder class is NOT immutable. Function chaining is only for convenience. */
-export class InputValidatorBuilder {
+export class InputValidatorBuilder<T extends {[_: string]: string}> {
      validators: ValidatorFn[] = [];
-     onChangeListenTo: string[] | undefined;
+     onChangeListenTo: (keyof T)[] | undefined;
 
-     static Single(fn: ValidatorFn, listenTo?: string[]): InputValidatorBuilder {
-	  const b = new InputValidatorBuilder();
+     static Single<K extends {[_: string]: string}>(fn: ValidatorFn, listenTo?: string[]) {
+	  const b = new InputValidatorBuilder<K>();
 	  b.addValidator(fn);
 	  if (listenTo) b.addListenTargets(listenTo);
-	  return b;
+	  return b.build();
      }
 
      constructor() {}
 
-     addListenTarget(target: string): InputValidatorBuilder {
+     addListenTarget(target: keyof T): InputValidatorBuilder<T> {
 	  if (!this.onChangeListenTo) this.onChangeListenTo = [];
 	  this.onChangeListenTo.push(target);
 	  return this;
      }
 
-     addListenTargets(target: string[]): InputValidatorBuilder {
+     addListenTargets(target: (keyof T)[]): InputValidatorBuilder<T> {
 	  target.forEach(t => this.addListenTarget(t));
 	  return this;
      }
 
      /** Convenience function which mirrors functionality of addValidator */
      add = this.addValidator;
-     addValidator(fn: ValidatorFn): InputValidatorBuilder {
+     addValidator(fn: ValidatorFn): InputValidatorBuilder<T> {
 	  this.validators.push(fn);
 	  return this;
      }
@@ -91,9 +91,14 @@ const Validators = {
      isPositive: () => Validators.isGreaterThan(0),
 
      // DateTime
-     isDateAfter: (time: Date) => ({ value }) => {
-	  const date = new Date(value);
-	  throw new Error("Not implemented!");
+     isDateAfter: (time: Date) => ({ value: valueStr }) => {
+	  const valueTs = Date.parse(valueStr);
+	  if (isNaN(valueTs)) return 'Invalid date.';
+
+	  const value = new Date(valueTs);
+
+	  if (value <= time) return `Must be after ${time.toLocaleString()}.`;
+	  return undefined;
      },
 };
 
