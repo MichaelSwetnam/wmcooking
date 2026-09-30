@@ -81,6 +81,15 @@ export default function EditEvent() {
 	  <form.Field name="notable_link"
 	       children={Components.Text}
 	       validators={InputValidatorBuilder.Single<DV>(Validators.isHyperlink())}/>
+	  <form.Field
+	       name="accessability"
+	       children={Components.Selector}
+
+	       validators={InputValidatorBuilder.Single<DV>(({value}) => {
+		    console.log(value);
+		    return undefined;
+	       })}
+	  />
 	  <p>accessability</p>
 	  <p>allergens</p>
 	  <p>signups allowed</p>

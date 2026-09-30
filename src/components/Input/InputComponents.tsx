@@ -69,10 +69,26 @@ function SubmitButton({ form, text}: { form: AnyFormApi, text: string }) {
      >{text}</button>
 }
 
+function Selector({ field }: { field: AnyFieldApi }) {
+     return <InputWrapper field={field}>
+	  <select
+	       id={field.name}
+	       name={field.name}
+	       value={field.state.value}
+	       onBlur={field.handleBlur}
+	       onChange={e => field.handleChange(e.target.value)}
+	  >
+	       <option>A</option>
+	       <option>B</option>
+	  </select>
+     </InputWrapper>
+}
+
 const Components = {
      Text: (field: AnyFieldApi) => <TextInput field={field} />,
      Number: (field: AnyFieldApi) => <NumberInput field={field} />,
      DateTime: (field: AnyFieldApi) => <DateTimeInput field={field} />,
+     Selector: (field: AnyFieldApi) => <Selector field={field} />,
      Submit: SubmitButton
 }
 
