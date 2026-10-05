@@ -69,26 +69,43 @@ function SubmitButton({ form, text}: { form: AnyFormApi, text: string }) {
      >{text}</button>
 }
 
-function Selector({ field }: { field: AnyFieldApi }) {
+type SelectorOption = { val: string, display: string };
+function Selector({ field, options }: { field: AnyFieldApi, options: SelectorOption[] }) {
      return <InputWrapper field={field}>
 	  <select
+	       className="bg-white p-1 rounded-sm shadow-sm w-full text-center"
 	       id={field.name}
 	       name={field.name}
 	       value={field.state.value}
 	       onBlur={field.handleBlur}
 	       onChange={e => field.handleChange(e.target.value)}
 	  >
-	       <option>A</option>
-	       <option>B</option>
+	       {options.map((x, i) => <option key={i} value={x.val}>{x.display}</option>) }
 	  </select>
      </InputWrapper>
 }
 
+function Checkbox({ field }: { field: AnyFieldApi }) {
+     return <InputWrapper field={field}>
+	  <input 
+	       type="checkbox"
+	       step="any"
+	       className="bg-white p-1 rounded-sm shadow-sm w-full text-center"
+	       id={field.name}
+	       name={field.name}
+	       checked={field.state.value}
+	       onBlur={field.handleBlur}
+	       onChange={e => field.handleChange(e.target.checked)}
+	  />
+     </InputWrapper>
+}
+
 const Components = {
-     Text: (field: AnyFieldApi) => <TextInput field={field} />,
-     Number: (field: AnyFieldApi) => <NumberInput field={field} />,
-     DateTime: (field: AnyFieldApi) => <DateTimeInput field={field} />,
-     Selector: (field: AnyFieldApi) => <Selector field={field} />,
+     Text: () => (field: AnyFieldApi) => <TextInput field={field} />,
+     Number: () => (field: AnyFieldApi) => <NumberInput field={field} />,
+     DateTime: () => (field: AnyFieldApi) => <DateTimeInput field={field} />,
+     Selector: (options: SelectorOption[]) => (field: AnyFieldApi) => <Selector field={field} options={options} />,
+     Checkbox: () => (field: AnyFieldApi) => <Checkbox field={field} />,
      Submit: SubmitButton
 }
 

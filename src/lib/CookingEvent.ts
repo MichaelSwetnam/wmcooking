@@ -113,6 +113,7 @@ export async function deleteCookingEvent(id: number) {
 }
 
 type EventData = Tables<"Events">;
+export type EventFormData = EventData;
 export class CookingEvent {
     private data: EventData;
     constructor(data: EventData) {
@@ -166,5 +167,9 @@ export class CookingEvent {
         }
 
         return badges;
+    }
+
+    getFormData(): EventFormData {
+	 return this.data;
     }
 }
