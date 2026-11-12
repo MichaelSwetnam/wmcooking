@@ -14,7 +14,7 @@ const Components = {
      Number: () => (field: AnyFieldApi) => <NumberInput field={field} />,
      DateTime: () => (field: AnyFieldApi) => <DateTimeInput field={field} />,
      Checkbox: () => (field: AnyFieldApi) => <Checkbox field={field} />,
-     Allergens: (startSelected?: string[]) => (field: AnyFieldApi) => <AllergySelectorInput field={field} startSelected={startSelected} />,
+     Allergens: () => (field: AnyFieldApi) => <AllergySelectorInput field={field} />,
 
      Selector: (options: SelectorOption[]) => (field: AnyFieldApi) => <Selector field={field} options={options} />,
      Submit: SubmitButton
