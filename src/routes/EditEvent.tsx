@@ -84,7 +84,7 @@ function EditEventForm({event, allergens}: { event: CookingEvent, allergens: str
 
 	  <form.Field
 	       name="allergens"
-	       children={Components.Allergens(allergens)}
+	       children={Components.Allergens()}
 	  />
 
 	  <form.Field
@@ -106,7 +106,11 @@ function EditEventForm({event, allergens}: { event: CookingEvent, allergens: str
 	       }}
 	  />
 
-	  <p>background image</p>
+	  <form.Field
+	       name="event.background_image"
+	       children={Components.BackgroundSelector()}
+	  />
+
 	  {<Components.Submit form={form} text="Submit" />}
      </form>
 }

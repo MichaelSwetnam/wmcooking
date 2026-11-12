@@ -7,6 +7,7 @@ import { Checkbox } from "./Components/Checkbox";
 import { SubmitButton } from "./Components/Submit";
 import { Selector, type SelectorOption } from "./Components/Selector";
 import { AllergySelectorInput } from "./Components/AllergenSelector";
+import { BackgroundLinkSelector } from "./Components/BackgroundLinkSelector";
 
 const Components = {
      Text: () => (field: AnyFieldApi) => <TextInput field={field} />,
@@ -15,6 +16,7 @@ const Components = {
      DateTime: () => (field: AnyFieldApi) => <DateTimeInput field={field} />,
      Checkbox: () => (field: AnyFieldApi) => <Checkbox field={field} />,
      Allergens: () => (field: AnyFieldApi) => <AllergySelectorInput field={field} />,
+     BackgroundSelector: () => (field: AnyFieldApi) => <BackgroundLinkSelector field={field} />,
 
      Selector: (options: SelectorOption[]) => (field: AnyFieldApi) => <Selector field={field} options={options} />,
      Submit: SubmitButton
