@@ -4,11 +4,11 @@ type ValidatorProp = { value: string, fieldApi: AnyFieldApi };
 type ValidatorFn = (_: ValidatorProp) => string | undefined;
 
 /** Note! This builder class is NOT immutable. Function chaining is only for convenience. */
-export class InputValidatorBuilder<T extends {[_: string]: string}> {
+export class InputValidatorBuilder<T extends {[_: string]: any}> {
      validators: ValidatorFn[] = [];
      onChangeListenTo: (keyof T)[] | undefined;
 
-     static Single<K extends {[_: string]: string}>(fn: ValidatorFn, listenTo?: string[]) {
+     static Single<K extends {[_: string]: any}>(fn: ValidatorFn, listenTo?: string[]) {
 	  const b = new InputValidatorBuilder<K>();
 	  b.addValidator(fn);
 	  if (listenTo) b.addListenTargets(listenTo);
@@ -17,13 +17,13 @@ export class InputValidatorBuilder<T extends {[_: string]: string}> {
 
      constructor() {}
 
-     addListenTarget(target: keyof T): InputValidatorBuilder<T> {
+     addListenTarget(target: string): InputValidatorBuilder<T> {
 	  if (!this.onChangeListenTo) this.onChangeListenTo = [];
 	  this.onChangeListenTo.push(target);
 	  return this;
      }
 
-     addListenTargets(target: (keyof T)[]): InputValidatorBuilder<T> {
+     addListenTargets(target: string[]): InputValidatorBuilder<T> {
 	  target.forEach(t => this.addListenTarget(t));
 	  return this;
      }

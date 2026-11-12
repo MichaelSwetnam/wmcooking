@@ -79,8 +79,8 @@ export function useNextCookingEvents() {
     });
 }
 
-export function useCookingEventAllergens(id: number) {
-    return useQuery({
+function _eventAllergensQuery(id: number) {
+     return {
         queryKey: QueryKeys.allergens(id),
         queryFn: async () => {
             const { data, error } = await Supabase
@@ -91,7 +91,11 @@ export function useCookingEventAllergens(id: number) {
             if (error) throw error;
             return data.map(t => t.AllergyLabel.text);
         }
-    })
+    }
+}
+
+export function useCookingEventAllergens(id: number) {
+    return useQuery(_eventAllergensQuery(id))
 }
 
 export async function deleteCookingEvent(id: number) {
@@ -112,8 +116,8 @@ export async function deleteCookingEvent(id: number) {
      QueryClient.removeQueries({ queryKey: QueryKeys.next() });
 }
 
+
 type EventData = Tables<"Events">;
-export type EventFormData = EventData;
 export class CookingEvent {
     private data: EventData;
     constructor(data: EventData) {
@@ -169,7 +173,7 @@ export class CookingEvent {
         return badges;
     }
 
-    getFormData(): EventFormData {
+    getRawData(): EventData {
 	 return this.data;
     }
 }
