@@ -98,6 +98,40 @@ export function useCookingEventAllergens(id: number) {
     return useQuery(_eventAllergensQuery(id))
 }
 
+export async function createCookingEvent( data: Omit<CookingEventData, 'id'>): Promise<number> {
+     if (!OAuth.isPrivileged()) throw new Error("Logged in user does not have permission to create events");
+
+     const { error, data: supData } = await Supabase
+	  .from("Events")
+	  .insert(data)
+	  .select("*")
+	  .single();
+
+     if (error) throw error;
+
+     QueryClient.removeQueries({ queryKey: QueryKeys.next() });
+     QueryClient.setQueryData(QueryKeys.single(supData.id), new CookingEvent(supData));
+     // Month data
+     
+     return supData.id;
+}
+
+export async function updateCookingEvent(id: number, data: CookingEventData) {
+     if (!OAuth.isPrivileged()) throw new Error("Logged in user does not have permission to update events");
+
+     const { error } = await Supabase
+	  .from("Events")
+	  .update(data)
+	  .eq('id', id)
+	  .single();
+
+     if (error) throw error;
+
+     QueryClient.setQueryData(QueryKeys.single(id), new CookingEvent(data));
+     QueryClient.removeQueries({ queryKey: QueryKeys.next() });
+     // Month data
+}
+
 export async function deleteCookingEvent(id: number) {
      if (!OAuth.isPrivileged()) throw new Error("Logged in user does not have permission to delete events");
 
@@ -114,13 +148,14 @@ export async function deleteCookingEvent(id: number) {
      QueryClient.removeQueries({ queryKey: QueryKeys.single(id) });
      QueryClient.removeQueries({ queryKey: QueryKeys.allergens(id) });
      QueryClient.removeQueries({ queryKey: QueryKeys.next() });
+     // Month data
 }
 
 
-type EventData = Tables<"Events">;
+export type CookingEventData = Tables<"Events">;
 export class CookingEvent {
-    private data: EventData;
-    constructor(data: EventData) {
+    private data: CookingEventData;
+    constructor(data: CookingEventData) {
         this.data = data;
     }
 
@@ -173,7 +208,7 @@ export class CookingEvent {
         return badges;
     }
 
-    getRawData(): EventData {
+    getRawData(): CookingEventData {
 	 return this.data;
     }
 }

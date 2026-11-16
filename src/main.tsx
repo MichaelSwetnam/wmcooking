@@ -13,6 +13,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import QueryClient from './lib/database/QueryClient.ts';
 import { UserProvider } from './components/Auth/UserProvider.tsx';
 import EditEvent from './routes/EditEvent.tsx';
+import { CreateEvent } from './routes/CreateEvent.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <QueryClientProvider client={QueryClient}>
@@ -24,6 +25,7 @@ createRoot(document.getElementById('root')!).render(
                 <div className='w-full bg-linear-to-b from-orange-50 via-white to-orange-100 rounded-xl p-3'>
                   <Routes>
 		    <Route path="/events" element={<Events />} />
+		    <Route path="/create-event" element={<CreateEvent />} />
 		    <Route path="/events/:id" element={<EventPage />} />
 		    <Route path="/events/:id/edit" element={<EditEvent />} />
                     <Route path="/health" element={<Health />} />
