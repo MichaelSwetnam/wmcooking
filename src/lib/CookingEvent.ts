@@ -98,6 +98,10 @@ export function useCookingEventAllergens(id: number) {
     return useQuery(_eventAllergensQuery(id))
 }
 
+export function updateCookingEventAllergens(id: number, allergens: string[]) {
+     throw Error("Not implemented!");
+}
+
 export async function createCookingEvent( data: Omit<CookingEventData, 'id'>): Promise<number> {
      if (!OAuth.isPrivileged()) throw new Error("Logged in user does not have permission to create events");
 

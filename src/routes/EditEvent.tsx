@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import ErrorComponent from "../components/Utility/ErrorComponent";
-import { updateCookingEvent, useCookingEvent, useCookingEventAllergens } from "../lib/CookingEvent";
+import { updateCookingEvent, updateCookingEventAllergens, useCookingEvent, useCookingEventAllergens } from "../lib/CookingEvent";
 import LoadingComponent from "../components/Utility/LoadingComponent";
 import { EventForm } from "../components/Forms/EventForm";
 
@@ -31,6 +31,7 @@ export default function EditEvent() {
 
      return <EventForm eventData={event.getRawData()} allergens={allergens} onSubmit={(data) => {
 	  updateCookingEvent(event.id, data.event);
+	  updateCookingEventAllergens(event.id, data.allergens);
 	  nav(`/events/${event.id}`);
      }}/>
 }

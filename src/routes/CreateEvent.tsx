@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { createCookingEvent, type CookingEventData } from "../lib/CookingEvent";
+import { createCookingEvent, updateCookingEventAllergens, type CookingEventData } from "../lib/CookingEvent";
 import { EventForm } from "../components/Forms/EventForm";
 
 const defaultData = {
@@ -12,6 +12,7 @@ export function CreateEvent() {
 
      return <EventForm eventData={defaultData} allergens={[]} onSubmit={async (data) => {
 	  const id = await createCookingEvent(data.event);
+	  updateCookingEventAllergens(id, data.allergens);
 	  nav(`/events/${id}`);
      }}/>
 }
