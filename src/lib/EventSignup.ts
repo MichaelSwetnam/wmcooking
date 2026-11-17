@@ -4,19 +4,14 @@ import { Supabase } from "./database/Supabase";
 import OAuth from "./OAuth";
 import QueryClient from "./database/QueryClient";
 import { CookingEvent } from "./CookingEvent";
-
-const QueryKeys = {
-     event: (eventId: number) => ["signups", "event", eventId],
-     single: (signupId: number) => ["signup", signupId]
-
-};
+import { QueryKeys } from "./QueryKeys";
 
 export async function invokeDeleteSignup(signup: EventSignup): Promise<Tables<"EventSignup">> {
      const user = await OAuth.getUser();
      if (!user) 
 	  throw new Error("Could not delete the signup, as there is no logged user.");
 
-     const cachedSignup = QueryClient.getQueryData(QueryKeys.single(signup.signupId));
+     const cachedSignup = QueryClient.getQueryData(QueryKeys.signups.single(signup.signupId));
      if (!cachedSignup)
 	  throw new Error("Could not delete signup, as it does not appear to exist.");
 
@@ -32,8 +27,8 @@ export async function invokeDeleteSignup(signup: EventSignup): Promise<Tables<"E
      const data = _data as { payload: Tables<"EventSignup"> };
 
      // Using the fresh data returned from the function, as we know that is not corrupted.
-     QueryClient.invalidateQueries({ queryKey: QueryKeys.single(data.payload.id) });
-     QueryClient.invalidateQueries({ queryKey: QueryKeys.event(data.payload.event_id) });
+     QueryClient.invalidateQueries({ queryKey: QueryKeys.signups.single(data.payload.id) });
+     QueryClient.invalidateQueries({ queryKey: QueryKeys.signups.event(data.payload.event_id) });
 
      return data.payload;
 }
@@ -43,7 +38,7 @@ export async function invokeInsertSignup(event: CookingEvent): Promise<EventSign
      if (!user)
 	  throw new Error("Could not insert signup, as there is no logged in user.");
 
-     const eventSignups = QueryClient.getQueryData(QueryKeys.event(event.id)) as EventSignup[] | undefined;
+     const eventSignups = QueryClient.getQueryData(QueryKeys.signups.event(event.id)) as EventSignup[] | undefined;
      if (!eventSignups)
 	  throw new Error("Invalid cache data for event. Try refreshing your page");
 
@@ -65,13 +60,13 @@ export async function invokeInsertSignup(event: CookingEvent): Promise<EventSign
      });
 
      // Using the fresh data returned from the function, as we know that is not corrupted.
-     QueryClient.invalidateQueries({ queryKey: QueryKeys.event(data.event_id) });
+     QueryClient.invalidateQueries({ queryKey: QueryKeys.signups.event(data.event_id) });
      return signupInstance;
 }
 
 export function useSignupsFromEvent(eventId: number) {
      return useQuery({
-	  queryKey: QueryKeys.event(eventId),
+	  queryKey: QueryKeys.signups.event(eventId),
 	  queryFn: async () => {
 	       const { data, error } = await Supabase
 		    .from("EventSignup")
@@ -92,7 +87,7 @@ export function useSignupsFromEvent(eventId: number) {
 		    }
 	       }).map(d => new EventSignup(d));
 
-	       signupInstances.forEach(s => QueryClient.setQueryData(QueryKeys.single(s.signupId), s));
+	       signupInstances.forEach(s => QueryClient.setQueryData(QueryKeys.signups.single(s.signupId), s));
 	       return signupInstances;
 	  }
      });

@@ -1,6 +1,7 @@
 import LoadingComponent from "../Utility/LoadingComponent";
 import ErrorComponent from "../Utility/ErrorComponent";
-import { CookingEvent, useCookingEventAllergens } from "../../lib/CookingEvent.ts";
+import { CookingEvent } from "../../lib/CookingEvent.ts";
+import { useCookingEventAllergens } from "../../lib/Allergens.ts";
 
 export default function AllergySection({ event }: { event: CookingEvent }) {
     const { data: allergies, error, isLoading } = useCookingEventAllergens(event.id);

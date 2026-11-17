@@ -1,14 +1,11 @@
 import type { Tables } from "./database/gen-types.ts";
 import QueryClient from "./database/QueryClient.ts";
 import { Supabase } from "./database/Supabase.ts";
-
-const QueryKeys = {
-     single: (id: string) => ["profile", id] as const,
-};
+import { QueryKeys } from "./QueryKeys.ts";
 
 export async function getProfile(id: string): Promise<ProfileData> {
      return await QueryClient.query({
-	  queryKey: QueryKeys.single(id),
+	  queryKey: QueryKeys.profile.single(id),
 	  queryFn: async () => {
 	       const { data, error } = await Supabase
 		    .from("Profiles")

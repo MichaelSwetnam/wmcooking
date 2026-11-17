@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import EventBadge from "./Badges";
 import LoadingComponent from "../Utility/LoadingComponent";
-import { CookingEvent, useCookingEventAllergens } from "../../lib/CookingEvent";
+import { CookingEvent } from "../../lib/CookingEvent";
 import ErrorComponent from "../Utility/ErrorComponent";
+import { useCookingEventAllergens } from "../../lib/Allergens";
 
 function AllergySection({ event }: { event: CookingEvent }) {
     const { data: allergens, isLoading, isError, error } = useCookingEventAllergens(event.id);

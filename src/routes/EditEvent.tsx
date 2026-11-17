@@ -1,8 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
 import ErrorComponent from "../components/Utility/ErrorComponent";
-import { updateCookingEvent, updateCookingEventAllergens, useCookingEvent, useCookingEventAllergens } from "../lib/CookingEvent";
+import { updateCookingEvent, useCookingEvent } from "../lib/CookingEvent";
 import LoadingComponent from "../components/Utility/LoadingComponent";
 import { EventForm } from "../components/Forms/EventForm";
+import { updateCookingEventAllergens, useCookingEventAllergens } from "../lib/Allergens";
 
 export default function EditEvent() {
      const { id } = useParams();

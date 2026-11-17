@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { createCookingEvent, updateCookingEventAllergens, type CookingEventData } from "../lib/CookingEvent";
+import { createCookingEvent, type CookingEventData } from "../lib/CookingEvent";
 import { EventForm } from "../components/Forms/EventForm";
+import { updateCookingEventAllergens } from "../lib/Allergens";
 
 const defaultData = {
      background_image: "https://ysqrkscfqagmvjdglxcb.supabase.co/storage/v1/object/public/Images/crimdell.jpg",

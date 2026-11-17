@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { Supabase } from "./database/Supabase";
+import { QueryKeys } from "./QueryKeys";
 
 const PREFIX = "https://ysqrkscfqagmvjdglxcb.supabase.co/storage/v1/object/public/Images/";
 
 export function useDatabaseImages() {
      return useQuery({
-	  queryKey: ["DatabaseImages"],
+	  queryKey: QueryKeys.images.self(),
 	  queryFn: async () => {
 	     let { data, error } = await Supabase
 		 .storage
