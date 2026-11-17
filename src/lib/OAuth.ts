@@ -61,7 +61,7 @@ class OAuth {
 	 }
 
 	const userProfile = await getProfile(id);
-        return new Profile(userProfile);
+        return userProfile;
     }
 
     async isPrivileged(): Promise<boolean> {

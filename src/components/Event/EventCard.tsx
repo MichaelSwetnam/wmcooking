@@ -10,6 +10,7 @@ function AllergySection({ event }: { event: CookingEvent }) {
 
     if (isLoading) return <LoadingComponent />
     if (isError) return <ErrorComponent message={error!.message} />
+    if (!allergens) throw Error("Unreachable");
 
     if (allergens.length <= 0)
 	 return <></>;

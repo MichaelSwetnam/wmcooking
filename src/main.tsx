@@ -14,6 +14,7 @@ import QueryClient from './lib/database/QueryClient.ts';
 import { UserProvider } from './components/Auth/UserProvider.tsx';
 import EditEvent from './routes/EditEvent.tsx';
 import { CreateEvent } from './routes/CreateEvent.tsx';
+import { EditProfile } from './routes/EditProfile.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <QueryClientProvider client={QueryClient}>
@@ -29,6 +30,7 @@ createRoot(document.getElementById('root')!).render(
 		    <Route path="/events/:id" element={<EventPage />} />
 		    <Route path="/events/:id/edit" element={<EditEvent />} />
                     <Route path="/health" element={<Health />} />
+		    <Route path="/profile" element={<EditProfile />} />
                     <Route path="/" element={<Home />} />
                     {/* 
                     <Route path="/events" element={<Events />} />
