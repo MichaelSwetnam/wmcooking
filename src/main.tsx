@@ -15,6 +15,7 @@ import { UserProvider } from './components/Auth/UserProvider.tsx';
 import EditEvent from './routes/EditEvent.tsx';
 import { CreateEvent } from './routes/CreateEvent.tsx';
 import { EditProfile } from './routes/EditProfile.tsx';
+import { Minesweeper } from './routes/Minesweeper.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <QueryClientProvider client={QueryClient}>
@@ -31,6 +32,7 @@ createRoot(document.getElementById('root')!).render(
 		    <Route path="/events/:id/edit" element={<EditEvent />} />
                     <Route path="/health" element={<Health />} />
 		    <Route path="/profile" element={<EditProfile />} />
+		    <Route path="/games/minesweeper" element={<Minesweeper />} />
                     <Route path="/" element={<Home />} />
                     {/* 
                     <Route path="/events" element={<Events />} />
